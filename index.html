@@ -1,0 +1,2588 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dionysos — Passerelle de Commandement</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Roboto+Mono:wght@300;400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:     #030508;
+  --deep:   #060b14;
+  --hull:   #0a1628;
+  --panel:  rgba(7,13,24,0.82);
+  --border: rgba(255,255,255,0.07);
+  --gold:   #c9a84c;
+  --goldl:  #e8c97a;
+  --teal:   #00c8d4;
+  --teall:  #5eeaf0;
+  --hal:    #dc2626;
+  --hall:   #ff4444;
+  --text:   #d8ecf5;
+  --muted:  #4a7090;
+  --danger: #e84040;
+  --warn:   #f0c040;
+  --ok:     #40c080;
+  --font-title: 'Cinzel', serif;
+  --font-data:  'Roboto Mono', monospace;
+  --font-body:  'Inter', sans-serif;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+html { scroll-behavior:smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+  padding-bottom: 80px;
+}
+
+/* ─── AMBIENT BACKGROUND ─── */
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background:
+    radial-gradient(ellipse at 10% 0%,   rgba(220,38,38,.06)   0%, transparent 45%),
+    radial-gradient(ellipse at 90% 5%,   rgba(0,200,212,.05)   0%, transparent 45%),
+    radial-gradient(ellipse at 50% 100%, rgba(201,168,76,.035) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 50%,  rgba(0,200,212,.02)   0%, transparent 60%);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* Subtle noise texture */
+body::after {
+  content:'';
+  position:fixed; inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:0;
+  opacity:.6;
+}
+
+/* ─── HEADER ─── */
+header {
+  position:sticky; top:0;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 32px;
+  background: linear-gradient(180deg, #010104 0%, rgba(3,6,14,.97) 100%);
+  border-bottom:1px solid rgba(220,38,38,.18);
+  z-index:100;
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+}
+header::after {
+  content:'';
+  position:absolute; bottom:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(220,38,38,.6) 25%, rgba(0,200,212,.5) 75%, transparent 100%);
+}
+
+/* HAL EYE */
+.hal-eye {
+  width:54px; height:54px; flex-shrink:0;
+  animation: hal-breathe 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 10px rgba(220,38,38,.55));
+}
+@keyframes hal-breathe {
+  0%,100% { filter: drop-shadow(0 0 8px  rgba(220,38,38,.5)); }
+  50%      { filter: drop-shadow(0 0 22px rgba(220,38,38,.95)); }
+}
+
+.header-logo { display:flex; align-items:center; gap:16px; }
+.header-title { font-family:var(--font-title); font-size:30px; color:#ffffff; letter-spacing:5px; font-weight:700; text-shadow:0 0 18px rgba(201,168,76,.4); }
+.header-sub   { font-size:10px; letter-spacing:5px; color:var(--muted); text-transform:uppercase; margin-top:3px; }
+.header-dir   { font-size:9px; letter-spacing:2px; color:rgba(74,112,144,.6); margin-top:3px; font-style:italic; }
+.header-clock { text-align:center; }
+#clock-time   { font-family:var(--font-data); font-size:38px; color:var(--teal); letter-spacing:4px; text-shadow:0 0 20px rgba(0,200,212,.4); }
+#clock-date   { font-size:11px; color:var(--muted); letter-spacing:2px; margin-top:5px; text-transform:capitalize; }
+.header-loc   { text-align:right; font-size:13px; color:var(--muted); }
+.header-loc strong { display:block; font-family:var(--font-data); font-size:15px; color:var(--text); margin-bottom:5px; }
+.status-dot {
+  display:inline-block; width:7px; height:7px;
+  border-radius:50%; background:var(--ok); box-shadow:0 0 8px var(--ok);
+  animation:pulse 2s ease-in-out infinite; margin-right:6px;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+/* ─── WORLD CLOCKS BAR ─── */
+.world-clocks-bar {
+  display:flex;
+  background: linear-gradient(180deg, rgba(1,2,6,1) 0%, rgba(3,6,14,.95) 100%);
+  border-bottom:1px solid rgba(201,168,76,.1);
+  position:relative; overflow:hidden; z-index:10;
+}
+.world-clocks-bar::before {
+  content:'';
+  position:absolute; top:0; left:-100%; width:60%; height:1px;
+  background: linear-gradient(90deg, transparent, rgba(0,200,212,.5), transparent);
+  animation:wc-scan 7s linear infinite; z-index:2;
+}
+@keyframes wc-scan { 0%{left:-60%} 100%{left:160%} }
+
+.wc-slot {
+  flex:1; display:flex; align-items:center; gap:14px;
+  padding:14px 28px;
+  border-right:1px solid rgba(255,255,255,.04);
+  position:relative; transition:background .35s; cursor:default;
+}
+.wc-slot:last-child { border-right:none; }
+.wc-slot:hover { background:rgba(0,200,212,.03); }
+.wc-slot::before {
+  content:''; position:absolute; left:0; top:25%; bottom:25%; width:2px;
+  background:var(--gold); opacity:0; transition:opacity .3s; border-radius:2px;
+}
+.wc-slot:hover::before { opacity:.6; }
+.wc-flag { font-size:26px; line-height:1; filter:drop-shadow(0 0 6px rgba(255,255,255,.12)); flex-shrink:0; }
+.wc-body { display:flex; flex-direction:column; gap:3px; flex:1; min-width:0; }
+.wc-city { font-family:var(--font-title); font-size:8px; letter-spacing:3.5px; color:var(--gold); text-transform:uppercase; opacity:.7; white-space:nowrap; }
+.wc-time { font-family:var(--font-data); font-size:24px; color:var(--teal); letter-spacing:2px; line-height:1; text-shadow:0 0 10px rgba(0,200,212,.3); }
+.wc-foot { display:flex; align-items:center; gap:7px; }
+.wc-tz   { font-family:var(--font-data); font-size:9px; letter-spacing:1.5px; color:var(--gold); opacity:.5; flex-shrink:0; }
+.wc-date { font-size:10px; color:var(--muted); letter-spacing:.5px; white-space:nowrap; }
+.wc-badge { font-size:7px; padding:1px 5px; border-radius:2px; background:rgba(240,192,64,.1); color:var(--warn); border:1px solid rgba(240,192,64,.2); letter-spacing:1px; text-transform:uppercase; flex-shrink:0; }
+
+/* ─── SECTION SEPARATOR ─── */
+.section-sep {
+  display:flex; align-items:center; gap:18px;
+  padding:22px 28px 0;
+  position:relative; z-index:1;
+}
+.section-sep-label {
+  font-family:var(--font-title);
+  font-size:8px; letter-spacing:5px; color:var(--gold);
+  text-transform:uppercase; opacity:.5; white-space:nowrap;
+}
+.section-sep::before, .section-sep::after {
+  content:''; flex:1; height:1px;
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,.18), transparent);
+}
+
+/* ─── GRID ─── */
+.grid {
+  display:grid; grid-template-columns:repeat(4,1fr);
+  gap:14px; padding:14px 24px 0;
+  position:relative; z-index:1;
+}
+.grid-full { grid-column:1/-1; }
+.grid-3    { grid-column:span 3; }
+.grid-1    { grid-column:span 1; }
+.grid-2    { grid-column:span 2; }
+
+/* ─── PANEL ─── */
+.panel {
+  background: var(--panel);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:20px;
+  position:relative; overflow:hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,.55),
+              inset 0 1px 0 rgba(255,255,255,.04);
+  transition:border-color .3s, box-shadow .3s;
+}
+.panel:hover {
+  border-color:rgba(0,200,212,.15);
+  box-shadow: 0 10px 40px rgba(0,0,0,.65),
+              inset 0 1px 0 rgba(255,255,255,.05),
+              0 0 0 1px rgba(0,200,212,.04);
+}
+.panel::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg, transparent, rgba(0,200,212,.4), transparent);
+  opacity:.5;
+}
+.panel-title {
+  font-size:9.5px; letter-spacing:4px; text-transform:uppercase;
+  color:#ffffff; font-weight:700; margin-bottom:16px;
+  display:flex; align-items:center; gap:9px;
+  text-shadow:0 0 10px rgba(201,168,76,.5);
+}
+.panel-title::after {
+  content:''; flex:1; height:1px;
+  background:linear-gradient(90deg, rgba(201,168,76,.25), transparent);
+}
+
+/* ─── GAUGE ─── */
+.gauge-wrap { display:flex; flex-direction:column; align-items:center; gap:4px; }
+.gauge-val  { font-family:var(--font-data); font-size:26px; color:var(--teal); }
+.gauge-unit { font-size:11px; color:var(--muted); }
+.gauge-lbl  { font-size:12px; color:var(--text); margin-top:4px; }
+svg.gauge   { width:90px; height:52px; overflow:visible; }
+
+/* ─── WEATHER ─── */
+.weather-main { display:flex; align-items:center; gap:16px; margin-bottom:16px; }
+.weather-icon { font-size:52px; line-height:1; }
+.weather-temp { font-family:var(--font-data); font-size:48px; color:var(--text); }
+.weather-temp sup { font-size:22px; color:var(--muted); }
+.weather-desc { font-size:14px; color:var(--muted); margin-top:4px; }
+.weather-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:4px; }
+.weather-cell { background:rgba(0,0,0,.25); border-radius:10px; padding:10px; text-align:center; border:1px solid rgba(255,255,255,.04); }
+.weather-cell .val { font-family:var(--font-data); font-size:18px; color:var(--teal); }
+.weather-cell .lbl { font-size:10px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-top:3px; }
+
+/* ─── MARINE ─── */
+.wave-anim  { width:100%; height:40px; margin-bottom:12px; position:relative; overflow:hidden; }
+.wave-anim svg { position:absolute; bottom:0; }
+.marine-grid  { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+.marine-item  { background:rgba(0,200,212,.05); border:1px solid rgba(0,200,212,.1); border-radius:10px; padding:12px; }
+.marine-item .val { font-family:var(--font-data); font-size:22px; }
+.marine-item .lbl { font-size:10px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; margin-top:3px; }
+
+/* ─── BITCOIN ─── */
+.btc-price  { font-family:var(--font-data); font-size:30px; color:var(--warn); letter-spacing:1px; margin-bottom:4px; }
+.btc-change { font-size:13px; }
+.btc-change.up   { color:var(--ok); }
+.btc-change.down { color:var(--danger); }
+.btc-sub    { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:14px; }
+.btc-cell   { background:rgba(0,0,0,.25); border-radius:8px; padding:8px 10px; border:1px solid rgba(255,255,255,.04); }
+.btc-cell .val { font-family:var(--font-data); font-size:14px; color:var(--text); }
+.btc-cell .lbl { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-top:2px; }
+canvas#btc-spark { width:100%; height:50px; border-radius:8px; background:rgba(0,0,0,.25); margin-top:14px; display:block; }
+.stocks-grid { display:grid; grid-template-columns:1fr 1fr; gap:7px; }
+.stock-card  { background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.05); border-radius:9px; padding:8px 10px; }
+.stock-ticker{ font-size:10px; letter-spacing:1.5px; color:var(--muted); text-transform:uppercase; margin-bottom:3px; }
+.stock-price { font-family:var(--font-data); font-size:15px; color:var(--text); }
+.stock-chg   { font-size:11px; margin-top:2px; }
+.stock-chg.up   { color:var(--ok); }
+.stock-chg.down { color:var(--danger); }
+
+/* ─── SERVER OFFLINE ─── */
+.server-offline {
+  text-align:center; padding:16px; color:var(--muted); font-size:13px;
+  border:1px dashed rgba(255,255,255,.1); border-radius:10px; margin-top:8px;
+}
+.server-offline code { font-family:var(--font-data); color:var(--gold); font-size:12px; display:block; margin-top:6px; }
+
+/* ─── NEWS MONDE ─── */
+.news-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+.news-item { display:flex; gap:10px; align-items:flex-start; padding:10px 12px; background:rgba(0,0,0,.25); border-radius:10px; border-left:2px solid rgba(0,200,212,.4); transition:background .2s, border-color .2s; }
+.news-item:hover { background:rgba(0,200,212,.06); border-left-color:var(--teal); }
+.news-num  { font-family:var(--font-data); font-size:18px; color:rgba(0,200,212,.3); min-width:24px; }
+.news-text { font-size:13px; color:var(--text); line-height:1.5; }
+.news-src  { font-size:10px; color:var(--muted); margin-top:4px; }
+
+/* ─── SEA CONDITIONS WEEK ─── */
+.seaweek-strip { display:grid; grid-template-columns:repeat(7,1fr); gap:10px; }
+.sw-day {
+  background:rgba(0,0,0,.3); border:1px solid rgba(255,255,255,.07); border-radius:12px;
+  padding:14px 10px 12px; text-align:center; transition:border-color .25s, background .25s;
+  position:relative; overflow:hidden;
+}
+.sw-day::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--teal),transparent); opacity:0; transition:opacity .3s; }
+.sw-day:hover::before  { opacity:.5; }
+.sw-day:hover          { border-color:rgba(0,200,212,.3); background:rgba(0,200,212,.04); }
+.sw-day.today          { border-color:rgba(0,200,212,.35); }
+.sw-day.today::before  { opacity:.6; }
+.sw-name      { font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:2px; }
+.sw-date-num  { font-family:var(--font-data); font-size:11px; color:var(--gold); opacity:.7; margin-bottom:10px; letter-spacing:1px; }
+.sw-wave-h    { font-family:var(--font-data); font-size:32px; line-height:1; letter-spacing:-1px; margin-bottom:2px; }
+.sw-wave-unit { font-size:10px; color:var(--muted); }
+.sw-divider   { height:1px; background:rgba(255,255,255,.06); margin:10px -10px; }
+.sw-wave-dir  { display:flex; align-items:center; justify-content:center; gap:5px; margin:6px 0 2px; }
+.sw-arrow     { display:inline-block; font-size:14px; color:var(--teal); transition:transform .3s; }
+.sw-wave-label { font-size:10px; color:var(--muted); letter-spacing:1px; }
+.sw-period    { font-family:var(--font-data); font-size:11px; color:rgba(0,200,212,.6); margin-bottom:8px; }
+.sw-wind      { display:flex; align-items:center; justify-content:center; gap:4px; margin-bottom:2px; }
+.sw-wind-spd  { font-family:var(--font-data); font-size:15px; }
+.sw-wind-unit { font-size:9px; color:var(--muted); }
+.sw-wind-dir  { font-size:9px; color:var(--gold); letter-spacing:1px; margin-left:2px; }
+.sw-temp      { font-family:var(--font-data); font-size:14px; color:#5bb8d4; margin-top:8px; display:flex; align-items:center; justify-content:center; gap:4px; }
+.sw-temp-ico  { font-size:12px; }
+
+/* ─── TRADUCTION DRAPEAUX ─── */
+.trans-flags {
+  display:inline-flex; gap:1px; flex-shrink:0; align-items:center; margin-left:5px;
+}
+.trans-flag-btn {
+  font-size:13px; cursor:pointer; opacity:0.45; transition:opacity .2s, transform .15s;
+  background:none; border:none; padding:1px 2px; line-height:1; border-radius:3px;
+}
+.trans-flag-btn:hover { opacity:1; transform:scale(1.15); }
+.trans-flag-btn.active { opacity:1; background:rgba(255,255,255,.08); }
+@media (max-width:768px) {
+  .trans-flag-btn { font-size:12px; }
+}
+
+/* ─── PRESSE ISRAÉLIENNE ─── */
+.israel-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:12px; margin-top:8px;
+}
+.israel-paper {
+  background:rgba(0,0,0,.3); border-radius:12px; padding:14px;
+  border-top:3px solid var(--gold);
+  transition:transform .2s, box-shadow .2s;
+}
+.israel-paper:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.4); }
+.israel-paper-name   { font-family:var(--font-title); font-size:12px; color:var(--goldl); margin-bottom:2px; letter-spacing:.3px; }
+.israel-paper-orient { font-size:10px; color:var(--muted); margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid rgba(255,255,255,.06); }
+.israel-headline { display:flex; align-items:flex-start; gap:4px; font-size:12px; color:var(--text); padding:6px 0; border-bottom:1px solid rgba(255,255,255,.04); line-height:1.45; cursor:default; transition:color .15s; }
+.israel-headline:last-child { border-bottom:none; }
+.israel-headline:hover { color:var(--teal); }
+.israel-headline a { flex:1; min-width:0; display:block; color:inherit; text-decoration:none; }
+.israel-headline a:hover { color:var(--teal); }
+
+/* ─── CALENDAR ─── */
+.cal-day { margin-bottom:16px; }
+.cal-day-title { font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#ffffff; font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+.cal-day-title::after { content:''; flex:1; height:1px; background:rgba(255,255,255,.07); }
+.cal-event { display:flex; gap:12px; align-items:flex-start; margin-bottom:8px; padding:10px; background:rgba(0,0,0,.25); border-radius:10px; }
+.cal-time  { font-family:var(--font-data); font-size:13px; color:var(--teal); min-width:52px; }
+.cal-title { font-size:13px; color:var(--text); }
+.cal-cal   { font-size:10px; color:var(--muted); margin-top:2px; }
+.cal-empty { font-size:13px; color:var(--muted); padding:10px; text-align:center; border:1px dashed rgba(255,255,255,.1); border-radius:10px; }
+
+/* ─── X / TWITTER ─── */
+.x-feeds-row { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-top:4px; }
+.x-feed-col  { display:flex; flex-direction:column; gap:8px; min-width:0; }
+.x-feed-head { display:flex; align-items:center; gap:10px; padding:8px 12px; background:rgba(0,0,0,.35); border-radius:10px; border-left:3px solid var(--teal); }
+.x-feed-avatar { width:28px; height:28px; border-radius:50%; background:var(--hull); border:1px solid rgba(255,255,255,.1); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+.x-feed-info   { display:flex; flex-direction:column; gap:1px; min-width:0; }
+.x-feed-name   { font-family:var(--font-title); font-size:10px; color:var(--goldl); letter-spacing:.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.x-feed-handle { font-family:var(--font-data); font-size:9px; color:var(--muted); }
+.x-feed-widget { height:520px; border-radius:10px; overflow-y:auto; overflow-x:hidden; background:rgba(0,0,0,.2); border:1px solid rgba(255,255,255,.06); padding:6px; scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.1) transparent; }
+.tweet-card    { background:rgba(255,255,255,.03); border-radius:8px; padding:10px 12px; margin-bottom:7px; border-left:2px solid rgba(0,200,212,.2); transition:border-color .2s, background .2s; cursor:default; }
+.tweet-card:hover { border-left-color:var(--teal); background:rgba(0,200,212,.05); }
+.tweet-text    { font-size:12px; color:var(--text); line-height:1.55; word-break:break-word; }
+.tweet-meta    { font-size:10px; color:var(--muted); margin-top:6px; display:flex; align-items:center; gap:6px; }
+.tweet-x-icon  { opacity:.35; font-size:9px; }
+.tweet-unavail { text-align:center; padding:40px 10px; font-size:12px; color:var(--muted); }
+
+/* ─── FORECAST ─── */
+.forecast-strip { display:grid; grid-template-columns:repeat(7,1fr); gap:8px; }
+.forecast-day   { background:rgba(0,0,0,.25); border-radius:10px; padding:12px 8px; text-align:center; border:1px solid rgba(255,255,255,.06); transition:border-color .2s; }
+.forecast-day:hover { border-color:rgba(0,200,212,.3); }
+.forecast-day .name { font-size:10px; color:var(--muted); letter-spacing:2px; text-transform:uppercase; }
+.forecast-day .icon { font-size:22px; margin:6px 0; }
+.forecast-day .temp { font-family:var(--font-data); font-size:14px; color:var(--text); }
+.forecast-day .wave { font-size:11px; color:var(--teal); margin-top:4px; }
+.forecast-day .wind { font-size:10px; color:var(--muted); margin-top:2px; }
+
+/* ─── PRESSE INTERNATIONALE ─── */
+.intl-region { margin-bottom:20px; }
+.intl-region:last-child { margin-bottom:0; }
+.intl-region-title { font-size:13px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#ffffff; margin-bottom:6px; display:flex; align-items:center; gap:8px; text-shadow:0 0 10px rgba(201,168,76,.3); }
+.intl-summary { font-size:12px; color:var(--muted); font-style:italic; line-height:1.5; margin-bottom:10px; padding:8px 12px; background:rgba(201,168,76,.05); border-left:2px solid rgba(201,168,76,.4); border-radius:0 6px 6px 0; }
+.intl-sources-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.intl-source { background:rgba(0,0,0,.25); border-radius:10px; padding:10px 12px; border:1px solid rgba(255,255,255,.04); }
+.intl-source-name { font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+.intl-headline { display:flex; align-items:flex-start; gap:4px; font-size:12px; color:var(--text); padding:4px 0; border-bottom:1px solid rgba(255,255,255,.05); line-height:1.4; transition:color .2s; }
+.intl-headline:last-child { border-bottom:none; }
+.intl-headline a { flex:1; min-width:0; color:inherit; text-decoration:none; display:block; }
+.intl-headline a:hover { color:var(--teal); }
+
+/* ─── LINKS ─── */
+.news-item a { color:inherit; text-decoration:none; }
+.news-item a:hover .item-title { color:var(--teal); }
+
+/* ─── ACTION BUTTONS ─── */
+.actions-bar { display:flex; gap:14px; flex-wrap:wrap; padding:14px 24px 20px; position:relative; z-index:1; }
+.action-btn {
+  flex:1; min-width:180px; padding:18px 24px; border-radius:12px; border:1px solid;
+  background:transparent; cursor:pointer; text-align:left; transition:all .2s;
+  text-decoration:none; display:flex; align-items:center; gap:14px; font-family:var(--font-body);
+}
+.action-btn .icon  { font-size:28px; }
+.action-btn .label { font-size:10px; letter-spacing:3px; text-transform:uppercase; display:block; }
+.action-btn .desc  { font-size:13px; margin-top:3px; }
+.action-btn.gold  { border-color:rgba(201,168,76,.35); color:var(--gold); }
+.action-btn.gold:hover  { background:rgba(201,168,76,.08); border-color:var(--gold); transform:translateY(-1px); }
+.action-btn.teal  { border-color:rgba(0,200,212,.25); color:var(--teal); }
+.action-btn.teal:hover  { background:rgba(0,200,212,.07); border-color:var(--teal); transform:translateY(-1px); }
+
+/* ─── BANNIÈRE RESTAURANT ─── */
+.resto-banner {
+  display:flex; align-items:center; justify-content:center; gap:14px;
+  margin:14px 24px 0; padding:14px 32px;
+  background:linear-gradient(90deg, rgba(201,168,76,.07) 0%, rgba(201,168,76,.13) 50%, rgba(201,168,76,.07) 100%);
+  border:1px solid rgba(201,168,76,.25); border-radius:12px;
+  text-decoration:none; color:var(--gold); transition:all .25s;
+  position:relative; z-index:1;
+}
+.resto-banner:hover { background:linear-gradient(90deg, rgba(201,168,76,.13) 0%, rgba(201,168,76,.2) 50%, rgba(201,168,76,.13) 100%); border-color:var(--gold); transform:translateY(-1px); }
+.resto-icon  { font-size:18px; }
+.resto-label { font-size:11px; font-weight:700; letter-spacing:4px; text-transform:uppercase; }
+.resto-arrow { font-size:14px; opacity:.6; transition:transform .2s; }
+.resto-banner:hover .resto-arrow { transform:translateX(4px); opacity:1; }
+
+/* ─── LOADING ─── */
+.loading { color:var(--muted); font-size:12px; letter-spacing:2px; animation:blink 1.2s infinite; }
+@keyframes blink { 0%,100%{opacity:.25} 50%{opacity:1} }
+
+/* ─── RADIO — EUROPE 1 ─── */
+#radio-bar {
+  position:fixed; bottom:0; left:0; right:0; z-index:9999;
+  background:linear-gradient(135deg, #08081a 0%, #10102a 100%);
+  border-top:1px solid rgba(201,168,76,.3);
+  display:flex; align-items:center; gap:20px;
+  padding:10px 28px; box-shadow:0 -4px 30px rgba(0,0,0,.7);
+  backdrop-filter:blur(10px);
+}
+#radio-bar .radio-logo { font-size:13px; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:#ffffff; white-space:nowrap; }
+#radio-bar .radio-logo span { color:#fff; }
+#radio-bar .radio-wave { display:flex; align-items:flex-end; gap:3px; height:22px; }
+#radio-bar .radio-wave .bar { width:3px; background:var(--gold); border-radius:2px; animation:wave-bar 1.1s ease-in-out infinite; }
+#radio-bar .radio-wave .bar:nth-child(1){height:8px;animation-delay:0s}
+#radio-bar .radio-wave .bar:nth-child(2){height:16px;animation-delay:.15s}
+#radio-bar .radio-wave .bar:nth-child(3){height:22px;animation-delay:.3s}
+#radio-bar .radio-wave .bar:nth-child(4){height:14px;animation-delay:.45s}
+#radio-bar .radio-wave .bar:nth-child(5){height:10px;animation-delay:.6s}
+#radio-bar .radio-wave.paused .bar { animation-play-state:paused; }
+@keyframes wave-bar { 0%,100%{transform:scaleY(.35)} 50%{transform:scaleY(1)} }
+#radio-bar .radio-info { flex:1; font-size:12px; color:var(--muted); letter-spacing:1px; }
+#radio-bar .radio-info strong { color:var(--text); font-size:13px; }
+#radio-toggle { background:none; border:1px solid rgba(201,168,76,.45); border-radius:50%; width:40px; height:40px; cursor:pointer; color:var(--gold); font-size:16px; display:flex; align-items:center; justify-content:center; transition:all .2s; }
+#radio-toggle:hover { background:rgba(201,168,76,.15); border-color:var(--gold); transform:scale(1.1); }
+#radio-vol { -webkit-appearance:none; appearance:none; width:90px; height:3px; background:rgba(255,255,255,.15); border-radius:3px; outline:none; cursor:pointer; }
+#radio-vol::-webkit-slider-thumb { -webkit-appearance:none; width:13px; height:13px; border-radius:50%; background:var(--gold); cursor:pointer; }
+#radio-close { background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer; padding:4px 8px; transition:color .2s; }
+#radio-close:hover { color:#fff; }
+
+
+/* ─── REFRESH BTN ─── */
+.refresh-btn {
+  position:fixed; bottom:80px; right:22px;
+  width:44px; height:44px; border-radius:50%;
+  background:rgba(7,13,24,.9); border:1px solid rgba(0,200,212,.3);
+  color:var(--teal); font-size:18px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  z-index:100; transition:all .2s;
+  backdrop-filter:blur(10px);
+}
+.refresh-btn:hover { border-color:var(--teal); background:rgba(0,200,212,.1); transform:scale(1.05); }
+.refresh-btn.spinning { animation:spin 1s linear infinite; }
+@keyframes spin { to{transform:rotate(360deg)} }
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(255,255,255,.12); border-radius:2px; }
+
+/* ════════════════════════════════
+   RESPONSIVE — MOBILE
+   ════════════════════════════════ */
+@media (max-width:768px) {
+  .grid { grid-template-columns:1fr !important; padding:10px 12px 0; gap:12px; }
+  .grid-full,.grid-3,.grid-2,.grid-1 { grid-column:1/-1 !important; }
+  header { padding:14px 14px; flex-wrap:wrap; gap:8px; position:relative; }
+  .header-title { font-size:22px; }
+  #clock-time { font-size:28px; }
+  .world-clocks-bar { overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; flex-wrap:nowrap; }
+  .world-clocks-bar::-webkit-scrollbar { display:none; }
+  .wc-slot { flex:0 0 auto; min-width:80px; padding:8px 10px; gap:7px; }
+  .wc-flag { font-size:20px; }
+  .wc-time { font-size:18px; }
+  .wc-city { font-size:7px; letter-spacing:2px; }
+  .wc-tz   { display:none; }
+  .wc-badge { display:none !important; }
+  .wc-foot { gap:3px; }
+  .panel { padding:14px; }
+  .weather-main { flex-direction:column; align-items:flex-start; }
+  .seaweek-strip { overflow-x:auto; -webkit-overflow-scrolling:touch; gap:6px; flex-wrap:nowrap; }
+  .sw-day { min-width:72px; }
+  .news-grid { grid-template-columns:1fr !important; }
+  .israel-grid { grid-template-columns:1fr 1fr !important; }
+  .intl-sources-grid { grid-template-columns:1fr !important; }
+  .x-feeds-row { display:flex !important; flex-direction:row !important; overflow-x:auto; -webkit-overflow-scrolling:touch; gap:10px; flex-wrap:nowrap; padding-bottom:8px; }
+  .x-feed-col { min-width:240px; flex:0 0 auto; }
+  .x-feed-widget { max-height:280px; }
+  .forecast-strip { overflow-x:auto; -webkit-overflow-scrolling:touch; flex-wrap:nowrap; }
+  .forecast-day { min-width:70px; flex:0 0 auto; }
+  .actions-bar { padding:10px 12px 80px; gap:10px; }
+  .action-btn { min-width:140px; padding:12px 14px; }
+  #radio-bar { padding:8px 14px; gap:10px; }
+  #radio-bar .radio-info { display:none; }
+  #radio-vol { width:60px; }
+  #radio-vol { width:60px; }
+  .refresh-btn { bottom:76px; right:14px; }
+  .section-sep { padding:14px 16px 0; }
+}
+@media (max-width:390px) {
+  .wc-slot { min-width:72px; padding:6px 7px; gap:5px; }
+  .wc-flag { font-size:18px; }
+  .wc-time { font-size:16px; }
+  .x-feed-col { min-width:200px; }
+}
+
+/* ── SYNTHÈSE DE PRESSE ── */
+.digest-wrap { padding: 10px 6px; }
+.digest-dateline {
+  font-family: var(--font-title);
+  font-size: 0.68rem;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+  padding-bottom: 20px;
+  margin-bottom: 28px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.digest-col-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+@media (max-width: 1100px) { .digest-col-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px)  { .digest-col-grid { grid-template-columns: 1fr; } }
+.digest-col {}
+.digest-col-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-title);
+  font-size: 0.62rem;
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: #ffffff;
+  font-weight: 700;
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(201,168,76,0.2);
+}
+.digest-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 16px;
+  padding-left: 12px;
+  border-left: 2px solid rgba(201,168,76,0.18);
+  transition: border-color .25s;
+}
+.digest-item:hover { border-left-color: var(--teal); }
+.digest-item a { color: inherit; text-decoration: none; }
+.digest-item a:hover .digest-headline-txt { color: rgba(100,210,230,0.95); }
+.digest-headline-txt {
+  font-family: var(--font-title);
+  font-size: 0.88rem;
+  font-weight: 300;
+  color: rgba(238,232,215,0.92);
+  line-height: 1.55;
+  letter-spacing: 0.01em;
+}
+.digest-item:hover .digest-headline-txt { color: rgba(100,210,230,0.95); }
+.digest-src {
+  font-family: var(--font-data);
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  margin-top: 4px;
+  opacity: 0.75;
+}
+
+/* ── RÉORDONNANCEMENT MOBILE : cams en premier ── */
+@media (max-width: 768px) {
+  .sections-reorder { display: flex; flex-direction: column; }
+  .sec-cams { order: -1; }
+}
+
+/* ── CAM GRID — mise en page desktop ── */
+@media (min-width: 769px) {
+  .cam-grid { grid-template-columns: 1fr 1fr 1fr 260px; grid-template-rows: auto auto; }
+  .cam-grid .panel.grid-3  { grid-column: 1 / 4; grid-row: 1; }
+  .cam-grid #beach-cams-strip { grid-column: 1 / 4; grid-row: 2; align-self: start; padding: 0; }
+  .cam-grid #marine-sidebar { grid-column: 4; grid-row: 1 / 3; }
+}
+/* Hauteur du player sur mobile */
+@media (max-width: 768px) {
+  #live-cam-wrap { height: 220px !important; }
+}
+
+/* ── ÉDITORIAL ── */
+.editorial-wrap { padding: 4px 0 8px; }
+.editorial-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  flex-wrap: wrap; gap: 8px; margin-bottom: 14px;
+  padding-bottom: 10px; border-bottom: 1px solid rgba(201,168,76,0.18);
+}
+.editorial-byline { font-size: 11px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; }
+.editorial-date   { font-size: 11px; color: var(--muted); letter-spacing: 1px; }
+.editorial-body { line-height: 1.82; color: var(--text); font-size: 14px; }
+.editorial-body p { margin-bottom: 16px; }
+.editorial-body p em { color: var(--goldl); font-style: italic; }
+.editorial-lede { font-size: 15px !important; color: rgba(255,255,255,0.88) !important; font-style: italic; border-left: 2px solid rgba(201,168,76,0.4); padding-left: 12px; margin-bottom: 20px !important; }
+.editorial-closing {
+  margin-top: 16px; padding-top: 10px;
+  border-top: 1px solid rgba(201,168,76,0.18);
+  font-size: 13px; color: var(--muted); font-style: italic; line-height: 1.6;
+}
+.editorial-sig {
+  margin-top: 10px; font-size: 12px; color: rgba(201,168,76,0.6);
+  letter-spacing: 2px; text-transform: uppercase;
+}
+/* ── ARCHIVE ÉDITORIAL ── */
+.edito-archive { margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 14px; }
+.edito-archive-header {
+  width:100%; background:none; border:1px solid rgba(201,168,76,0.2);
+  color:var(--muted); font-size:11px; letter-spacing:1.5px; text-transform:uppercase;
+  padding:9px 14px; border-radius:6px; cursor:pointer;
+  display:flex; justify-content:space-between; align-items:center;
+  transition:all 0.2s; text-align:left; font-family:inherit;
+}
+.edito-archive-header:hover { border-color:var(--gold); color:var(--goldl); background:rgba(201,168,76,0.04); }
+.edito-arc-chevron-main { font-size:11px; transition:transform 0.2s; }
+.edito-archive-list { padding:4px 0 0; }
+.edito-archive-item { border-bottom:1px solid rgba(255,255,255,0.04); }
+.edito-archive-item:last-child { border-bottom:none; }
+.edito-archive-toggle {
+  width:100%; background:none; border:none; color:var(--text);
+  padding:11px 2px; cursor:pointer; display:flex; justify-content:space-between;
+  align-items:center; font-size:12px; text-align:left; transition:color 0.2s; font-family:inherit;
+}
+.edito-archive-toggle:hover { color:var(--goldl); }
+.edito-arc-date { color:var(--muted); font-size:11px; letter-spacing:0.5px; flex:1; }
+.edito-arc-preview { color:rgba(255,255,255,0.3); font-size:11px; margin-left:10px; flex:2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.edito-arc-chev { color:var(--muted); font-size:10px; flex-shrink:0; margin-left:8px; transition:transform 0.2s; }
+.edito-archive-body {
+  padding:12px 0 18px; border-top:1px solid rgba(255,255,255,0.04);
+  opacity:0.88; animation:fadeIn .25s ease;
+}
+.edito-archive-body .editorial-body { font-size:13px; }
+.edito-archive-body .editorial-sig { font-size:11px; }
+/* ── REC BUTTON ── */
+.rec-btn {
+  background: none; border: 1px solid rgba(220,38,38,0.3); color: rgba(220,38,38,0.55);
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+  padding: 4px 9px; border-radius: 4px; cursor: pointer; font-family: var(--font-data);
+  display: flex; align-items: center; gap: 5px; transition: all 0.2s;
+  flex-shrink: 0;
+}
+.rec-btn:hover { border-color: rgba(220,38,38,0.7); color: rgba(220,38,38,0.9); background: rgba(220,38,38,0.05); }
+.rec-btn .rec-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(220,38,38,0.6); animation: rec-blink 1.4s ease-in-out infinite; }
+@keyframes rec-blink { 0%,100%{opacity:0.4} 50%{opacity:1} }
+.rec-edit-bar {
+  display: none; align-items: center; gap: 8px; margin-top: 10px;
+  padding: 8px 10px; background: rgba(220,38,38,0.06); border-radius: 6px;
+  border: 1px solid rgba(220,38,38,0.15);
+}
+.rec-edit-bar span { font-size: 11px; color: rgba(220,38,38,0.7); letter-spacing: 1px; flex: 1; }
+.rec-save-btn, .rec-cancel-btn, .rec-gen-btn {
+  font-size: 11px; padding: 4px 12px; border-radius: 4px; cursor: pointer;
+  font-family: var(--font-data); letter-spacing: 1px; transition: all 0.2s;
+}
+.rec-save-btn { background: rgba(64,192,128,0.15); border: 1px solid rgba(64,192,128,0.4); color: var(--ok); }
+.rec-save-btn:hover { background: rgba(64,192,128,0.25); }
+.rec-gen-btn { background: rgba(0,200,212,0.1); border: 1px solid rgba(0,200,212,0.3); color: var(--teal); }
+.rec-gen-btn:hover { background: rgba(0,200,212,0.2); border-color: var(--teal); }
+.rec-cancel-btn { background: none; border: 1px solid rgba(255,255,255,0.1); color: var(--muted); }
+.rec-cancel-btn:hover { border-color: rgba(255,255,255,0.3); color: var(--text); }
+[contenteditable="true"] { outline: 1px solid rgba(201,168,76,0.35) !important; border-radius: 4px; padding: 8px !important; }
+</style>
+<!-- Google Translate -->
+<script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<style>
+/* ─── LANGUAGE SWITCHER ─── */
+#google_translate_element { display:none; }
+.goog-te-banner-frame, .skiptranslate { display:none !important; }
+body { top:0 !important; }
+
+.lang-switcher {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.lang-btn {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 22px;
+  line-height: 1;
+  transition: all .2s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--muted);
+}
+.lang-btn:hover {
+  background: rgba(201,168,76,0.15);
+  border-color: var(--gold);
+  transform: scale(1.12);
+}
+.lang-btn.active {
+  background: rgba(201,168,76,0.22);
+  border-color: var(--gold);
+  box-shadow: 0 0 10px rgba(201,168,76,0.3);
+}
+.lang-btn span.lang-label {
+  font-size: 10px;
+  font-family: var(--font-body);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     HEADER
+     ══════════════════════════════════════ -->
+<header>
+  <div class="header-logo">
+
+    <!-- LOGO RENASSIA/A -->
+    <img src="logo_dionysos3.png" alt="Renassia" style="height:140px;width:140px;object-fit:contain;filter:drop-shadow(0 0 20px rgba(56,182,255,0.65));">
+
+    <div>
+      <div class="header-title">Revue de Presse</div>
+      <div class="lang-switcher">
+        <button class="lang-btn active" id="lang-fr" onclick="translateTo('fr')" title="Tout en Français">
+          🇫🇷 <span class="lang-label">FR</span>
+        </button>
+        <button class="lang-btn" id="lang-iw" onclick="translateTo('iw')" title="הכל בעברית">
+          🇮🇱 <span class="lang-label">עב</span>
+        </button>
+        <button class="lang-btn" id="lang-en" onclick="translateTo('en')" title="All in English">
+          🇺🇸 <span class="lang-label">EN</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Google Translate hidden element -->
+  <div id="google_translate_element"></div>
+
+  <div class="header-clock">
+    <div id="clock-time">--:--:--</div>
+    <div id="clock-date">Chargement…</div>
+  </div>
+
+  <div class="header-loc">
+    <strong>📍 <span id="loc-name">Césarée, Israël</span></strong>
+    <span class="status-dot"></span><span id="status-text" style="font-size:11px">Systèmes en ligne</span>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════
+     WORLD CLOCKS
+     ══════════════════════════════════════ -->
+<div class="world-clocks-bar">
+
+  <div class="wc-slot">
+    <div class="wc-flag">🇯🇵</div>
+    <div class="wc-body">
+      <div class="wc-city">Tokyo</div>
+      <div class="wc-time" id="wct-toronto">--:--:--</div>
+      <div class="wc-foot">
+        <span class="wc-tz"   id="wcz-toronto">---</span>
+        <span class="wc-date" id="wcd-toronto">---</span>
+        <span class="wc-badge" id="wcb-toronto" style="display:none"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="wc-slot">
+    <div class="wc-flag">🇺🇸</div>
+    <div class="wc-body">
+      <div class="wc-city">Washington D.C.</div>
+      <div class="wc-time" id="wct-washington">--:--:--</div>
+      <div class="wc-foot">
+        <span class="wc-tz"   id="wcz-washington">---</span>
+        <span class="wc-date" id="wcd-washington">---</span>
+        <span class="wc-badge" id="wcb-washington" style="display:none"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="wc-slot">
+    <div class="wc-flag">🇫🇷</div>
+    <div class="wc-body">
+      <div class="wc-city">Paris</div>
+      <div class="wc-time" id="wct-paris">--:--:--</div>
+      <div class="wc-foot">
+        <span class="wc-tz"   id="wcz-paris">---</span>
+        <span class="wc-date" id="wcd-paris">---</span>
+        <span class="wc-badge" id="wcb-paris" style="display:none"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="wc-slot">
+    <div class="wc-flag">🇻🇳</div>
+    <div class="wc-body">
+      <div class="wc-city">Hanoï</div>
+      <div class="wc-time" id="wct-taormina">--:--:--</div>
+      <div class="wc-foot">
+        <span class="wc-tz"   id="wcz-taormina">---</span>
+        <span class="wc-date" id="wcd-taormina">---</span>
+        <span class="wc-badge" id="wcb-taormina" style="display:none"></span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════
+     ÉDITORIAL HUMORISTIQUE — EN TÊTE DE PAGE
+     ══════════════════════════════════════ -->
+<div class="section-sep"><span class="section-sep-label">Éditorial</span></div>
+<div class="grid">
+  <div class="panel grid-full">
+    <div class="panel-title" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <span>Billet du Jour</span>
+      <span class="trans-flags" id="editorial-flags" style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+        <button class="trans-flag-btn" onclick="translateEditorial(this,'fr')">🇫🇷</button>
+        <button class="trans-flag-btn" onclick="translateEditorial(this,'iw')">🇮🇱</button>
+        <button class="trans-flag-btn" onclick="translateEditorial(this,'en')">🇬🇧</button>
+        <button class="rec-btn" id="rec-btn" onclick="recEditBillet()" title="Éditer le billet"><span class="rec-dot"></span>REC</button>
+      </span>
+    </div>
+    <div id="editorial-content" class="editorial-wrap">
+      <div class="loading">Rédaction du billet du jour…</div>
+    </div>
+    <div id="rec-edit-bar" class="rec-edit-bar">
+      <span id="rec-edit-status">✏️ Mode édition</span>
+      <button class="rec-gen-btn" onclick="recGenerate()">↺ Générer</button>
+      <button class="rec-save-btn" onclick="recSaveBillet()">Publier</button>
+      <button class="rec-cancel-btn" onclick="recCancelBillet()">Annuler</button>
+    </div>
+    <div id="editorial-archive"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     WRAPPER RÉORDONNANCEMENT MOBILE
+     ══════════════════════════════════════ -->
+<div class="sections-reorder">
+
+<!-- ── CONDITIONS ── -->
+<div class="sec-conditions">
+<div class="section-sep"><span class="section-sep-label">Conditions · Marchés</span></div>
+<div class="grid">
+
+  <div class="panel">
+    <div class="panel-title">☀️ Météo actuelle</div>
+    <div id="weather-content"><div class="loading">Connexion aux satellites…</div></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">🌊 Conditions marines</div>
+    <div id="marine-content"><div class="loading">Lecture des bouées…</div></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">📈 Cours Live</div>
+    <div id="btc-content"><div class="loading">Connexion aux marchés…</div></div>
+    <div id="stocks-content" style="margin-top:14px;"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">🌤️ Prévisions 3 jours</div>
+    <div id="forecast3-content"><div class="loading">Calcul des trajectoires…</div></div>
+  </div>
+
+</div>
+</div><!-- /sec-conditions -->
+
+<!-- ── CAMÉRAS LIVE ── -->
+<div class="sec-cams">
+<div class="section-sep"><span class="section-sep-label">Caméras Live · Mer</span></div>
+<link href="https://vjs.zencdn.net/8.6.1/video-js.css" rel="stylesheet">
+<script src="https://vjs.zencdn.net/8.6.1/video.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.13/dist/hls.min.js"></script>
+<div class="grid cam-grid" style="align-items:stretch;">
+
+  <!-- GRANDE CAMÉRA -->
+  <div class="panel grid-3" style="padding:0;overflow:hidden;display:flex;flex-direction:column;">
+    <div class="panel-title" id="live-cam-title"
+         style="padding:12px 18px 10px;margin:0;border-bottom:1px solid rgba(255,255,255,.07);
+                display:flex;align-items:center;gap:10px;flex-shrink:0;">
+      📷 <span id="live-cam-name">Sédot Yam · Freegull</span>
+      <span style="margin-left:auto;display:flex;align-items:center;gap:6px;
+                   font-size:10px;color:var(--hal);font-weight:700;letter-spacing:2px;">
+        <span style="width:7px;height:7px;background:var(--hal);border-radius:50%;
+                     display:inline-block;animation:blink 1s infinite;
+                     box-shadow:0 0 6px var(--hal);"></span>EN DIRECT
+      </span>
+    </div>
+    <div id="live-cam-wrap" style="background:#000;width:100%;height:460px;overflow:hidden;position:relative;">
+      <video id="live-cam" class="video-js vjs-default-skin vjs-big-play-centered"
+             controls muted playsinline style="width:100%;height:100%;position:absolute;top:0;left:0;">
+      </video>
+      <div id="kotel-yt-wrap" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;">
+        <iframe id="kotel-yt-frame" src="" style="width:100%;height:100%;border:0;"
+          allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- STRIP MINI-CAMÉRAS (between main cam and sidebar so mobile order is correct) -->
+  <div id="beach-cams-strip"
+       style="display:flex;gap:10px;overflow-x:auto;
+              -webkit-overflow-scrolling:touch;padding-bottom:6px;scrollbar-width:thin;
+              scrollbar-color:rgba(255,255,255,.12) transparent;"></div>
+
+  <!-- MÉTÉO MARINE SIDEBAR -->
+  <div id="marine-sidebar" class="panel" style="overflow-y:auto;padding:14px 12px;">
+    <div class="panel-title" style="margin-bottom:10px;">🌊 Mer · <span id="marine-sidebar-loc"></span></div>
+    <div id="marine-sidebar-content"><div class="loading">Chargement…</div></div>
+    <div id="marine-sidebar-week"></div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const BEACH_CAMS = [
+    // ── HLS testés 200 ──
+    { name:'Sédot Yam · Césarée',      type:'hls', stream:'https://s75.ipcamlive.com/streams/4bfay86s7cqyxu9ej/stream.m3u8',   lat:32.4994, lon:34.9006, locName:'Césarée' },
+    { name:'Haïfa · Bat Galim',        type:'hls', stream:'https://s5.ipcamlive.com/streams/05wx9zunsr5qp6l43/stream.m3u8',   lat:32.8352, lon:34.9641, locName:'Haïfa · Bat Galim' },
+    { name:'Haïfa · Krayot',           type:'hls', stream:'https://s122.ipcamlive.com/streams/7ayowdseo0x27undj/stream.m3u8',  lat:32.8466, lon:35.0085, locName:'Haïfa · Krayot' },
+    { name:'Tel Aviv · Hilton · Yamit', type:'hls', stream:'https://s122.ipcamlive.com/streams/7ajncq4mkgrume5s9/stream.m3u8', lat:32.0938, lon:34.7638, locName:'Tel Aviv · Hilton' },
+    { name:'Tel Aviv · Dolphinarium',   type:'hls', stream:'https://s31.ipcamlive.com/streams/1f2jwqhrkuwap1shm/stream.m3u8',  lat:32.0895, lon:34.7652, locName:'Tel Aviv · Dolphinarium' },
+    { name:'Tel Aviv · Yafo',           type:'hls', stream:'https://s75.ipcamlive.com/streams/4bdfbailjelwzv8qy/stream.m3u8',  lat:32.0503, lon:34.7480, locName:'Tel Aviv · Yafo' },
+    { name:'Herzliya · Marina',         type:'hls', stream:'https://s75.ipcamlive.com/streams/4bmg1hmlafovvp4bt/stream.m3u8',  lat:32.1480, lon:34.8010, locName:'Herzliya' },
+    { name:'Haïfa · Méridian',          type:'hls', stream:'https://s44.ipcamlive.com/streams/2cpsqhf35xtwpmudd/stream.m3u8',  lat:32.8294, lon:34.9601, locName:'Haïfa · Méridian' },
+  ];
+
+  window._BEACH_CAMS = BEACH_CAMS;
+  let mainPlayer = null;
+
+  function initMainPlayer() {
+    if (typeof videojs === 'undefined') { setTimeout(initMainPlayer, 300); return; }
+    mainPlayer = videojs('live-cam', {
+      controls: true,
+      autoplay: 'muted',
+      muted: true,
+      liveui: true,
+      html5: {
+        vhs: { overrideNative: false, enableLowInitialPlaylist: true, limitRenditionByPlayerDimensions: true },
+        nativeVideoTracks: true, nativeAudioTracks: true, nativeTextTracks: true,
+      }
+    }, function onReady() {
+      // Load first camera (HLS)
+      switchCam(0);
+    });
+    // Sync weather once all scripts loaded
+    setTimeout(function() {
+      const c = BEACH_CAMS[0];
+      if (c && c.lat && typeof switchBeachWeather === 'function') {
+        switchBeachWeather(c.lat, c.lon, c.locName);
+      }
+    }, 1200);
+  }
+
+  function switchCam(idx) {
+    const cam = BEACH_CAMS[idx];
+    document.getElementById('live-cam-name').textContent = cam.name;
+
+    const ytWrap   = document.getElementById('kotel-yt-wrap');
+    const ytFrame  = document.getElementById('kotel-yt-frame');
+    const hlsVideo = document.getElementById('live-cam');
+    const camWrap  = document.getElementById('live-cam-wrap');
+
+    // Remove any existing ipcam iframe
+    const oldIframe = document.getElementById('ipcam-iframe');
+    if (oldIframe) oldIframe.remove();
+
+    if (cam.type === 'youtube') {
+      hlsVideo.style.display = 'none';
+      if (mainPlayer) mainPlayer.pause();
+      ytFrame.src = `https://www.youtube.com/embed/${cam.videoId}?autoplay=1&mute=1&rel=0`;
+      ytWrap.style.display = 'block';
+    } else if (cam.type === 'ipcam') {
+      hlsVideo.style.display = 'none';
+      if (mainPlayer) mainPlayer.pause();
+      ytWrap.style.display = 'none';
+      ytFrame.src = '';
+      const iframe = document.createElement('iframe');
+      iframe.id = 'ipcam-iframe';
+      iframe.src = `https://ipcamlive.com/player/player.php?alias=${cam.alias}&autoplay=1`;
+      iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:0;';
+      iframe.allow = 'autoplay; encrypted-media';
+      iframe.allowFullscreen = true;
+      camWrap.appendChild(iframe);
+    } else {
+      // HLS stream
+      ytWrap.style.display = 'none';
+      ytFrame.src = '';
+      hlsVideo.style.display = 'block';
+      if (mainPlayer && !mainPlayer.isDisposed()) {
+        mainPlayer.src({ src: cam.stream, type: 'application/x-mpegURL' });
+        mainPlayer.play().catch(() => {});
+      }
+    }
+
+    document.querySelectorAll('.beach-mini-wrap').forEach((el, i) => {
+      el.style.borderColor = i === idx ? 'var(--gold)' : 'rgba(255,255,255,.1)';
+      el.style.transform   = i === idx ? 'scale(1.04)' : 'scale(1)';
+    });
+
+    // Update weather to the selected beach's location
+    if (cam.lat && cam.lon && cam.locName) {
+      if (typeof switchBeachWeather === 'function') switchBeachWeather(cam.lat, cam.lon, cam.locName);
+    }
+  }
+
+  window._switchCam = switchCam;
+
+  // Attache un flux HLS à un <video> via hls.js (Chrome/Firefox) ou nativement (Safari)
+  function attachHLS(video, url) {
+    if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      // Safari — HLS natif
+      video.src = url;
+      video.play().catch(() => {});
+    } else if (typeof Hls !== 'undefined' && Hls.isSupported()) {
+      const hls = new Hls({
+        maxBufferLength: 8,
+        maxMaxBufferLength: 15,
+        liveSyncDurationCount: 2,
+        liveMaxLatencyDurationCount: 5,
+        enableWorker: true,
+        lowLatencyMode: false,
+      });
+      hls.loadSource(url);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => { video.play().catch(() => {}); });
+      hls.on(Hls.Events.ERROR, (e, data) => {
+        if (data.fatal) {
+          // Tentative de récupération
+          if (data.type === Hls.ErrorTypes.NETWORK_ERROR) hls.startLoad();
+          else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) hls.recoverMediaError();
+          else hls.destroy();
+        }
+      });
+      video._hls = hls;
+    }
+  }
+
+  const strip = document.getElementById('beach-cams-strip');
+  BEACH_CAMS.forEach((cam, i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'beach-mini-wrap';
+    wrap.style.cssText = `flex:0 0 auto;cursor:pointer;border-radius:10px;overflow:hidden;
+      border:2px solid ${i===0?'var(--gold)':'rgba(255,255,255,.1)'};
+      transition:all .2s;transform:${i===0?'scale(1.04)':'scale(1)'};background:#000;
+      box-shadow:${i===0?'0 4px 16px rgba(201,168,76,.2)':'none'};`;
+
+    const thumb = document.createElement('div');
+    thumb.style.cssText = 'width:150px;height:85px;position:relative;background:#000;overflow:hidden;';
+
+    if (cam.type === 'youtube') {
+      // YouTube : miniature statique (pas de streaming possible cross-origin)
+      const img = document.createElement('img');
+      img.src = `https://img.youtube.com/vi/${cam.videoId}/mqdefault.jpg`;
+      img.style.cssText = 'width:150px;height:85px;display:block;object-fit:cover;';
+      img.onerror = () => { img.style.display='none'; };
+      thumb.appendChild(img);
+      const playO = document.createElement('div');
+      playO.style.cssText = `position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+        width:30px;height:30px;background:rgba(255,0,0,.85);border-radius:50%;
+        display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;pointer-events:none;`;
+      playO.textContent = '▶';
+      thumb.appendChild(playO);
+    } else if (cam.type === 'ipcam') {
+      // ipcamlive — petit iframe live chargé en décalé
+      const iframeWrap = document.createElement('div');
+      iframeWrap.style.cssText = 'width:150px;height:85px;overflow:hidden;position:relative;background:#000;';
+      const miniFrame = document.createElement('iframe');
+      miniFrame.style.cssText = `width:300px;height:170px;border:0;
+        transform:scale(0.5);transform-origin:top left;
+        pointer-events:none;position:absolute;top:0;left:0;`;
+      miniFrame.allow = 'autoplay; encrypted-media';
+      // Chargement décalé pour ne pas bloquer le rendu initial
+      setTimeout(() => {
+        miniFrame.src = `https://ipcamlive.com/player/player.php?alias=${cam.alias}&autoplay=1`;
+      }, 1500 + i * 400);
+      iframeWrap.appendChild(miniFrame);
+      // Fallback visible jusqu'au chargement
+      const fallbackMini = document.createElement('div');
+      fallbackMini.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;
+        display:flex;align-items:center;justify-content:center;
+        background:linear-gradient(135deg,#060d1a,#0a1628);font-size:18px;pointer-events:none;`;
+      fallbackMini.textContent = '📷';
+      iframeWrap.appendChild(fallbackMini);
+      miniFrame.addEventListener('load', () => { fallbackMini.style.display = 'none'; });
+      thumb.appendChild(iframeWrap);
+    } else {
+      // Flux HLS — vidéo live via hls.js
+      const vid = document.createElement('video');
+      vid.muted = true;
+      vid.autoplay = true;
+      vid.playsInline = true;
+      vid.style.cssText = 'width:150px;height:85px;display:block;object-fit:cover;';
+      // Overlay de chargement / hors-ligne
+      const fallback = document.createElement('div');
+      fallback.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;
+        display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+        background:linear-gradient(135deg,#060d1a,#0a1628);
+        transition:opacity .4s;pointer-events:none;`;
+      const fbIcon = document.createElement('div');
+      fbIcon.style.cssText = 'font-size:20px;opacity:.5;';
+      fbIcon.textContent = '📷';
+      const fbLabel = document.createElement('div');
+      fbLabel.style.cssText = 'font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;';
+      fbLabel.textContent = 'Chargement…';
+      fallback.appendChild(fbIcon);
+      fallback.appendChild(fbLabel);
+      thumb.appendChild(fallback);
+      vid.addEventListener('playing', () => { fallback.style.opacity = '0'; });
+      vid.addEventListener('waiting', () => { fallback.style.opacity = '1'; fbLabel.textContent = 'Chargement…'; });
+      vid.addEventListener('error',   () => { fallback.style.opacity = '1'; fbLabel.textContent = 'Hors ligne'; fbIcon.textContent = '📵'; });
+      thumb.appendChild(vid);
+      // Lance le flux (après un délai pour ne pas tout charger en même temps)
+      setTimeout(() => attachHLS(vid, cam.stream), 800 + i * 600);
+    }
+
+    // Badge LIVE
+    const badge = document.createElement('div');
+    badge.style.cssText = `position:absolute;top:5px;right:5px;background:#dc2626;color:#fff;
+      font-size:7px;font-weight:700;padding:2px 5px;border-radius:3px;letter-spacing:1.5px;
+      animation:blink 1.4s infinite;pointer-events:none;`;
+    badge.textContent = 'LIVE';
+    thumb.appendChild(badge);
+
+    wrap.appendChild(thumb);
+
+    const label = document.createElement('div');
+    label.className = 'beach-mini-label';
+    label.style.cssText = `padding:5px 8px;font-size:9px;letter-spacing:1px;
+      color:${i===0?'var(--gold)':'var(--muted)'};text-align:center;
+      background:rgba(3,5,8,.9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;`;
+    label.textContent = cam.name;
+    wrap.appendChild(label);
+
+    wrap.addEventListener('click', () => {
+      switchCam(i);
+      document.querySelectorAll('.beach-mini-label').forEach((l, j) => {
+        l.style.color = j === i ? 'var(--gold)' : 'var(--muted)';
+      });
+    });
+    strip.appendChild(wrap);
+  });
+
+  initMainPlayer();
+})();
+</script>
+</div><!-- /sec-cams -->
+</div><!-- /sections-reorder -->
+
+<!-- ══════════════════════════════════════
+     SYNTHÈSE DE PRESSE
+     ══════════════════════════════════════ -->
+<div class="section-sep"><span class="section-sep-label">Synthèse</span></div>
+<div class="grid">
+  <div class="panel grid-full">
+    <div class="panel-title">✒️ Revue de Presse</div>
+    <div id="digest-content"><div class="loading">Compilation des dépêches en cours…</div></div>
+    <div id="news-showbiz-content" style="display:none;"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     ROW 2C — PRESSE ISRAÉLIENNE
+     ══════════════════════════════════════ -->
+<div class="section-sep"><span class="section-sep-label">Presse Israélienne</span></div>
+<div class="grid">
+  <div class="panel grid-full">
+    <div class="panel-title">🇮🇱 Presse Israélienne — Kiosque complet</div>
+    <div id="news-israel-content">
+      <div class="loading">Connexion aux kiosques de Tel-Aviv et Jérusalem…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     ROW 3 — PRESSE INTERNATIONALE
+     ══════════════════════════════════════ -->
+<div class="section-sep"><span class="section-sep-label">Presse Internationale</span></div>
+<div class="grid">
+  <div class="panel grid-full">
+    <div class="panel-title">🌍 Presse Internationale — USA · Liban · Chine · Iran · Russie</div>
+    <div id="news-intl-content">
+      <div class="loading">Écoute des capitales du monde…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     ROW 4 — REVUE DE PRESSE MONDIALE
+     ══════════════════════════════════════ -->
+<div class="section-sep"><span class="section-sep-label">Revue de Presse</span></div>
+<div class="grid">
+  <div class="panel grid-full">
+    <div class="panel-title">📡 Revue de Presse Internationale</div>
+    <div id="news-world-content">
+      <div class="loading">Écoute des ondes courtes…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     ACTIONS
+     ══════════════════════════════════════ -->
+<div class="actions-bar">
+  <button class="action-btn teal" onclick="refreshAll()">
+    <span class="icon">🔄</span>
+    <div>
+      <span class="label">Systèmes</span>
+      <span class="desc">Actualiser le tableau de bord</span>
+    </div>
+  </button>
+</div>
+
+<button class="refresh-btn" id="refresh-btn" onclick="refreshAll()" title="Actualiser">↻</button>
+
+<!-- ══════════════════════════════════════
+     SCRIPTS PRINCIPAUX
+     ══════════════════════════════════════ -->
+<script>
+// ═══ CONFIG ═══
+let LAT  = 32.4994;
+let LON  = 34.9006;
+const DEFAULT_LAT = 32.4994;
+const DEFAULT_LON = 34.9006;
+const TZ   = 'Asia/Jerusalem';
+const LOCAL_SERVER = 'http://localhost:8765';
+const DAYS_FR   = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+const MONTHS_FR = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+
+// ═══ HORLOGES MONDIALES ═══
+const WORLD_CLOCKS = [
+  { id:'toronto',    tz:'Asia/Tokyo'       },
+  { id:'washington', tz:'America/New_York' },
+  { id:'paris',      tz:'Europe/Paris'     },
+  { id:'taormina',   tz:'Asia/Ho_Chi_Minh' },
+];
+
+function getTZAbbr(date, tz) {
+  try {
+    const s = date.toLocaleTimeString('en-GB', {timeZone:tz, timeZoneName:'short'});
+    const w = s.split(' ');
+    return w[w.length-1] || '';
+  } catch(e) { return ''; }
+}
+
+function updateWorldClocks(now) {
+  try {
+    const homeISO = now.toLocaleDateString('sv-SE', {timeZone:'Asia/Jerusalem'});
+    WORLD_CLOCKS.forEach(function(c) {
+      var tE = document.getElementById('wct-'+c.id);
+      var zE = document.getElementById('wcz-'+c.id);
+      var dE = document.getElementById('wcd-'+c.id);
+      var bE = document.getElementById('wcb-'+c.id);
+      if (!tE||!zE||!dE) return;
+      tE.textContent = now.toLocaleTimeString('fr-FR',{timeZone:c.tz,hour:'2-digit',minute:'2-digit',second:'2-digit'});
+      zE.textContent = getTZAbbr(now,c.tz);
+      dE.textContent = now.toLocaleDateString('fr-FR',{timeZone:c.tz,weekday:'short',day:'numeric',month:'short'});
+      if (bE) {
+        var remISO = now.toLocaleDateString('sv-SE',{timeZone:c.tz});
+        if (remISO < homeISO)      { bE.textContent='VEILLE'; bE.style.display='inline-block'; }
+        else if (remISO > homeISO) { bE.textContent='DEMAIN'; bE.style.display='inline-block'; }
+        else                       { bE.style.display='none'; }
+      }
+    });
+  } catch(e) {}
+}
+
+// ═══ CLOCK ═══
+function updateClock() {
+  var now = new Date();
+  document.getElementById('clock-time').textContent =
+    now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  document.getElementById('clock-date').textContent =
+    now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  updateWorldClocks(now);
+}
+setInterval(updateClock,1000);
+updateClock();
+
+// ═══ WEATHER CODES ═══
+function wmoIcon(code) {
+  if (code===0)  return '☀️';
+  if (code<=3)   return '⛅';
+  if (code<=48)  return '🌫️';
+  if (code<=55)  return '🌦️';
+  if (code<=65)  return '🌧️';
+  if (code<=75)  return '🌨️';
+  if (code<=82)  return '🌦️';
+  return '⛈️';
+}
+function wmoLabel(code) {
+  if (code===0)  return 'Ciel dégagé';
+  if (code===1)  return 'Peu nuageux';
+  if (code===2)  return 'Partiellement nuageux';
+  if (code===3)  return 'Couvert';
+  if (code<=48)  return 'Brumeux';
+  if (code<=55)  return 'Bruine';
+  if (code<=65)  return 'Pluie';
+  if (code<=75)  return 'Neige';
+  if (code<=82)  return 'Averses';
+  return 'Orage';
+}
+
+// ═══ WIND ═══
+function windDir(deg) {
+  const dirs=['N','NE','E','SE','S','SO','O','NO'];
+  return dirs[Math.round(deg/45)%8];
+}
+function windColor(spd) {
+  if (spd<20) return 'var(--ok)';
+  if (spd<40) return 'var(--warn)';
+  return 'var(--danger)';
+}
+function waveColor(h) {
+  if (h<0.5) return 'var(--ok)';
+  if (h<1.5) return 'var(--teal)';
+  if (h<3)   return 'var(--warn)';
+  return 'var(--danger)';
+}
+
+// ═══ SVG GAUGE ═══
+function polarXY(cx,cy,r,angleDeg) {
+  const rad=(angleDeg-90)*Math.PI/180;
+  return {x:cx+r*Math.cos(rad), y:cy+r*Math.sin(rad)};
+}
+function arcPath(cx,cy,r,a1,a2) {
+  const s=polarXY(cx,cy,r,a1);
+  const e=polarXY(cx,cy,r,a2);
+  const lg=a2-a1>180?1:0;
+  return `M ${s.x.toFixed(1)} ${s.y.toFixed(1)} A ${r} ${r} 0 ${lg} 1 ${e.x.toFixed(1)} ${e.y.toFixed(1)}`;
+}
+function gauge(val,max,color,unit,label) {
+  const pct=Math.min(Math.max(val/max,0),1);
+  const start=135, span=270;
+  const end=start+span*pct;
+  const bg=arcPath(45,45,35,start,start+span);
+  const fg=pct>0?arcPath(45,45,35,start,end):'';
+  const needle=polarXY(45,45,28,end);
+  return `<svg class="gauge" viewBox="0 0 90 70" xmlns="http://www.w3.org/2000/svg">
+    <path d="${bg}" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="7" stroke-linecap="round"/>
+    ${fg?`<path d="${fg}" fill="none" stroke="${color}" stroke-width="7" stroke-linecap="round" filter="url(#glow)"/>`:''}
+    <defs><filter id="glow"><feGaussianBlur stdDeviation="2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    <line x1="45" y1="45" x2="${needle.x.toFixed(1)}" y2="${needle.y.toFixed(1)}" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="45" cy="45" r="4" fill="var(--gold)"/>
+    <text x="45" y="63" text-anchor="middle" font-size="9" fill="${color}" font-family="Roboto Mono,monospace">${val}${unit}</text>
+    <text x="45" y="72" text-anchor="middle" font-size="7" fill="#4a7090" font-family="Inter,sans-serif">${label}</text>
+  </svg>`;
+}
+
+// ═══ WIND COMPASS ═══
+function windCompassSvg(deg,size=36) {
+  const r=size/2;
+  const tip=polarXY(r,r,r-4,deg);
+  const tail=polarXY(r,r,r-4,deg+180);
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <circle cx="${r}" cy="${r}" r="${r-1}" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
+    <line x1="${tail.x.toFixed(1)}" y1="${tail.y.toFixed(1)}" x2="${tip.x.toFixed(1)}" y2="${tip.y.toFixed(1)}" stroke="var(--teal)" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="${tip.x.toFixed(1)}" cy="${tip.y.toFixed(1)}" r="3" fill="var(--gold)"/>
+  </svg>`;
+}
+
+// ═══ BEACH WEATHER SWITCH ═══
+function switchBeachWeather(lat, lon, locName) {
+  LAT = lat;
+  LON = lon;
+  const locEl = document.getElementById('loc-name');
+  if (locEl) locEl.textContent = locName + ', Israël';
+  const sidebarLoc = document.getElementById('marine-sidebar-loc');
+  if (sidebarLoc) sidebarLoc.textContent = locName;
+  fetchWeather();
+  fetchMarine();
+  fetchForecast3();
+}
+
+// ═══ WEATHER ═══
+async function fetchWeather() {
+  try {
+    const url=`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}`+
+      `&current=temperature_2m,apparent_temperature,weathercode,windspeed_10m,winddirection_10m,relativehumidity_2m`+
+      `&timezone=${TZ}`;
+    const r=await fetch(url);
+    const d=await r.json();
+    const c=d.current;
+    document.getElementById('weather-content').innerHTML=`
+      <div class="weather-main">
+        <div class="weather-icon">${wmoIcon(c.weathercode)}</div>
+        <div>
+          <div class="weather-temp">${Math.round(c.temperature_2m)}<sup>°C</sup></div>
+          <div class="weather-desc">${wmoLabel(c.weathercode)} · Ressenti ${Math.round(c.apparent_temperature)}°C</div>
+        </div>
+      </div>
+      <div class="weather-grid">
+        <div class="weather-cell">
+          ${gauge(Math.round(c.windspeed_10m),80,windColor(c.windspeed_10m),'','')}
+          <div class="val" style="color:${windColor(c.windspeed_10m)};font-family:var(--font-data);font-size:16px">${Math.round(c.windspeed_10m)} km/h</div>
+          <div class="lbl">Vent ${windDir(c.winddirection_10m)}</div>
+        </div>
+        <div class="weather-cell">
+          ${gauge(c.relativehumidity_2m,100,'var(--teal)','','')}
+          <div class="val" style="color:var(--teal);font-family:var(--font-data);font-size:16px">${c.relativehumidity_2m}%</div>
+          <div class="lbl">Humidité</div>
+        </div>
+        <div class="weather-cell" style="display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <div style="font-size:32px">${windCompassSvg(c.winddirection_10m,52)}</div>
+          <div class="val" style="font-size:16px;font-family:var(--font-data);color:var(--gold)">${windDir(c.winddirection_10m)}</div>
+          <div class="lbl">Direction</div>
+        </div>
+      </div>`;
+  } catch(e) {
+    document.getElementById('weather-content').innerHTML=`<div class="server-offline">Données météo indisponibles<code>Vérifiez la connexion</code></div>`;
+  }
+}
+
+// ═══ MARINE ═══
+async function fetchMarine() {
+  try {
+    const url=`https://marine-api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}`+
+      `&current=wave_height,wave_direction,wave_period,wind_wave_height&timezone=${TZ}`;
+    const r=await fetch(url);
+    const d=await r.json();
+    const c=d.current;
+    const wh=c.wave_height?.toFixed(1)??'--';
+    const wp=Math.round(c.wave_period??0);
+    const wd=Math.round(c.wind_wave_height*10)/10??'--';
+    const wdir=c.wave_direction??0;
+    document.getElementById('marine-content').innerHTML=`
+      <div style="margin-bottom:12px">${waveBar(parseFloat(wh))}</div>
+      <div class="marine-grid">
+        <div class="marine-item"><div class="val" style="color:${waveColor(parseFloat(wh))}">${wh} m</div><div class="lbl">Hauteur vagues</div></div>
+        <div class="marine-item"><div class="val" style="color:var(--teal)">${wp} s</div><div class="lbl">Période houle</div></div>
+        <div class="marine-item"><div class="val" style="color:var(--muted)">${wd} m</div><div class="lbl">Vagues vent</div></div>
+        <div class="marine-item" style="display:flex;align-items:center;gap:8px">
+          ${windCompassSvg(wdir,38)}
+          <div><div class="val" style="color:var(--gold);font-size:16px">${windDir(wdir)}</div><div class="lbl">Direction mer</div></div>
+        </div>
+      </div>`;
+  } catch(e) {
+    document.getElementById('marine-content').innerHTML=`<div class="server-offline">Données marines indisponibles<code>Vérifiez la connexion</code></div>`;
+  }
+
+  try {
+    const url2=`https://marine-api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}`+
+      `&current=wave_height,wave_direction,wave_period,wind_wave_height,sea_surface_temperature`+
+      `&hourly=wave_height,wave_period,sea_surface_temperature&timezone=${TZ}&forecast_days=3`;
+    const r2=await fetch(url2);
+    const d2=await r2.json();
+    const c2=d2.current;
+    const wh2=c2.wave_height?.toFixed(1)??'--';
+    const wp2=Math.round(c2.wave_period??0);
+    const wdir2=c2.wave_direction??0;
+    const sst2=c2.sea_surface_temperature?.toFixed(1)??'--';
+    const hours=d2.hourly?.time?.slice(0,12)??[];
+    const whs=d2.hourly?.wave_height?.slice(0,12)??[];
+    let hoursHtml='';
+    for (let i=0;i<hours.length;i+=3) {
+      const t=new Date(hours[i]);
+      const hh=t.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+      const v=whs[i]?.toFixed(1)??'--';
+      hoursHtml+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.05);">
+        <span style="font-size:11px;color:var(--muted)">${hh}</span>
+        <span style="font-size:13px;font-family:var(--font-data);color:${waveColor(parseFloat(v))}">${v}m</span>
+      </div>`;
+    }
+    document.getElementById('marine-sidebar-content').innerHTML=`
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;">
+        <div style="background:rgba(0,200,212,.07);border-radius:10px;padding:10px;">
+          <div style="font-family:var(--font-data);font-size:28px;color:${waveColor(parseFloat(wh2))}">${wh2}<span style="font-size:13px;color:var(--muted)"> m</span></div>
+          <div style="font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:2px">Vagues actuelles</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+          <div style="background:rgba(0,0,0,.25);border-radius:8px;padding:8px;text-align:center;">
+            <div style="font-family:var(--font-data);font-size:18px;color:var(--teal)">${wp2}s</div>
+            <div style="font-size:9px;color:var(--muted);letter-spacing:1px">Période</div>
+          </div>
+          <div style="background:rgba(0,0,0,.25);border-radius:8px;padding:8px;text-align:center;">
+            <div style="font-family:var(--font-data);font-size:18px;color:var(--gold)">${sst2}°</div>
+            <div style="font-size:9px;color:var(--muted);letter-spacing:1px">Eau</div>
+          </div>
+        </div>
+        <div style="background:rgba(0,0,0,.25);border-radius:8px;padding:8px;text-align:center;">
+          <div style="font-size:14px;color:var(--text)">${windCompassSvg(wdir2,28)} ${windDir(wdir2)}</div>
+          <div style="font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:2px">Direction</div>
+        </div>
+      </div>
+      <div style="font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px">Prochaines heures</div>
+      ${hoursHtml}`;
+  } catch(e) {}
+}
+
+function waveBar(h) {
+  const max=4;
+  const color=waveColor(h);
+  const bars=Array.from({length:12},(_,i)=>{
+    const barH=8+Math.sin(i*0.8)*12+(i/12)*10;
+    return `<rect x="${i*9}" y="${30-barH}" width="7" height="${barH}" rx="2" fill="${color}" opacity="${0.3+(i/12)*0.7}"/>`;
+  }).join('');
+  return `<svg width="100%" height="32" viewBox="0 110 112 30" style="overflow:visible">
+    ${bars}
+    <text x="108" y="30" text-anchor="end" font-size="9" fill="${color}" font-family="Roboto Mono,monospace">${h}m</text>
+  </svg>`;
+}
+
+// ═══ BITCOIN ═══
+async function fetchBitcoin() {
+  try {
+    const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,eur,ils&include_24hr_change=true&include_last_updated_at=true');
+    const d=await r.json();
+    const btc=d.bitcoin;
+    const chg=btc.usd_24h_change;
+    const arrow=chg>=0?'▲':'▼';
+    const cls=chg>=0?'up':'down';
+    const usd=btc.usd.toLocaleString('fr-FR');
+    const eur=btc.eur.toLocaleString('fr-FR');
+    const ils=btc.ils.toLocaleString('fr-FR');
+    document.getElementById('btc-content').innerHTML=`
+      <div class="btc-price">$${usd}</div>
+      <div class="btc-change ${cls}">${arrow} ${Math.abs(chg).toFixed(2)}% sur 24h</div>
+      <div class="btc-sub">
+        <div class="btc-cell"><div class="val">€${eur}</div><div class="lbl">EUR</div></div>
+        <div class="btc-cell"><div class="val">₪${ils}</div><div class="lbl">ILS</div></div>
+      </div>
+      <canvas id="btc-spark" height="50"></canvas>`;
+    drawSpark(chg);
+  } catch(e) {
+    document.getElementById('btc-content').innerHTML=`<div class="server-offline">Cours Bitcoin indisponible<code>Vérifiez la connexion</code></div>`;
+  }
+}
+
+function drawSpark(trend) {
+  const c=document.getElementById('btc-spark');
+  if (!c) return;
+  c.width=c.offsetWidth||200;
+  const ctx=c.getContext('2d');
+  const pts=Array.from({length:30},(_,i)=>25+Math.sin(i*0.6)*8+Math.random()*6+(trend>0?(i/30)*8:-(i/30)*8));
+  ctx.clearRect(0,0,c.width,50);
+  const col=trend>=0?'#40c080':'#e84040';
+  ctx.strokeStyle=col; ctx.lineWidth=1.5; ctx.shadowColor=col; ctx.shadowBlur=4;
+  ctx.beginPath();
+  pts.forEach((y,i)=>{ const x=(i/(pts.length-1))*c.width; i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+  ctx.stroke();
+  const grad=ctx.createLinearGradient(0,0,0,50);
+  grad.addColorStop(0,col+'40'); grad.addColorStop(1,col+'00');
+  ctx.fillStyle=grad;
+  ctx.beginPath();
+  pts.forEach((y,i)=>{ const x=(i/(pts.length-1))*c.width; i===0?ctx.moveTo(x,y):ctx.lineTo(x,y); });
+  ctx.lineTo(c.width,50); ctx.lineTo(0,50); ctx.closePath(); ctx.fill();
+}
+
+// ═══ STOCKS ═══
+async function fetchStocks() {
+  const el = document.getElementById('stocks-content');
+  if (!el) return;
+  const DEFS = [
+    { sym:'QQQ',    label:'QQQ' },
+    { sym:'^GSPC',  label:'S&P 500' },
+    { sym:'TSLA',   label:'Tesla' },
+    { sym:'NVDA',   label:'NVDA' },
+  ];
+  try {
+    const r = await fetch('/news/stocks.php', { signal: abortSignal(10000) });
+    const d = await r.json();
+    const quotes = d?.quoteResponse?.result || [];
+    if (!quotes.length) throw new Error('no data');
+    const cards = quotes.map(q => {
+      if (q.error) return `<div class="stock-card"><div class="stock-ticker">${q.label||q.symbol}</div><div class="stock-price" style="color:var(--muted)">—</div></div>`;
+      const price = q.regularMarketPrice;
+      const chg   = q.regularMarketChangePercent;
+      const arrow = chg >= 0 ? '▲' : '▼';
+      const cls   = chg >= 0 ? 'up' : 'down';
+      const fmt   = price >= 1000
+        ? price.toLocaleString('fr-FR', {maximumFractionDigits:0})
+        : price.toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2});
+      return `<div class="stock-card">
+        <div class="stock-ticker">${q.label||q.symbol}</div>
+        <div class="stock-price">$${fmt}</div>
+        <div class="stock-chg ${cls}">${arrow} ${Math.abs(chg).toFixed(2)}%</div>
+      </div>`;
+    }).join('');
+    el.innerHTML = `<div class="stocks-grid">${cards}</div>`;
+  } catch(e) {
+    el.innerHTML = `<div style="font-size:11px;color:var(--muted);text-align:center;padding:6px 0">Cours indisponibles</div>`;
+  }
+}
+
+// ═══ EMAILS ═══
+async function fetchEmails(retryCount=0) {
+  try {
+    const r=await fetch(`${LOCAL_SERVER}/emails`,{signal:abortSignal(8000)});
+    const d=await r.json();
+    if (d===null) { if (retryCount<10) { const el=document.getElementById('email-content'); if(el) el.innerHTML=`<div class="loading">⏳ Chargement des emails…</div>`; setTimeout(()=>fetchEmails(retryCount+1),4000); } return; }
+    const emails=d.emails||[];
+    const el=document.getElementById('email-content');
+    if (!el) return;
+    if (emails.length===0) { el.innerHTML=`<div style="text-align:center;padding:20px"><div style="font-size:32px;margin-bottom:8px">✅</div><div style="font-size:13px;color:var(--ok)">Boîte vide — Aucun message non lu</div></div>`; return; }
+    const items=emails.slice(0,6).map(e=>`<div class="email-item"><div class="from">✉️ ${e.sender}</div><div class="subj">${e.subject}</div><div class="date">${e.date}</div></div>`).join('');
+    el.innerHTML=`<div class="email-count">${emails.length}<span> non lus</span></div><div class="email-list">${items}</div>`;
+  } catch(e) { const el=document.getElementById('email-content'); if(el) el.innerHTML=`<div class="server-offline">Démarrez le serveur local<code>python3 emilie_server.py</code></div>`; }
+}
+
+// ═══ CALENDAR ═══
+async function fetchCalendar(retryCount=0) {
+  try {
+    const r=await fetch(`${LOCAL_SERVER}/calendar`,{signal:abortSignal(8000)});
+    const d=await r.json();
+    if (d===null) { if (retryCount<10) { const el=document.getElementById('cal-content'); if(el) el.innerHTML=`<div class="loading">⏳ Interrogation du calendrier…</div>`; setTimeout(()=>fetchCalendar(retryCount+1),5000); } return; }
+    const events=d.events||[];
+    const el=document.getElementById('cal-content');
+    if (!el) return;
+    if (events.length===0) { el.innerHTML=`<div class="cal-empty">📭 Aucun rendez-vous dans les 14 prochains jours</div>`; return; }
+    const today=new Date(); today.setHours(0,0,0,0);
+    const tomorrow=new Date(today); tomorrow.setDate(tomorrow.getDate()+1);
+    const byDay={};
+    events.forEach(e=>{ const dt=new Date(e.date); if(isNaN(dt)) return; const key=dt.toLocaleDateString('sv-SE'); if(!byDay[key]) byDay[key]=[]; byDay[key].push(e); });
+    const days=Object.keys(byDay).sort();
+    const JOURS=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+    const MOIS=['jan','fév','mar','avr','mai','juin','juil','août','sep','oct','nov','déc'];
+    let html='';
+    days.forEach(key=>{ const dt=new Date(key+'T00:00:00'); const isToday=dt.getTime()===today.getTime(); const isTomorrow=dt.getTime()===tomorrow.getTime(); let label; if(isToday) label=`📅 Aujourd'hui`; else if(isTomorrow) label=`⏩ Demain`; else label=`${JOURS[dt.getDay()]} ${dt.getDate()} ${MOIS[dt.getMonth()]}`; html+=`<div class="cal-day"><div class="cal-day-title">${label}</div>`; html+=byDay[key].map(e=>calEvent(e)).join(''); html+='</div>'; });
+    if (!html) html=`<div class="cal-empty">Aucun RDV dans les 14 prochains jours</div>`;
+    el.innerHTML=html;
+  } catch(e) { const el=document.getElementById('cal-content'); if(el) el.innerHTML=`<div class="server-offline">Démarrez le serveur local<code>python3 emilie_server.py</code></div>`; }
+}
+
+function calEvent(e) {
+  let time='--:--';
+  try { const d=new Date(e.date); if(!isNaN(d)) time=d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}); } catch {}
+  return `<div class="cal-event"><div class="cal-time">${time}</div><div><div class="cal-title">${e.title}</div><div class="cal-cal">${e.calendar||''}</div></div></div>`;
+}
+
+// ═══ RSS via rss2json (mode public — fonctionne sans serveur local) ═══
+const IS_LOCAL = window.location.hostname==='localhost' || window.location.hostname==='127.0.0.1';
+
+// abortSignal() n'existe pas sur Safari < 16 — fallback universel
+function abortSignal(ms) {
+  try { if (typeof AbortSignal?.timeout === 'function') return AbortSignal.timeout(ms); } catch(e) {}
+  const c = new AbortController();
+  setTimeout(() => c.abort(), ms);
+  return c.signal;
+}
+
+async function fetchRSS(url, maxItems=6) {
+  try {
+    const api = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`;
+    const r = await fetch(api, {signal:abortSignal(12000)});
+    const d = await r.json();
+    if (d.status !== 'ok' || !d.items?.length) return [];
+    return d.items.slice(0, maxItems).map(it => ({
+      title: (it.title||'').trim(),
+      link:  it.link || '',
+      date:  it.pubDate || '',
+    })).filter(it => it.title);
+  } catch(e) { return []; }
+}
+
+// ═══ NEWS MONDE ═══
+async function fetchNewsWorld(retryCount=0) {
+  const el = document.getElementById('news-world-content');
+  if (IS_LOCAL) {
+    try {
+      const r=await fetch(`${LOCAL_SERVER}/news/world`,{signal:abortSignal(15000)});
+      const d=await r.json();
+      if (!d?.items?.length) throw new Error('vide');
+      const TF=`<span class="trans-flags"><button class="trans-flag-btn" onclick="translateItem(this,'fr')">🇫🇷</button><button class="trans-flag-btn" onclick="translateItem(this,'iw')">🇮🇱</button><button class="trans-flag-btn" onclick="translateItem(this,'en')">🇬🇧</button></span>`;
+      const items=d.items.map((it,i)=>{
+        let dateStr=''; try{dateStr=new Date(it.date).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});}catch{}
+        const sa=it.title.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+        const ti=it.link?`<a href="${it.link}" target="_blank" rel="noopener"><span class="item-title">${it.title}</span></a>`:`<span class="item-title">${it.title}</span>`;
+        return `<div class="news-item" data-orig="${sa}"><div class="news-num">${String(i+1).padStart(2,'0')}</div><div style="flex:1;min-width:0"><div class="news-text">${ti}</div><div class="news-src">🗞️ ${it.source}${dateStr?' · '+dateStr:''}</div></div>${TF}</div>`;
+      }).join('');
+      el.innerHTML=`<div class="news-grid">${items}</div>`; return;
+    } catch(e) {}
+  }
+  // Mode public : RSS direct via proxy
+  el.innerHTML=`<div class="loading">⏳ Chargement de la presse mondiale…</div>`;
+  const WORLD_SOURCES = [
+    {url:'https://feeds.bbci.co.uk/news/world/rss.xml', name:'BBC Monde'},
+    {url:'https://feeds.reuters.com/reuters/worldNews',  name:'Reuters'},
+    {url:'https://www.theguardian.com/world/rss',        name:'The Guardian'},
+    {url:'https://rss.nytimes.com/services/xml/rss/nyt/World.xml', name:'NY Times'},
+    {url:'https://www.lemonde.fr/rss/une.xml',           name:'Le Monde'},
+    {url:'https://www.lefigaro.fr/rss/figaro_actualites.xml', name:'Le Figaro'},
+  ];
+  try {
+    const all = await Promise.all(WORLD_SOURCES.map(s => fetchRSS(s.url,5).then(items=>items.map(it=>({...it,source:s.name})))));
+    const flat = all.flat().sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,20);
+    if (!flat.length) throw new Error('vide');
+    const TFw=`<span class="trans-flags"><button class="trans-flag-btn" onclick="translateItem(this,'fr')">🇫🇷</button><button class="trans-flag-btn" onclick="translateItem(this,'iw')">🇮🇱</button><button class="trans-flag-btn" onclick="translateItem(this,'en')">🇬🇧</button></span>`;
+    const items=flat.map((it,i)=>{
+      let dateStr=''; try{dateStr=new Date(it.date).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});}catch{}
+      const sa=it.title.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+      const ti=it.link?`<a href="${it.link}" target="_blank" rel="noopener"><span class="item-title">${it.title}</span></a>`:`<span class="item-title">${it.title}</span>`;
+      return `<div class="news-item" data-orig="${sa}"><div class="news-num">${String(i+1).padStart(2,'0')}</div><div style="flex:1;min-width:0"><div class="news-text">${ti}</div><div class="news-src">🗞️ ${it.source}${dateStr?' · '+dateStr:''}</div></div>${TFw}</div>`;
+    }).join('');
+    el.innerHTML=`<div class="news-grid">${items}</div>`;
+  } catch(e) { el.innerHTML=`<div class="server-offline">Presse mondiale indisponible.</div>`; }
+}
+
+// ═══ PRESSE ISRAÉLIENNE ═══
+async function fetchNewsIsrael(retryCount=0) {
+  const el = document.getElementById('news-israel-content');
+  if (IS_LOCAL) {
+    try {
+      const r=await fetch(`${LOCAL_SERVER}/news/israel`,{signal:abortSignal(20000)});
+      const d=await r.json();
+      if (!d?.sources?.length) throw new Error('vide');
+      const papers=d.sources.map(src=>{
+        const headlines=src.items.map(it=>{
+          const sa=it.title.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+          const inner=it.link?`<a href="${it.link}" target="_blank" rel="noopener"><span class="item-title">${it.title}</span></a>`:`<span class="item-title">${it.title}</span>`;
+          return `<div class="israel-headline" data-orig="${sa}">${inner}<span class="trans-flags"><button class="trans-flag-btn" onclick="translateItem(this,'fr')">🇫🇷</button><button class="trans-flag-btn" onclick="translateItem(this,'iw')">🇮🇱</button><button class="trans-flag-btn" onclick="translateItem(this,'en')">🇬🇧</button></span></div>`;
+        }).join('');
+        return `<div class="israel-paper" style="border-top-color:${src.color||'var(--gold)'}"><div class="israel-paper-name">${src.name}</div><div class="israel-paper-orient">${src.orientation}</div>${headlines}</div>`;
+      }).join('');
+      el.innerHTML=`<div class="israel-grid">${papers}</div>`; return;
+    } catch(e) {}
+  }
+  // Mode public : RSS direct via proxy
+  el.innerHTML=`<div class="loading">⏳ Chargement de la presse israélienne…</div>`;
+  const ISRAEL_SOURCES = [
+    {url:'https://www.israelhayom.com/feed/',                    name:'Israel Hayom',    orientation:'🔴 Droite',      color:'#c0392b'},
+    {url:'https://www.jpost.com/rss/rssfeedsfrontpage.aspx',    name:'Jerusalem Post',   orientation:'🟢 Centre-D',    color:'#27ae60'},
+    {url:'https://www.timesofisrael.com/feed/',                  name:'Times of Israel', orientation:'🟢 Centre',      color:'#2980b9'},
+    {url:'https://www.ynetnews.com/Integration/StoryRss2.xml',   name:'Ynet News',       orientation:'🟡 Centre',      color:'#f39c12'},
+    {url:'https://www.haaretz.com/cmlink/1.628765',              name:'Haaretz',         orientation:'🔵 Gauche',      color:'#8e44ad'},
+    {url:'https://www.i24news.tv/fr/rss',                        name:'i24 News FR',     orientation:'📺 Chaîne info', color:'#e74c3c'},
+  ];
+  try {
+    const results = await Promise.all(ISRAEL_SOURCES.map(async s => ({...s, items: await fetchRSS(s.url)})));
+    const papers = results.filter(s=>s.items.length).map(src=>{
+      const headlines=src.items.map(it=>{
+        const sa=it.title.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+        const inner=it.link?`<a href="${it.link}" target="_blank" rel="noopener"><span class="item-title">${it.title}</span></a>`:`<span class="item-title">${it.title}</span>`;
+        return `<div class="israel-headline" data-orig="${sa}">${inner}<span class="trans-flags"><button class="trans-flag-btn" onclick="translateItem(this,'fr')">🇫🇷</button><button class="trans-flag-btn" onclick="translateItem(this,'iw')">🇮🇱</button><button class="trans-flag-btn" onclick="translateItem(this,'en')">🇬🇧</button></span></div>`;
+      }).join('');
+      return `<div class="israel-paper" style="border-top-color:${src.color}"><div class="israel-paper-name">${src.name}</div><div class="israel-paper-orient">${src.orientation}</div>${headlines}</div>`;
+    }).join('');
+    if (!papers) throw new Error('vide');
+    el.innerHTML=`<div class="israel-grid">${papers}</div>`;
+  } catch(e) { el.innerHTML=`<div class="server-offline">Presse israélienne indisponible.</div>`; }
+}
+
+async function fetchNews(retryCount=0) { return fetchNewsWorld(retryCount); }
+
+// ═══ PRESSE INTERNATIONALE ═══
+async function fetchNewsIntl(retryCount=0) {
+  const el = document.getElementById('news-intl-content');
+  if (IS_LOCAL) {
+    try {
+      const r=await fetch(`${LOCAL_SERVER}/news/intl`,{signal:abortSignal(25000)});
+      const d=await r.json();
+      if (!d?.regions?.length) throw new Error('vide');
+      const html=d.regions.map(reg=>{
+        const sourcesHtml=reg.sources.map(src=>{
+          const items=src.items.slice(0,4).map(it=>{
+            const sa=it.title.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+            const inner=it.link?`<a href="${it.link}" target="_blank" rel="noopener"><span class="item-title">${it.title}</span></a>`:`<span class="item-title">${it.title}</span>`;
+            return `<div class="intl-headline" data-orig="${sa}">${inner}<span class="trans-flags"><button class="trans-flag-btn" onclick="translateItem(this,'fr')">🇫🇷</button><button class="trans-flag-btn" onclick="translateItem(this,'iw')">🇮🇱</button><button class="trans-flag-btn" onclick="translateItem(this,'en')">🇬🇧</button></span></div>`;
+          }).join('');
+          return `<div class="intl-source"><div class="intl-source-name">${src.name}</div>${items}</div>`;
+        }).join('');
+        return `<div class="intl-region"><div class="intl-region-title">${reg.flag} ${reg.name}</div>${reg.summary?`<div class="intl-summary">${reg.summary}</div>`:''}<div class="intl-sources-grid">${sourcesHtml}</div></div>`;
+      }).join('<hr style="border:none;border-top:1px solid rgba(255,255,255,.05);margin:18px 0">');
+      el.innerHTML=html; return;
+    } catch(e) {}
+  }
+  // Mode public : RSS direct via proxy, groupé par région
+  el.innerHTML=`<div class="loading">⏳ Chargement de la presse internationale…</div>`;
+  const INTL_REGIONS = [
+    { flag:'🇺🇸', name:'États-Unis', sources:[
+      {url:'https://feeds.washingtonpost.com/rss/world', name:'Washington Post'},
+      {url:'http://rss.cnn.com/rss/edition_world.rss',  name:'CNN World'},
+      {url:'https://moxie.foxnews.com/google-publisher/world.xml', name:'Fox News'},
+    ]},
+    { flag:'🇫🇷', name:'France', sources:[
+      {url:'https://www.lemonde.fr/rss/une.xml',              name:'Le Monde'},
+      {url:'https://www.lefigaro.fr/rss/figaro_actualites.xml', name:'Le Figaro'},
+      {url:'https://www.liberation.fr/arc/outboundfeeds/rss/', name:'Libération'},
+    ]},
+    { flag:'🇬🇧', name:'Royaume-Uni', sources:[
+      {url:'https://feeds.bbci.co.uk/news/world/rss.xml',  name:'BBC World'},
+      {url:'https://www.theguardian.com/world/rss',         name:'The Guardian'},
+    ]},
+    { flag:'🇷🇺', name:'Russie', sources:[
+      {url:'https://sputnikglobe.com/export/rss2/world/index.xml', name:'Sputnik'},
+      {url:'https://www.rt.com/rss/news/',                         name:'RT'},
+    ]},
+    { flag:'🇨🇳', name:'Chine', sources:[
+      {url:'http://www.chinadaily.com.cn/rss/world_rss.xml', name:'China Daily'},
+      {url:'https://english.news.cn/rss/world.xml',           name:'Xinhua'},
+    ]},
+    { flag:'🇮🇷', name:'Iran', sources:[
+      {url:'https://www.iranintl.com/en/rss.xml', name:'Iran International'},
+    ]},
+  ];
+  try {
+    const regionsHtml = await Promise.all(INTL_REGIONS.map(async reg=>{
+      const sourcesData = await Promise.all(reg.sources.map(async s=>({...s, items: await fetchRSS(s.url,4)})));
+      const sourcesHtml = sourcesData.filter(s=>s.items.length).map(src=>{
+        const items=src.items.map(it=>{
+          const sa=it.title.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+          const inner=it.link?`<a href="${it.link}" target="_blank" rel="noopener"><span class="item-title">${it.title}</span></a>`:`<span class="item-title">${it.title}</span>`;
+          return `<div class="intl-headline" data-orig="${sa}">${inner}<span class="trans-flags"><button class="trans-flag-btn" onclick="translateItem(this,'fr')">🇫🇷</button><button class="trans-flag-btn" onclick="translateItem(this,'iw')">🇮🇱</button><button class="trans-flag-btn" onclick="translateItem(this,'en')">🇬🇧</button></span></div>`;
+        }).join('');
+        return `<div class="intl-source"><div class="intl-source-name">${src.name}</div>${items}</div>`;
+      }).join('');
+      if (!sourcesHtml) return '';
+      return `<div class="intl-region"><div class="intl-region-title">${reg.flag} ${reg.name}</div><div class="intl-sources-grid">${sourcesHtml}</div></div>`;
+    }));
+    const html = regionsHtml.filter(Boolean).join('<hr style="border:none;border-top:1px solid rgba(255,255,255,.05);margin:18px 0">');
+    if (!html) throw new Error('vide');
+    el.innerHTML=html;
+  } catch(e) { el.innerHTML=`<div class="server-offline">Presse internationale indisponible.</div>`; }
+}
+
+// ═══ CONDITIONS MARINES 7J ═══
+async function fetchSeaWeek() {
+  try {
+    const [mr,wr]=await Promise.all([
+      fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${LAT}&longitude=${LON}&daily=wave_height_max,wave_period_max,wave_direction_dominant&hourly=sea_surface_temperature&timezone=${TZ}&forecast_days=7`),
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&daily=windspeed_10m_max,windgusts_10m_max,winddirection_10m_dominant&timezone=${TZ}&forecast_days=7`)
+    ]);
+    const md=await mr.json();
+    const wd=await wr.json();
+    const sstHourly=md.hourly?.sea_surface_temperature||[];
+    const sstByDay=md.daily.time.map((_,i)=>{ const idx=i*24+12; return sstHourly[idx]!=null?Math.round(sstHourly[idx]*10)/10:null; });
+    const days=md.daily.time.map((t,i)=>{
+      const date=new Date(t+'T12:00:00');
+      const isToday=i===0;
+      const dayName=isToday?'Auj.':DAYS_FR[date.getDay()];
+      const dateNum=date.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+      const wh=md.daily.wave_height_max?.[i];
+      const wp=md.daily.wave_period_max?.[i];
+      const wdDeg=md.daily.wave_direction_dominant?.[i];
+      const ws=wd.daily.windspeed_10m_max?.[i];
+      const wg=wd.daily.windgusts_10m_max?.[i];
+      const wDir=wd.daily.winddirection_10m_dominant?.[i];
+      const sst=sstByDay[i];
+      const whF=wh!=null?wh:0;
+      const whColor=whF<0.5?'var(--ok)':whF<1.0?'var(--teal)':whF<1.5?'var(--goldl)':whF<2.5?'var(--warn)':'var(--danger)';
+      const wsV=ws!=null?ws:0;
+      const wsColor=wsV<20?'var(--ok)':wsV<35?'var(--goldl)':wsV<50?'var(--warn)':'var(--danger)';
+      const arrowRot=wdDeg!=null?wdDeg:0;
+      const waveDirLabel=windDir(wdDeg||0);
+      const windDirLabel=windDir(wDir||0);
+      const periodStr=wp!=null?`${wp.toFixed(0)}s`:'--';
+      const sstStr=sst!=null?`${sst}°`:'--';
+      const wsStr=ws!=null?Math.round(ws):'--';
+      return `<div class="sw-day${isToday?' today':''}">
+        <div class="sw-name">${dayName}</div>
+        <div class="sw-date-num">${dateNum}</div>
+        <div class="sw-wave-h" style="color:${whColor}">${wh!=null?wh.toFixed(1):'--'}<span class="sw-wave-unit"> m</span></div>
+        <div class="sw-wave-dir"><span class="sw-arrow" style="transform:rotate(${arrowRot}deg)">↑</span><span class="sw-wave-label">${waveDirLabel}</span></div>
+        <div class="sw-period">⏱ ${periodStr}</div>
+        <div class="sw-divider"></div>
+        <div class="sw-wind"><span class="sw-wind-spd" style="color:${wsColor}">💨 ${wsStr}</span><span class="sw-wind-unit">km/h</span><span class="sw-wind-dir">${windDirLabel}</span></div>
+        ${wg!=null?`<div style="font-size:9px;color:var(--muted);margin-bottom:2px">rafales ${Math.round(wg)} km/h</div>`:''}
+        <div class="sw-temp"><span class="sw-temp-ico">🌡️</span>${sstStr}</div>
+      </div>`;
+    }).join('');
+    const swEl=document.getElementById('sea-week-content');
+    if (swEl) swEl.innerHTML=`<div class="seaweek-strip">${days}</div>`;
+    const sidebarWeek=document.getElementById('marine-sidebar-week');
+    if (sidebarWeek) {
+      const weekRows=md.daily.time.map((t,i)=>{
+        const date=new Date(t+'T12:00:00');
+        const isToday=i===0;
+        const dayName=isToday?'Auj.':DAYS_FR[date.getDay()];
+        const wh=md.daily.wave_height_max?.[i];
+        const ws=wd.daily.windspeed_10m_max?.[i];
+        const sst=sstByDay[i];
+        const whF=wh??0;
+        const whColor=whF<0.5?'var(--ok)':whF<1.0?'var(--teal)':whF<1.5?'var(--goldl)':whF<2.5?'var(--warn)':'var(--danger)';
+        return `<div style="display:grid;grid-template-columns:32px 1fr 1fr 1fr;align-items:center;gap:4px;padding:5px 4px;border-bottom:1px solid rgba(255,255,255,.05);${isToday?'background:rgba(0,200,212,.06);border-radius:4px;':''}">
+          <span style="font-size:10px;color:${isToday?'var(--teal)':'var(--muted)'};font-weight:${isToday?700:400}">${dayName}</span>
+          <span style="font-family:var(--font-data);font-size:12px;color:${whColor};text-align:center">${wh!=null?wh.toFixed(1):'--'}m</span>
+          <span style="font-size:10px;color:var(--muted);text-align:center">💨${ws!=null?Math.round(ws):'--'}</span>
+          <span style="font-size:10px;color:var(--gold);text-align:right">${sst!=null?sst+'°':'--'}</span>
+        </div>`;
+      }).join('');
+      sidebarWeek.innerHTML=`<div style="font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin:10px 0 4px;padding-top:8px;border-top:1px solid rgba(255,255,255,.08)">📅 7 Jours</div>${weekRows}`;
+    }
+  } catch(e) { const swEl=document.getElementById('sea-week-content'); if(swEl) swEl.innerHTML=`<div class="server-offline">Données marines indisponibles</div>`; }
+}
+
+// ═══ FORECAST 3J ═══
+async function fetchForecast3() {
+  try {
+    const url=`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&daily=weathercode,temperature_2m_max,temperature_2m_min,windspeed_10m_max&timezone=${TZ}&forecast_days=7`;
+    const r=await fetch(url);
+    const d=await r.json();
+    const WMO={0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'🌨️',73:'🌨️',75:'🌨️',80:'🌦️',81:'🌧️',82:'⛈️',95:'⛈️',96:'⛈️',99:'⛈️'};
+    const days=d.daily.time.map((t,i)=>{
+      const dt=new Date(t+'T12:00:00');
+      const name=dt.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
+      const ico=WMO[d.daily.weathercode[i]]??'🌡️';
+      const max=Math.round(d.daily.temperature_2m_max[i]);
+      const min=Math.round(d.daily.temperature_2m_min[i]);
+      const wind=Math.round(d.daily.windspeed_10m_max[i]);
+      return `<div style="background:rgba(0,0,0,.25);border-radius:10px;padding:10px 8px;text-align:center;border:1px solid rgba(255,255,255,.06);">
+        <div style="font-size:10px;color:var(--muted);letter-spacing:1px">${name}</div>
+        <div style="font-size:26px;margin:6px 0">${ico}</div>
+        <div style="font-family:var(--font-data);font-size:13px"><span style="color:var(--text)">${max}°</span> <span style="color:var(--muted)">${min}°</span></div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px">💨 ${wind} km/h</div>
+      </div>`;
+    }).join('');
+    document.getElementById('forecast3-content').innerHTML=`<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px">${days}</div>`;
+  } catch(e) { document.getElementById('forecast3-content').innerHTML=`<div class="loading">Indisponible</div>`; }
+}
+
+// ═══ FILS X ═══
+function fmtTweetDate(s) {
+  try { const d=new Date(s); if(isNaN(d)) return s; return d.toLocaleDateString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); } catch { return ''; }
+}
+function escX(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+const X_HANDLES = ['IsraeliPM','naftalibennett','AvigdorLiberman','MarionMarechal','JPhTanguy'];
+
+async function fetchTweets(retryCount=0) {
+  if (!IS_LOCAL) {
+    // ── Mode public : cartes profil directes (embed Twitter bloqué partout) ──
+    X_HANDLES.forEach(handle => {
+      const el = document.getElementById('tweets-' + handle);
+      if (!el) return;
+      el.innerHTML =
+        '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:18px;padding:28px;text-align:center">' +
+          '<div style="font-size:2rem;color:rgba(255,255,255,0.35)">X</div>' +
+          '<div style="font-size:0.75rem;color:#666;letter-spacing:0.14em">@' + handle + '</div>' +
+          '<a href="https://x.com/' + handle + '" target="_blank" rel="noopener noreferrer" ' +
+             'style="padding:9px 24px;border:1px solid rgba(100,210,230,0.45);border-radius:20px;' +
+             'color:rgba(100,210,230,0.9);text-decoration:none;font-size:0.68rem;letter-spacing:0.2em">' +
+            'Voir sur X' +
+          '</a>' +
+        '</div>';
+    });
+    return;
+  }
+  // ── Mode local : serveur Python ──
+  try {
+    const r=await fetch(`${LOCAL_SERVER}/tweets`,{signal:abortSignal(20000)});
+    const d=await r.json();
+    if (d===null) { if(retryCount<10) setTimeout(()=>fetchTweets(retryCount+1),5000); return; }
+    (d.accounts||[]).forEach(acc=>{
+      const el=document.getElementById('tweets-'+acc.handle);
+      if (!el) return;
+      if (!acc.tweets||!acc.tweets.length) { el.innerHTML=`<div class="tweet-unavail">𝕏<br><br>Fil temporairement<br>indisponible</div>`; return; }
+      el.innerHTML=acc.tweets.map(t=>{
+        let txt=t.text.replace(/^R to @\w+:\s*/,'').trim();
+        return `<div class="tweet-card"><div class="tweet-text">${escX(txt)}</div><div class="tweet-meta"><span class="tweet-x-icon">𝕏</span><span>${fmtTweetDate(t.date)}</span></div></div>`;
+      }).join('');
+    });
+  } catch(e) {
+    X_HANDLES.forEach(h=>{
+      const el=document.getElementById('tweets-'+h);
+      if (el) el.innerHTML=`<div class="tweet-unavail">𝕏<br><br>Serveur requis</div>`;
+    });
+  }
+}
+
+// ═══ TRADUCTION DES TITRES ═══
+const _transCache = {};
+
+async function translateItem(btn, lang) {
+  const item = btn.closest('[data-orig]');
+  if (!item) return;
+  const orig = item.dataset.orig;
+  const titleEl = item.querySelector('.item-title');
+  if (!titleEl) return;
+
+  const allBtns = item.querySelectorAll('.trans-flag-btn');
+  const wasActive = btn.classList.contains('active');
+  allBtns.forEach(b => b.classList.remove('active'));
+
+  // Toggle off: restore original
+  if (wasActive) { titleEl.textContent = orig; return; }
+
+  btn.classList.add('active');
+
+  const savedEmoji = btn.textContent;
+  btn.textContent = '⌛';
+
+  const cacheKey = orig + '|' + lang;
+  let translated;
+
+  if (_transCache[cacheKey]) {
+    translated = _transCache[cacheKey];
+  } else {
+    try {
+      const q = encodeURIComponent(orig.slice(0, 500));
+      const res = await fetch(
+        `https://api.mymemory.translated.net/get?q=${q}&langpair=autodetect|${lang}`,
+        { signal: abortSignal(10000) }
+      );
+      const data = await res.json();
+      const t = data?.responseData?.translatedText;
+      translated = (t && t !== orig && data?.responseStatus === 200) ? t : orig;
+      if (translated !== orig) _transCache[cacheKey] = translated;
+    } catch(e) {
+      translated = orig;
+    }
+  }
+
+  btn.textContent = savedEmoji;
+  titleEl.textContent = translated;
+}
+
+// ═══ BACKSTAGE — Showbiz (Cinéma + Musique) ═══
+async function fetchShowbiz() {
+  const el = document.getElementById('news-showbiz-content');
+  if (!el) return;
+  const SHOWBIZ = [
+    { url:'https://variety.com/v/film/feed/',                        name:'Variety Film',       cat:'🎬' },
+    { url:'https://deadline.com/category/film/feed/',                name:'Deadline',           cat:'🎬' },
+    { url:'https://www.hollywoodreporter.com/movies/movie-news/feed/', name:'Hollywood Reporter', cat:'🎬' },
+    { url:'https://www.nme.com/music/feed',                          name:'NME',                cat:'🎵' },
+    { url:'https://www.rollingstone.com/music/music-news/feed/',     name:'Rolling Stone',      cat:'🎵' },
+    { url:'https://www.billboard.com/feed/',                         name:'Billboard',          cat:'🎵' },
+    { url:'https://www.lesinrocks.com/cinema/feed/',                 name:'Les Inrocks Cinéma', cat:'🎬' },
+    { url:'https://www.lesinrocks.com/musique/feed/',                name:'Les Inrocks Musique',cat:'🎵' },
+  ];
+  try {
+    const results = await Promise.allSettled(SHOWBIZ.map(s => fetchRSS(s.url, 4).then(items => ({...s, items}))));
+    const all = [];
+    results.forEach(r => {
+      if (r.status === 'fulfilled' && r.value.items?.length) {
+        r.value.items.forEach(it => {
+          if (it.title) all.push({
+            txt: it.title,
+            src: r.value.cat + ' ' + r.value.name,
+            href: it.link || ''
+          });
+        });
+      }
+    });
+    if (!all.length) { el.innerHTML = ''; return; }
+    el.innerHTML = all.slice(0, 14).map(it => {
+      const inner = it.href
+        ? `<a href="${it.href}" target="_blank" rel="noopener"><span class="news-text">${it.txt}</span></a>`
+        : `<span class="news-text">${it.txt}</span>`;
+      return `<div class="news-item">${inner}<div class="news-src">🗞️ ${it.src}</div></div>`;
+    }).join('');
+  } catch(e) { el.innerHTML = ''; }
+}
+
+// ═══ REFRESH ALL ═══
+// ═══ SYNTHÈSE DE PRESSE ═══
+function generateRevueDePresse() {
+  const el = document.getElementById('digest-content');
+  if (!el) return;
+
+  const now = new Date();
+  const dateline = now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})
+    .replace(/^\w/, c => c.toUpperCase())
+    + ' · ' + now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+
+  // Collecte depuis le DOM déjà rendu
+  function collectNewsItems(containerId, limit) {
+    const c = document.getElementById(containerId);
+    if (!c) return [];
+    const out = [];
+    c.querySelectorAll('.news-item, .israel-headline').forEach(node => {
+      if (out.length >= limit) return;
+      const a    = node.querySelector('a');
+      const txt  = (node.querySelector('.news-text') || node.querySelector('a') || node).textContent.trim();
+      const src  = node.querySelector('.news-src')?.textContent.replace('🗞️ ','').trim() || '';
+      if (txt && txt.length > 10) out.push({ txt, src, href: a?.href || '' });
+    });
+    return out;
+  }
+
+  const israel   = collectNewsItems('news-israel-content',  7);
+  const world    = collectNewsItems('news-world-content',   7);
+  const intl     = collectNewsItems('news-intl-content',    7);
+  const showbiz  = collectNewsItems('news-showbiz-content', 7);
+
+  if (!israel.length && !world.length && !intl.length && !showbiz.length) {
+    el.innerHTML = '<div class="loading">Compilation des dépêches en cours…</div>';
+    return;
+  }
+
+  function renderCol(items) {
+    const flags = `<span class="trans-flags" style="margin-top:3px"><button class="trans-flag-btn" onclick="translateItem(this,'fr')">🇫🇷</button><button class="trans-flag-btn" onclick="translateItem(this,'iw')">🇮🇱</button><button class="trans-flag-btn" onclick="translateItem(this,'en')">🇬🇧</button></span>`;
+    return items.map(it => {
+      const safe = it.txt.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+      const titleEl = `<span class="item-title digest-headline-txt">${it.txt}</span>`;
+      const srcEl = it.src ? `<div class="digest-src">${it.src}</div>` : '';
+      const content = it.href
+        ? `<a href="${it.href}" target="_blank" rel="noopener">${titleEl}</a>${srcEl}`
+        : `${titleEl}${srcEl}`;
+      return `<div class="digest-item" data-orig="${safe}"><div style="flex:1;min-width:0">${content}</div>${flags}</div>`;
+    }).join('');
+  }
+
+  const cols = [
+    { flag:'🇮🇱', label:'Israël',        items: israel   },
+    { flag:'🌍', label:'Monde',           items: world    },
+    { flag:'📡', label:'International',   items: intl     },
+    { flag:'🎬', label:'Backstage',       items: showbiz  },
+  ].filter(c => c.items.length);
+
+  el.innerHTML = `
+    <div class="digest-wrap">
+      <div class="digest-dateline">${dateline}</div>
+      <div class="digest-col-grid">
+        ${cols.map(c => `
+          <div class="digest-col">
+            <div class="digest-col-head">${c.flag}&nbsp; ${c.label}</div>
+            ${renderCol(c.items)}
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ══ BILLET DU JOUR ══════════════════════════════════════════════════════
+// Architecture : serveur (billet.php) → localStorage → génération déterministe
+// Seed = date YYYYMMDD → même billet pour tous les navigateurs le même jour
+// ════════════════════════════════════════════════════════════════════════
+
+// ── Seeded RNG (Mulberry32) — déterministe par date ──
+function _mulberry32(seed) {
+  return function() {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function _dateSeed(extra) {
+  const d = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  return parseInt(d) + (extra || 0);
+}
+
+// ── Paragraphes standalone — pas de dépendance aux titres d'articles ──
+// Identique sur tous les appareils le même jour
+const _EDITO_PARAS = [
+  `Le Moyen-Orient a encore produit ses nouvelles ce matin. La plupart étaient prévisibles. Certaines un peu moins. Aucune n'était surprenante pour qui suit le dossier depuis plus d'un cycle d'information.`,
+  `La communauté internationale s'est dite "profondément préoccupée". Comme d'habitude. Prochaine étape : résolution non-contraignante. Étape suivante : oubli. Le cycle est connu. Il tourne depuis 1948.`,
+  `Les experts ont analysé. Les commissions ont conclu. Les décisions seront prises "dans les meilleurs délais". Pendant ce temps, les faits continuent sans attendre les commissions.`,
+  `Depuis Tel Aviv, l'actualité mondiale se lit avec un angle particulier. Pas meilleur que les autres. Juste différent. Celui d'un pays qui est souvent au centre du débat sans avoir été invité à la table.`,
+  `Les gens qui n'ont pas à vivre avec les conséquences ont toujours les solutions les plus élégantes. C'est un don. Ça s'appelle aussi de la géographie.`,
+  `Les déclarations officielles ont ce charme particulier : elles disent tout sauf ce qui s'est passé. C'est un art. Les meilleurs le pratiquent avec une fluidité qui confine au génie.`,
+  `Certains observateurs se disent "surpris". Ceux qui lisent les sources primaires — pas les communiqués — l'étaient un peu moins. La surprise est un luxe qu'on perd avec l'âge et les abonnements RSS.`,
+  `Il y a les nouvelles telles qu'elles sont présentées. Et les nouvelles telles qu'elles sont. Dionysos vous donne les deux — avec la différence clairement indiquée.`,
+  `La France a une position. Israël a une réalité. Les deux ne se recoupent pas toujours. C'est dans cet écart que Dionysos fait son travail.`,
+  `Ceux qui savent se taisent. Ceux qui ne savent pas ont beaucoup à dire. C'est une loi de la physique médiatique : l'ignorance occupe le vide laissé par la compétence.`,
+  `Tout le monde attend. Tout le monde sait ce qui va se passer. Personne ne bouge en premier. C'est ça, la diplomatie moderne : un western avec moins d'honnêteté et plus de microphones.`,
+  `Les gens ordinaires — ceux qui ne font jamais les manchettes — continuent de vivre avec les décisions que d'autres ont prises pour eux. Ils ne font pas de communiqués. Ils font avec.`,
+  `Il y a une forme de cohérence sombre dans la façon dont le monde reproduit les mêmes schémas avec une régularité d'horloger. Pas une cohérence qu'on admire. Celle qu'on documente.`,
+  `Les bien-pensants ont une opinion là-dessus. Conforme à ce qu'on attendait. Elle sera oubliée quand l'actualité passera à autre chose. Les faits, eux, ne passent pas à autre chose.`,
+  `Certaines choses n'ont pas changé depuis soixante-dix-sept ans. Les protagonistes changent de noms. Les mécanismes, eux, sont identiques. Dionysos a de la mémoire.`,
+  `Israël n'a pas besoin qu'on lui explique ce que c'est que la menace. Ça fait sept décennies qu'il vit avec. Ce que les analyses parisiennes appellent "complexe", Tel Aviv appelle "mardi".`,
+  `Les médias mainstream ont leur récit. Dionysos a les sources. La différence entre les deux est parfois instructive. Souvent énorme. Toujours utile à noter.`,
+  `Ce n'est pas de la paranoïa. C'est de l'expérience accumulée sur sept décennies. Il y a une nuance. Dionysos la note. Les autres l'oublient selon les besoins du moment.`,
+  `Vérifiez vos sources. Méfiez-vous des premières dépêches. Elles sont toujours les moins précises — et les plus reprises. C'est une loi du journalisme que personne n'a réussi à abolir.`,
+  `L'histoire a cette mauvaise habitude de repasser les mêmes plats sous des emballages différents. Ceux qui l'ont lue reconnaissent le menu avant même d'ouvrir la carte.`,
+  `Le timing des déclarations officielles est rarement innocent. Quand une annonce tombe à 23h un vendredi, c'est qu'on espère que personne ne la lira avant lundi. Dionysos, lui, lit le vendredi soir.`,
+  `Les mots ont du poids. "Conflit armé" et "acte terroriste" ne désignent pas la même réalité, même quand ils décrivent le même événement. Le choix du mot est déjà une position.`,
+  `Il y a ce qu'on dit en public. Ce qu'on dit en privé. Et ce qui se passe vraiment. Les trois ne coïncident pas souvent. Dionysos travaille sur le troisième niveau.`,
+  `La diplomatie consiste souvent à parler longtemps pour ne rien dire, et à ne rien faire en attendant que le problème se résolve de lui-même — ou que quelqu'un d'autre paie le prix de l'inaction.`,
+  `Le droit international est une belle chose. En théorie. En pratique, il s'applique sélectivement, selon qui le viole et qui en parle. Dionysos a noté� l'asymétrie. Elle est régulière.`,
+  `Israël a survécu à des prédictions de disparition depuis soixante-dix-sept ans. C'est statistiquement remarquable. C'est aussi la raison pour laquelle les Israéliens prennent les menaces au sérieux quand d'autres les écartent.`,
+  `Les réseaux sociaux ont transformé chaque citoyen en éditorialiste. Le problème n'est pas l'opinion — tout le monde en a une. Le problème c'est quand l'opinion précède l'information.`,
+  `Ce matin, comme tous les matins, Dionysos a lu les dépêches. Ce qui est factuel est factuel. Ce qui mérite un commentaire corrosif en a un. Ce qui est du vent est signalé comme tel.`,
+  `Le monde ne manque pas d'analyses. Il manque de gens prêts à écrire ce qui dérange. Dionysos n'a pas ce problème. Il n'a pas non plus de directeur de publication à qui rendre des comptes.`,
+  `Le Conseil de sécurité a ses habitudes. Certains pays votent toujours dans le sens qui leur convient et appellent ça de la justice. Dionysos documente. Le lecteur juge.`,
+];
+
+const _EDITO_CLOSINGS = [
+  `Factuel. Corrosif. Assumé. — Dionysos, depuis Israël. À demain.`,
+  `Demain, nouvelles nouvelles. Même rigueur. Même mordant. Même café turc. — Dionysos.`,
+  `<em>"Les cons, ça ose tout. C'est même à ça qu'on les reconnaît."</em> — Audiard. La seule citation du jour. Elle était méritée.`,
+  `Les dépêches sont rangées. Elles seront là demain — différentes dans la forme, identiques dans la mécanique. Dionysos aussi.`,
+  `Le soleil se couche sur la Méditerranée. Les problèmes, eux, ne se couchent pas. À demain.`,
+  `Ce n'est pas de l'optimisme. C'est de l'endurance. C'est différent — et c'est amplement suffisant. À demain depuis Israël.`,
+  `Vérifiez vos sources. Méfiez-vous des certitudes. Revenez demain. — Dionysos.`,
+  `Le monde dure. C'est déjà quelque chose. À demain.`,
+];
+
+// ═══ PERSISTENCE & ARCHIVE ═══
+// v3 — clé versionnée pour effacer tout ancien cache incompatible
+const _EDITO_ARCHIVE_KEY = 'hal_billet_archive_v3';
+const _editoTodayKey = () => 'hal_billet_v3_' + new Date().toISOString().slice(0,10);
+const _getTodayDateStr = () => new Date().toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+function _loadEditoArchive() {
+  try { return JSON.parse(localStorage.getItem(_EDITO_ARCHIVE_KEY) || '[]'); }
+  catch(e) { return []; }
+}
+
+function _saveToEditoArchive(dateKey, dateStr, html) {
+  const arch = _loadEditoArchive().filter(e => e.date !== dateKey);
+  arch.unshift({ date: dateKey, dateStr, html });
+  localStorage.setItem(_EDITO_ARCHIVE_KEY, JSON.stringify(arch.slice(0, 45)));
+}
+
+function renderEditorialArchive() {
+  const el = document.getElementById('editorial-archive');
+  if (!el) return;
+  const todayKey = _editoTodayKey();
+  const past = _loadEditoArchive().filter(e => e.date !== todayKey);
+  if (!past.length) { el.innerHTML = ''; return; }
+  const items = past.map((entry, i) => {
+    const preview = entry.html.replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim().slice(0,80) + '…';
+    return `<div class="edito-archive-item" id="edito-arc-${i}">
+      <button class="edito-archive-toggle" onclick="toggleArchiveItem(${i})">
+        <span class="edito-arc-date">${entry.dateStr}</span>
+        <span class="edito-arc-preview">${preview}</span>
+        <span class="edito-arc-chev" id="edito-arc-chev-${i}">▸</span>
+      </button>
+      <div class="edito-archive-body" id="edito-arc-body-${i}" style="display:none;">${entry.html}</div>
+    </div>`;
+  }).join('');
+  el.innerHTML = `<div class="edito-archive">
+    <button class="edito-archive-header" onclick="toggleArchivePanel()">
+      <span>📁&nbsp; Archives &mdash; ${past.length} billet${past.length>1?'s':''}</span>
+      <span class="edito-arc-chevron-main" id="edito-arc-chevron-main">▸</span>
+    </button>
+    <div id="edito-archive-panel" style="display:none;">
+      <div class="edito-archive-list">${items}</div>
+    </div>
+  </div>`;
+}
+
+function toggleArchivePanel() {
+  const p = document.getElementById('edito-archive-panel');
+  const c = document.getElementById('edito-arc-chevron-main');
+  if (!p) return;
+  const open = p.style.display !== 'none';
+  p.style.display = open ? 'none' : 'block';
+  if (c) c.textContent = open ? '▸' : '▾';
+}
+
+function toggleArchiveItem(i) {
+  const b = document.getElementById(`edito-arc-body-${i}`);
+  const c = document.getElementById(`edito-arc-chev-${i}`);
+  if (!b) return;
+  const open = b.style.display !== 'none';
+  b.style.display = open ? 'none' : 'block';
+  if (c) c.textContent = open ? '▸' : '▾';
+}
+
+let _editorialOrigHTML = '';
+let _recGenExtra = 0; // incrément pour générations d'urgence
+
+// ── Construit et affiche le billet à partir d'un seed ──
+function _buildAndShowBillet(seed, todayKey) {
+  const rng = _mulberry32(seed);
+  const pick = (arr, used) => {
+    let idx;
+    let attempts = 0;
+    do { idx = Math.floor(rng() * arr.length); attempts++; }
+    while (used.has(idx) && used.size < arr.length && attempts < 200);
+    used.add(idx); return idx;
+  };
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  const numParas = 4 + (Math.floor(rng() * 10) < 5 ? 0 : 1); // 4 ou 5 paragraphes
+  const usedP = new Set();
+  const paras = Array.from({length: numParas}, () =>
+    `<p>${_EDITO_PARAS[pick(_EDITO_PARAS, usedP)]}</p>`
+  ).join('');
+  const closingIdx = Math.floor(rng() * _EDITO_CLOSINGS.length);
+
+  const html = `
+    <div class="editorial-header">
+      <div>
+        <div class="editorial-byline">Chronique · Rédaction Dionysos</div>
+        <div class="editorial-date">${dateStr.charAt(0).toUpperCase() + dateStr.slice(1)}</div>
+      </div>
+    </div>
+    <div class="editorial-body" id="editorial-body">
+      ${paras}
+      <div class="editorial-closing">${_EDITO_CLOSINGS[closingIdx]}</div>
+    </div>`;
+
+  const el = document.getElementById('editorial-content');
+  if (el) el.innerHTML = html;
+  _editorialOrigHTML = html;
+
+  const tKey = todayKey || _editoTodayKey();
+  try {
+    localStorage.setItem(tKey, JSON.stringify({ html, dateStr }));
+    _saveToEditoArchive(tKey, dateStr, html);
+  } catch(e) {}
+
+  document.querySelectorAll('#editorial-flags .trans-flag-btn').forEach(b => b.classList.remove('active'));
+  renderEditorialArchive();
+  return html;
+}
+
+async function generateEditorial() {
+  const el = document.getElementById('editorial-content');
+  if (!el) return;
+
+  const todayKey = _editoTodayKey();
+  el.innerHTML = '<div class="loading">Rédaction du billet du jour…</div>';
+
+  // ── 1. SERVEUR — source unique de vérité, même billet pour tous ──
+  try {
+    const res = await fetch('/news/billet.php?t=' + Date.now(), { cache: 'no-store', signal: abortSignal(6000) });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.date === todayKey && data.html) {
+        el.innerHTML = data.html;
+        _editorialOrigHTML = data.html;
+        document.querySelectorAll('#editorial-flags .trans-flag-btn').forEach(b => b.classList.remove('active'));
+        _saveToEditoArchive(todayKey, data.dateStr || _getTodayDateStr(), data.html);
+        renderEditorialArchive();
+        return;
+      }
+    }
+  } catch(e) { /* serveur indisponible — génération locale */ }
+
+  // ── 2. Génération déterministe + auto-publication serveur ──
+  // Seed = date UTC → IDENTIQUE sur tous les appareils le même jour
+  // Pas de lecture localStorage : impossible d'avoir un vieux cache
+  const dateStr = _getTodayDateStr();
+  const html = _buildAndShowBillet(_dateSeed(), todayKey);
+
+  // Auto-publication : le premier visiteur publie pour tous les autres
+  try {
+    await fetch('/news/billet.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ date: todayKey, html, dateStr, password: 'hdr2012' }),
+      signal: abortSignal(8000)
+    });
+  } catch(e) { /* publication silencieuse — seeded billet reste identique */ }
+}
+
+// ── REC : édition & publication du billet ──
+function recEditBillet() {
+  const pwd = prompt('Code d\'accès rédaction :');
+  if (pwd === null) return;
+  if (pwd !== 'hdr2012') { alert('Code incorrect.'); return; }
+  const body = document.getElementById('editorial-body');
+  if (!body) { alert('Billet pas encore chargé — attendez quelques secondes.'); return; }
+  body.contentEditable = 'true';
+  body.focus();
+  const bar = document.getElementById('rec-edit-bar');
+  if (bar) bar.style.display = 'flex';
+  const btn = document.getElementById('rec-btn');
+  if (btn) btn.style.display = 'none';
+}
+
+// Génère un nouveau billet d'urgence (seed différent)
+function recGenerate() {
+  _recGenExtra += 99991; // nombre premier — seed unique à chaque génération
+  const todayKey = _editoTodayKey();
+  _buildAndShowBillet(_dateSeed() + _recGenExtra, todayKey);
+  // Repasse en mode édition
+  const body = document.getElementById('editorial-body');
+  if (body) { body.contentEditable = 'true'; body.focus(); }
+  const st = document.getElementById('rec-edit-status');
+  if (st) st.textContent = '✏️ Nouveau billet généré — éditez si besoin';
+}
+
+// Publie le billet sur le serveur (tous les lecteurs le verront)
+async function recSaveBillet() {
+  const body = document.getElementById('editorial-body');
+  if (!body) return;
+  body.contentEditable = 'false';
+
+  const content = document.getElementById('editorial-content');
+  const st = document.getElementById('rec-edit-status');
+  if (!content) return;
+
+  const newHTML = content.innerHTML;
+  _editorialOrigHTML = newHTML;
+  const todayKey = _editoTodayKey();
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+  // Sauvegarde locale
+  try {
+    localStorage.setItem(todayKey, JSON.stringify({ html: newHTML, dateStr }));
+    _saveToEditoArchive(todayKey, dateStr, newHTML);
+  } catch(e) {}
+
+  // Publication serveur
+  if (st) st.textContent = '⏳ Publication…';
+  try {
+    const res = await fetch('/news/billet.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ date: todayKey, html: newHTML, dateStr, password: 'hdr2012' })
+    });
+    const data = await res.json();
+    if (data && data.ok) {
+      if (st) { st.textContent = '✅ Publié — visible par tous'; setTimeout(() => { const bar = document.getElementById('rec-edit-bar'); if (bar) bar.style.display = 'none'; }, 1500); }
+      const btn = document.getElementById('rec-btn');
+      setTimeout(() => { if (btn) btn.style.display = 'flex'; }, 1500);
+      return;
+    }
+  } catch(e) {
+    if (st) st.textContent = '⚠️ Serveur indisponible — sauvegardé localement';
+    setTimeout(() => {
+      const bar = document.getElementById('rec-edit-bar'); if (bar) bar.style.display = 'none';
+      const btn = document.getElementById('rec-btn'); if (btn) btn.style.display = 'flex';
+    }, 2000);
+    return;
+  }
+
+  const bar = document.getElementById('rec-edit-bar');
+  if (bar) bar.style.display = 'none';
+  const btn = document.getElementById('rec-btn');
+  if (btn) btn.style.display = 'flex';
+}
+
+function recCancelBillet() {
+  const body = document.getElementById('editorial-body');
+  if (!body) return;
+  body.contentEditable = 'false';
+  const content = document.getElementById('editorial-content');
+  if (content && _editorialOrigHTML) content.innerHTML = _editorialOrigHTML;
+  const bar = document.getElementById('rec-edit-bar');
+  if (bar) bar.style.display = 'none';
+  const btn = document.getElementById('rec-btn');
+  if (btn) btn.style.display = 'flex';
+}
+
+const _editoTransCache = {};
+async function translateEditorial(btn, lang) {
+  const el = document.getElementById('editorial-body');
+  if (!el) return;
+
+  const allBtns = document.querySelectorAll('#editorial-flags .trans-flag-btn');
+  const wasActive = btn.classList.contains('active');
+  allBtns.forEach(b => b.classList.remove('active'));
+
+  if (wasActive || lang === 'fr') {
+    // Restaure l'original
+    const editoEl = document.getElementById('editorial-content');
+    if (editoEl && _editorialOrigHTML) editoEl.innerHTML = _editorialOrigHTML.replace(/id="editorial-body"/,'id="editorial-body"');
+    return;
+  }
+
+  btn.classList.add('active');
+  const savedEmoji = btn.textContent;
+  btn.textContent = '⌛';
+
+  const paragraphs = el.querySelectorAll('p, .editorial-closing, .editorial-sig');
+  for (const p of paragraphs) {
+    const origText = p.textContent.trim();
+    if (!origText || origText.length < 4) continue;
+    const cacheKey = origText.slice(0,200) + '|' + lang;
+    let translated;
+    if (_editoTransCache[cacheKey]) {
+      translated = _editoTransCache[cacheKey];
+    } else {
+      try {
+        const q = encodeURIComponent(origText.slice(0, 500));
+        const res = await fetch(`https://api.mymemory.translated.net/get?q=${q}&langpair=fr|${lang}`, { signal: abortSignal(10000) });
+        const data = await res.json();
+        const t = data?.responseData?.translatedText;
+        translated = (t && t !== origText && data?.responseStatus === 200) ? t : origText;
+        if (translated !== origText) _editoTransCache[cacheKey] = translated;
+      } catch(e) { translated = origText; }
+    }
+    p.textContent = translated;
+  }
+
+  btn.textContent = savedEmoji;
+}
+// ════════════════════════════════════════════════════════════════════════
+
+async function refreshAll() {
+  const btn=document.getElementById('refresh-btn');
+  btn.classList.add('spinning');
+  await Promise.all([
+    fetchWeather(), fetchMarine(), fetchBitcoin(), fetchStocks(), fetchForecast3(),
+    fetchSeaWeek(),
+    fetchNewsWorld(), fetchNewsIsrael(), fetchNewsIntl(), fetchShowbiz(),
+  ]);
+  generateRevueDePresse();
+  await generateEditorial();
+  btn.classList.remove('spinning');
+}
+
+// Auto-refresh toutes les 4 heures
+setInterval(refreshAll, 4 * 60 * 60 * 1000);
+refreshAll();
+</script>
+
+<!-- ══════════════════════════════════════
+     RADIO EUROPE 1
+     ══════════════════════════════════════ -->
+<div id="radio-bar">
+  <div class="radio-logo"><span>Europe</span> 1</div>
+  <div class="radio-wave" id="radio-wave">
+    <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+    <div class="bar"></div><div class="bar"></div>
+  </div>
+  <div class="radio-info">
+    <strong>🔴 EN DIRECT</strong><br>
+    <span>Radio Europe 1 — Actualités &amp; Débats</span>
+  </div>
+  <input type="range" id="radio-vol" min="0" max="1" step="0.05" value="0.5" title="Volume">
+  <button id="radio-toggle" title="Play / Pause">⏸</button>
+  <button id="radio-close" title="Fermer la radio" onclick="closeRadio()">✕</button>
+</div>
+<audio id="europe1-audio" preload="none">
+  <source src="https://stream.europe1.fr/europe1.mp3" type="audio/mpeg">
+</audio>
+<script>
+(function(){
+  const audio=document.getElementById('europe1-audio');
+  const btn=document.getElementById('radio-toggle');
+  const vol=document.getElementById('radio-vol');
+  const wave=document.getElementById('radio-wave');
+  audio.volume=0.5;
+  audio.play().catch(()=>{});
+  btn.addEventListener('click',()=>{
+    if (audio.paused) { audio.play(); btn.textContent='⏸'; wave.classList.remove('paused'); }
+    else { audio.pause(); btn.textContent='▶'; wave.classList.add('paused'); }
+  });
+  vol.addEventListener('input',()=>{ audio.volume=parseFloat(vol.value); });
+  audio.addEventListener('playing',()=>{ btn.textContent='⏸'; wave.classList.remove('paused'); });
+  audio.addEventListener('pause',()=>{ btn.textContent='▶'; wave.classList.add('paused'); });
+})();
+
+function closeRadio(){
+  document.getElementById('europe1-audio').pause();
+  document.getElementById('radio-bar').style.display='none';
+  document.body.style.paddingBottom='0';
+}
+</script>
+
+<script>
+/* ─── GOOGLE TRANSLATE INIT ─── */
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({
+    pageLanguage: 'fr',
+    includedLanguages: 'fr,iw,en',
+    autoDisplay: false
+  }, 'google_translate_element');
+}
+
+/* ─── HIGHLIGHT ACTIVE LANG BUTTON ON LOAD ─── */
+(function() {
+  const m = document.cookie.match(/googtrans=\/fr\/([^;]+)/);
+  const cur = m ? m[1] : 'fr';
+  document.addEventListener('DOMContentLoaded', function() {
+    ['fr','iw','en'].forEach(l => {
+      const btn = document.getElementById('lang-'+l);
+      if (btn) btn.classList.toggle('active', l === cur);
+    });
+  });
+})();
+
+/* ─── TRANSLATE TO LANGUAGE (cookie + reload) ─── */
+function translateTo(lang) {
+  const exp = 'expires=' + new Date(Date.now() + 365*24*3600*1000).toUTCString();
+  const host = location.hostname;
+
+  if (lang === 'fr') {
+    // Effacer les cookies de traduction → retour à la langue originale
+    document.cookie = 'googtrans=; path=/; expires=' + new Date(0).toUTCString();
+    document.cookie = 'googtrans=; path=/; domain=' + host + '; expires=' + new Date(0).toUTCString();
+    document.cookie = 'googtrans=; path=/; domain=.' + host + '; expires=' + new Date(0).toUTCString();
+  } else {
+    // Poser le cookie de traduction → Google Translate l'applique au rechargement
+    document.cookie = 'googtrans=/fr/' + lang + '; path=/; ' + exp;
+    document.cookie = 'googtrans=/fr/' + lang + '; path=/; domain=.' + host + '; ' + exp;
+  }
+  location.reload();
+}
+</script>
+
+</body>
+</html>

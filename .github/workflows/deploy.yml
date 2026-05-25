@@ -1,26 +1,24 @@
-name: Deploy to FTP
+name: Sync & Verify
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  deploy:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: caesarea.tv
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          server-dir: /news/
-          local-dir: ./
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            .github/**
+      - name: Vérifier les caméras actives
+        run: |
+          echo "=== Vérification des streams HLS ==="
+          grep "stream:'" index.html | grep -o "https://[^']*" | while read url; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 8 "$url")
+            if [ "$code" = "200" ]; then
+              echo "✅ $url"
+            else
+              echo "❌ MORT ($code): $url"
+            fi
+          done

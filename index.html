@@ -2326,23 +2326,19 @@ async function generateEditorial() {
         return;
       }
     }
-  } catch(e) { /* serveur indisponible — génération locale */ }
+  } catch(e) { /* serveur indisponible */ }
 
-  // ── 2. Génération déterministe + auto-publication serveur ──
-  // Seed = date UTC → IDENTIQUE sur tous les appareils le même jour
-  // Pas de lecture localStorage : impossible d'avoir un vieux cache
-  const dateStr = _getTodayDateStr();
-  const html = _buildAndShowBillet(_dateSeed(), todayKey);
-
-  // Auto-publication : le premier visiteur publie pour tous les autres
-  try {
-    await fetch('/news/billet.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ date: todayKey, html, dateStr, password: 'hdr2012' }),
-      signal: abortSignal(8000)
-    });
-  } catch(e) { /* publication silencieuse — seeded billet reste identique */ }
+  // ── 2. Pas de billet du jour disponible — message d'attente ──
+  el.innerHTML = `
+    <div class="editorial-header">
+      <div>
+        <div class="editorial-byline">Chronique · Rédaction Dionysos</div>
+        <div class="editorial-date">${_getTodayDateStr().charAt(0).toUpperCase() + _getTodayDateStr().slice(1)}</div>
+      </div>
+    </div>
+    <div class="editorial-body" id="editorial-body">
+      <p style="color:var(--muted);font-style:italic;">Le billet du jour arrive en cours de journée.</p>
+    </div>`;
 }
 
 // ── REC : édition & publication du billet ──

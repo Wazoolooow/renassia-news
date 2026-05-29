@@ -1530,6 +1530,7 @@ async function fetchBitcoin() {
     const eur=btc.eur.toLocaleString('fr-FR');
     const ils=btc.ils.toLocaleString('fr-FR');
     document.getElementById('btc-content').innerHTML=`
+      <div style="font-size:11px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">₿ Bitcoin</div>
       <div class="btc-price">$${usd}</div>
       <div class="btc-change ${cls}">${arrow} ${Math.abs(chg).toFixed(2)}% sur 24h</div>
       <div class="btc-sub">

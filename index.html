@@ -1802,7 +1802,8 @@ async function fetchNewsIntl(retryCount=0) {
     ]},
   ];
   try {
-    const regionsHtml = await Promise.all(INTL_REGIONS.map(async reg=>{
+    const regionsHtml = [];
+    for (const reg of INTL_REGIONS) {
       const sourcesData = await Promise.all(reg.sources.map(async s=>({...s, items: await fetchRSS(s.url,4)})));
       const sourcesHtml = sourcesData.filter(s=>s.items.length).map(src=>{
         const items=src.items.map(it=>{
@@ -1812,13 +1813,13 @@ async function fetchNewsIntl(retryCount=0) {
         }).join('');
         return `<div class="intl-source"><div class="intl-source-name">${src.name}</div>${items}</div>`;
       }).join('');
-      if (!sourcesHtml) return '';
-      return `<div class="intl-region"><div class="intl-region-title">${reg.flag} ${reg.name}</div><div class="intl-sources-grid">${sourcesHtml}</div></div>`;
-    }));
-    const html = regionsHtml.filter(Boolean).join('<hr style="border:none;border-top:1px solid rgba(255,255,255,.05);margin:18px 0">');
-    if (!html) throw new Error('vide');
-    el.innerHTML=html;
-  } catch(e) { el.innerHTML=`<div class="server-offline">Presse internationale indisponible.</div>`; }
+      if (!sourcesHtml) continue;
+      regionsHtml.push(`<div class="intl-region"><div class="intl-region-title">${reg.flag} ${reg.name}</div><div class="intl-sources-grid">${sourcesHtml}</div></div>`);
+      // Affichage progressif — chaque région s'affiche dès qu'elle est prête
+      el.innerHTML = regionsHtml.join('<hr style="border:none;border-top:1px solid rgba(255,255,255,.05);margin:18px 0">');
+    }
+    if (!regionsHtml.length) throw new Error('vide');
+  } catch(e) { if (!el.innerHTML || el.innerHTML.includes('loading')) el.innerHTML=`<div class="server-offline">Presse internationale indisponible.</div>`; }
 }
 
 // ═══ CONDITIONS MARINES 7J ═══

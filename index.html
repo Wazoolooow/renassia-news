@@ -873,10 +873,6 @@ body { top:0 !important; }
     <div id="stocks-content" style="margin-top:14px;"></div>
   </div>
 
-  <div class="panel">
-    <div class="panel-title">🌤️ Prévisions 3 jours</div>
-    <div id="forecast3-content"><div class="loading">Calcul des trajectoires…</div></div>
-  </div>
 
 </div>
 </div><!-- /sec-conditions -->
@@ -1382,7 +1378,6 @@ function switchBeachWeather(lat, lon, locName) {
   if (sidebarLoc) sidebarLoc.textContent = locName;
   fetchWeather();
   fetchMarine();
-  fetchForecast3();
 }
 
 // ═══ WEATHER ═══
@@ -1894,31 +1889,6 @@ async function fetchSeaWeek() {
       sidebarWeek.innerHTML=`<div style="font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin:10px 0 4px;padding-top:8px;border-top:1px solid rgba(255,255,255,.08)">📅 7 Jours</div>${weekRows}`;
     }
   } catch(e) { const swEl=document.getElementById('sea-week-content'); if(swEl) swEl.innerHTML=`<div class="server-offline">Données marines indisponibles</div>`; }
-}
-
-// ═══ FORECAST 3J ═══
-async function fetchForecast3() {
-  try {
-    const url=`https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&daily=weathercode,temperature_2m_max,temperature_2m_min,windspeed_10m_max&timezone=${TZ}&forecast_days=7`;
-    const r=await fetch(url);
-    const d=await r.json();
-    const WMO={0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',71:'🌨️',73:'🌨️',75:'🌨️',80:'🌦️',81:'🌧️',82:'⛈️',95:'⛈️',96:'⛈️',99:'⛈️'};
-    const days=d.daily.time.map((t,i)=>{
-      const dt=new Date(t+'T12:00:00');
-      const name=dt.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
-      const ico=WMO[d.daily.weathercode[i]]??'🌡️';
-      const max=Math.round(d.daily.temperature_2m_max[i]);
-      const min=Math.round(d.daily.temperature_2m_min[i]);
-      const wind=Math.round(d.daily.windspeed_10m_max[i]);
-      return `<div style="background:rgba(0,0,0,.25);border-radius:10px;padding:10px 8px;text-align:center;border:1px solid rgba(255,255,255,.06);">
-        <div style="font-size:10px;color:var(--muted);letter-spacing:1px">${name}</div>
-        <div style="font-size:26px;margin:6px 0">${ico}</div>
-        <div style="font-family:var(--font-data);font-size:13px"><span style="color:var(--text)">${max}°</span> <span style="color:var(--muted)">${min}°</span></div>
-        <div style="font-size:10px;color:var(--muted);margin-top:4px">💨 ${wind} km/h</div>
-      </div>`;
-    }).join('');
-    document.getElementById('forecast3-content').innerHTML=`<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px">${days}</div>`;
-  } catch(e) { document.getElementById('forecast3-content').innerHTML=`<div class="loading">Indisponible</div>`; }
 }
 
 // ═══ FILS X ═══
@@ -2478,7 +2448,7 @@ async function refreshAll() {
   const btn=document.getElementById('refresh-btn');
   btn.classList.add('spinning');
   await Promise.all([
-    fetchWeather(), fetchMarine(), fetchBitcoin(), fetchStocks(), fetchForecast3(),
+    fetchWeather(), fetchMarine(), fetchBitcoin(), fetchStocks(),
     fetchSeaWeek(),
     fetchNewsWorld(), fetchNewsIsrael(), fetchNewsIntl(), fetchShowbiz(),
   ]);

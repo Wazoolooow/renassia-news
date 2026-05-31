@@ -926,15 +926,55 @@ body { top:0 !important; }
 
 <script>
 (function(){
-  const BEACH_CAMS = [
-    // ── HLS vérifiés ✅ — état vérifié le 31 mai 2026 ──
-    { name:'Sédot Yam · Césarée',   type:'hls', stream:'https://s75.ipcamlive.com/streams/4bfay86s7cqyxu9ej/stream.m3u8',  lat:32.4994, lon:34.9006, locName:'Césarée' },
-    { name:'Haïfa · Krayot',        type:'hls', stream:'https://s122.ipcamlive.com/streams/7ayowdseo0x27undj/stream.m3u8', lat:32.8466, lon:35.0085, locName:'Haïfa · Krayot' },
-    { name:'Herzliya · Zvulun',     type:'hls', stream:'https://s173.ipcamlive.com/streams/adqj41o0ur56kjax7/stream.m3u8', lat:32.1648, lon:34.8274, locName:'Herzliya' },
+  // ── POOL COMPLET — toutes les caméras candidates ──
+  // kind:'direct' → URL HLS fixe vérifiée par HEAD fetch
+  // kind:'ipcam'  → alias ipcamlive, résolu en temps réel via leur API
+  const CAM_POOL = [
+    { kind:'direct', name:'Sédot Yam · Césarée',    stream:'https://s75.ipcamlive.com/streams/4bfay86s7cqyxu9ej/stream.m3u8',  lat:32.4994, lon:34.9006, locName:'Césarée' },
+    { kind:'direct', name:'Haïfa · Krayot',          stream:'https://s122.ipcamlive.com/streams/7ayowdseo0x27undj/stream.m3u8', lat:32.8466, lon:35.0085, locName:'Haïfa · Krayot' },
+    { kind:'ipcam',  alias:'634548590c353', name:'Herzliya · Zvulun',      lat:32.1648, lon:34.8274, locName:'Herzliya' },
+    { kind:'ipcam',  alias:'63454584c4c3c', name:'Tel Aviv · Hilton',      lat:32.0853, lon:34.7718, locName:'Tel Aviv' },
+    { kind:'ipcam',  alias:'5f6364b5551d7', name:'Tel Aviv · Aviv Beach',  lat:32.0703, lon:34.7635, locName:'Tel Aviv' },
+    { kind:'ipcam',  alias:'664cd75b7639c', name:'Tel Aviv · Yafo',        lat:32.0167, lon:34.7516, locName:'Yafo' },
+    { kind:'ipcam',  alias:'63454a0f442fc', name:'Herzliya · Marina Nord', lat:32.1520, lon:34.8020, locName:'Herzliya' },
+    { kind:'ipcam',  alias:'6994cb060b270', name:'Herzliya · South',       lat:32.1450, lon:34.8000, locName:'Herzliya' },
+    { kind:'ipcam',  alias:'60997a5d22ca9', name:'Haïfa · Bat Galim',     lat:32.8199, lon:34.9680, locName:'Haïfa' },
+    { kind:'ipcam',  alias:'633ef1ad3453e', name:'Haïfa · Meridian',       lat:32.8320, lon:34.9960, locName:'Haïfa' },
   ];
 
+  // Résolution d'une caméra : retourne un objet {name,type:'hls',stream,lat,lon,locName} ou null
+  async function resolveCamera(cam) {
+    if (cam.kind === 'direct') {
+      try {
+        const r = await fetch(cam.stream, { method:'HEAD', signal:AbortSignal.timeout(6000) });
+        if (r.ok) return { name:cam.name, type:'hls', stream:cam.stream, lat:cam.lat, lon:cam.lon, locName:cam.locName };
+      } catch(e) {}
+      return null;
+    } else {
+      try {
+        const api = `https://player.ipcamlive.com/player/getcamerastreamstate.php?_=${Date.now()}&alias=${cam.alias}&targetdomain=&getstreaminfo=1`;
+        const r = await fetch(api, { signal:AbortSignal.timeout(8000) });
+        const d = await r.json();
+        const det = d.details;
+        if (det && String(det.streamavailable) === '1' && det.streamid && det.address) {
+          const srv = det.address.replace('http://', 'https://').replace(/\/$/, '');
+          return { name:cam.name, type:'hls', stream:`${srv}/streams/${det.streamid}/stream.m3u8`, lat:cam.lat, lon:cam.lon, locName:cam.locName };
+        }
+      } catch(e) {}
+      return null;
+    }
+  }
+
+  let BEACH_CAMS = [];
   window._BEACH_CAMS = BEACH_CAMS;
   let mainPlayer = null;
+  let camsResolved = false;
+
+  // Résoudre toutes les caméras en parallèle, ne garder que les vivantes
+  async function resolveCameras() {
+    const results = await Promise.all(CAM_POOL.map(resolveCamera));
+    return results.filter(Boolean);
+  }
 
   function initMainPlayer() {
     if (typeof videojs === 'undefined') { setTimeout(initMainPlayer, 300); return; }
@@ -948,57 +988,26 @@ body { top:0 !important; }
         nativeVideoTracks: true, nativeAudioTracks: true, nativeTextTracks: true,
       }
     }, function onReady() {
-      // Load first camera (HLS)
-      switchCam(0);
+      if (BEACH_CAMS.length) switchCam(0);
     });
-    // Sync weather once all scripts loaded
-    setTimeout(function() {
-      const c = BEACH_CAMS[0];
-      if (c && c.lat && typeof switchBeachWeather === 'function') {
-        switchBeachWeather(c.lat, c.lon, c.locName);
-      }
-    }, 1200);
   }
 
   function switchCam(idx) {
     const cam = BEACH_CAMS[idx];
+    if (!cam) return;
     document.getElementById('live-cam-name').textContent = cam.name;
 
     const ytWrap   = document.getElementById('kotel-yt-wrap');
     const ytFrame  = document.getElementById('kotel-yt-frame');
     const hlsVideo = document.getElementById('live-cam');
-    const camWrap  = document.getElementById('live-cam-wrap');
 
-    // Remove any existing ipcam iframe
-    const oldIframe = document.getElementById('ipcam-iframe');
-    if (oldIframe) oldIframe.remove();
-
-    if (cam.type === 'youtube') {
-      hlsVideo.style.display = 'none';
-      if (mainPlayer) mainPlayer.pause();
-      ytFrame.src = `https://www.youtube.com/embed/${cam.videoId}?autoplay=1&mute=1&rel=0`;
-      ytWrap.style.display = 'block';
-    } else if (cam.type === 'ipcam') {
-      hlsVideo.style.display = 'none';
-      if (mainPlayer) mainPlayer.pause();
-      ytWrap.style.display = 'none';
-      ytFrame.src = '';
-      const iframe = document.createElement('iframe');
-      iframe.id = 'ipcam-iframe';
-      iframe.src = `https://ipcamlive.com/player/player.php?alias=${cam.alias}&autoplay=1`;
-      iframe.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;border:0;';
-      iframe.allow = 'autoplay; encrypted-media';
-      iframe.allowFullscreen = true;
-      camWrap.appendChild(iframe);
-    } else {
-      // HLS stream
-      ytWrap.style.display = 'none';
-      ytFrame.src = '';
-      hlsVideo.style.display = 'block';
-      if (mainPlayer && !mainPlayer.isDisposed()) {
-        mainPlayer.src({ src: cam.stream, type: 'application/x-mpegURL' });
-        mainPlayer.play().catch(() => {});
-      }
+    // All cameras are HLS — hide YouTube wrapper
+    ytWrap.style.display = 'none';
+    ytFrame.src = '';
+    hlsVideo.style.display = 'block';
+    if (mainPlayer && !mainPlayer.isDisposed()) {
+      mainPlayer.src({ src: cam.stream, type: 'application/x-mpegURL' });
+      mainPlayer.play().catch(() => {});
     }
 
     document.querySelectorAll('.beach-mini-wrap').forEach((el, i) => {
@@ -1044,62 +1053,31 @@ body { top:0 !important; }
     }
   }
 
-  const strip = document.getElementById('beach-cams-strip');
-  BEACH_CAMS.forEach((cam, i) => {
-    const wrap = document.createElement('div');
-    wrap.className = 'beach-mini-wrap';
-    wrap.style.cssText = `flex:0 0 auto;cursor:pointer;border-radius:10px;overflow:hidden;
-      border:2px solid ${i===0?'var(--gold)':'rgba(255,255,255,.1)'};
-      transition:all .2s;transform:${i===0?'scale(1.04)':'scale(1)'};background:#000;
-      box-shadow:${i===0?'0 4px 16px rgba(201,168,76,.2)':'none'};`;
+  // ── Construction du strip ──────────────────────────────────────────────────
+  function buildCamStrip(liveCams) {
+    const strip = document.getElementById('beach-cams-strip');
+    strip.innerHTML = '';
+    if (!liveCams.length) {
+      strip.innerHTML = '<div style="color:var(--muted);font-size:11px;padding:20px 10px;">Aucune caméra disponible pour l\'instant.</div>';
+      return;
+    }
+    liveCams.forEach((cam, i) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'beach-mini-wrap';
+      wrap.style.cssText = `flex:0 0 auto;cursor:pointer;border-radius:10px;overflow:hidden;
+        border:2px solid ${i===0?'var(--gold)':'rgba(255,255,255,.1)'};
+        transition:all .2s;transform:${i===0?'scale(1.04)':'scale(1)'};background:#000;
+        box-shadow:${i===0?'0 4px 16px rgba(201,168,76,.2)':'none'};`;
 
-    const thumb = document.createElement('div');
-    thumb.style.cssText = 'width:150px;height:85px;position:relative;background:#000;overflow:hidden;';
+      const thumb = document.createElement('div');
+      thumb.style.cssText = 'width:150px;height:85px;position:relative;background:#000;overflow:hidden;';
 
-    if (cam.type === 'youtube') {
-      // YouTube : miniature statique (pas de streaming possible cross-origin)
-      const img = document.createElement('img');
-      img.src = `https://img.youtube.com/vi/${cam.videoId}/mqdefault.jpg`;
-      img.style.cssText = 'width:150px;height:85px;display:block;object-fit:cover;';
-      img.onerror = () => { img.style.display='none'; };
-      thumb.appendChild(img);
-      const playO = document.createElement('div');
-      playO.style.cssText = `position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-        width:30px;height:30px;background:rgba(255,0,0,.85);border-radius:50%;
-        display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;pointer-events:none;`;
-      playO.textContent = '▶';
-      thumb.appendChild(playO);
-    } else if (cam.type === 'ipcam') {
-      // ipcamlive — petit iframe live chargé en décalé
-      const iframeWrap = document.createElement('div');
-      iframeWrap.style.cssText = 'width:150px;height:85px;overflow:hidden;position:relative;background:#000;';
-      const miniFrame = document.createElement('iframe');
-      miniFrame.style.cssText = `width:300px;height:170px;border:0;
-        transform:scale(0.5);transform-origin:top left;
-        pointer-events:none;position:absolute;top:0;left:0;`;
-      miniFrame.allow = 'autoplay; encrypted-media';
-      // Chargement décalé pour ne pas bloquer le rendu initial
-      setTimeout(() => {
-        miniFrame.src = `https://ipcamlive.com/player/player.php?alias=${cam.alias}&autoplay=1`;
-      }, 1500 + i * 400);
-      iframeWrap.appendChild(miniFrame);
-      // Fallback visible jusqu'au chargement
-      const fallbackMini = document.createElement('div');
-      fallbackMini.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;
-        display:flex;align-items:center;justify-content:center;
-        background:linear-gradient(135deg,#060d1a,#0a1628);font-size:18px;pointer-events:none;`;
-      fallbackMini.textContent = '📷';
-      iframeWrap.appendChild(fallbackMini);
-      miniFrame.addEventListener('load', () => { fallbackMini.style.display = 'none'; });
-      thumb.appendChild(iframeWrap);
-    } else {
-      // Flux HLS — vidéo live via hls.js
+      // Toutes les caméras sont HLS — miniature vidéo live
       const vid = document.createElement('video');
       vid.muted = true;
       vid.autoplay = true;
       vid.playsInline = true;
       vid.style.cssText = 'width:150px;height:85px;display:block;object-fit:cover;';
-      // Overlay de chargement / hors-ligne
       const fallback = document.createElement('div');
       fallback.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;
         display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
@@ -1118,38 +1096,71 @@ body { top:0 !important; }
       vid.addEventListener('waiting', () => { fallback.style.opacity = '1'; fbLabel.textContent = 'Chargement…'; });
       vid.addEventListener('error',   () => { fallback.style.opacity = '1'; fbLabel.textContent = 'Hors ligne'; fbIcon.textContent = '📵'; });
       thumb.appendChild(vid);
-      // Lance le flux (après un délai pour ne pas tout charger en même temps)
       setTimeout(() => attachHLS(vid, cam.stream), 800 + i * 600);
-    }
 
-    // Badge LIVE
-    const badge = document.createElement('div');
-    badge.style.cssText = `position:absolute;top:5px;right:5px;background:#dc2626;color:#fff;
-      font-size:7px;font-weight:700;padding:2px 5px;border-radius:3px;letter-spacing:1.5px;
-      animation:blink 1.4s infinite;pointer-events:none;`;
-    badge.textContent = 'LIVE';
-    thumb.appendChild(badge);
+      // Badge LIVE
+      const badge = document.createElement('div');
+      badge.style.cssText = `position:absolute;top:5px;right:5px;background:#dc2626;color:#fff;
+        font-size:7px;font-weight:700;padding:2px 5px;border-radius:3px;letter-spacing:1.5px;
+        animation:blink 1.4s infinite;pointer-events:none;`;
+      badge.textContent = 'LIVE';
+      thumb.appendChild(badge);
 
-    wrap.appendChild(thumb);
+      wrap.appendChild(thumb);
 
-    const label = document.createElement('div');
-    label.className = 'beach-mini-label';
-    label.style.cssText = `padding:5px 8px;font-size:9px;letter-spacing:1px;
-      color:${i===0?'var(--gold)':'var(--muted)'};text-align:center;
-      background:rgba(3,5,8,.9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;`;
-    label.textContent = cam.name;
-    wrap.appendChild(label);
+      const label = document.createElement('div');
+      label.className = 'beach-mini-label';
+      label.style.cssText = `padding:5px 8px;font-size:9px;letter-spacing:1px;
+        color:${i===0?'var(--gold)':'var(--muted)'};text-align:center;
+        background:rgba(3,5,8,.9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;`;
+      label.textContent = cam.name;
+      wrap.appendChild(label);
 
-    wrap.addEventListener('click', () => {
-      switchCam(i);
-      document.querySelectorAll('.beach-mini-label').forEach((l, j) => {
-        l.style.color = j === i ? 'var(--gold)' : 'var(--muted)';
+      wrap.addEventListener('click', () => {
+        switchCam(i);
+        document.querySelectorAll('.beach-mini-label').forEach((l, j) => {
+          l.style.color = j === i ? 'var(--gold)' : 'var(--muted)';
+        });
       });
+      strip.appendChild(wrap);
     });
-    strip.appendChild(wrap);
-  });
+  }
 
-  initMainPlayer();
+  // ── Démarrage asynchrone ───────────────────────────────────────────────────
+  async function startup() {
+    // Afficher un indicateur pendant la vérification
+    const strip = document.getElementById('beach-cams-strip');
+    strip.innerHTML = '<div style="color:var(--muted);font-size:11px;padding:20px 10px;letter-spacing:.5px;">🔍 Vérification des caméras…</div>';
+
+    const liveCams = await resolveCameras();
+    BEACH_CAMS = liveCams;
+    window._BEACH_CAMS = BEACH_CAMS;
+    camsResolved = true;
+
+    buildCamStrip(liveCams);
+    initMainPlayer();
+  }
+  startup();
+
+  // Rafraîchir automatiquement toutes les 5 minutes
+  setInterval(async () => {
+    const liveCams = await resolveCameras();
+    if (!liveCams.length) return; // Garder l'affichage actuel si tout est down
+    const currentIdx = BEACH_CAMS.findIndex(c => {
+      // Essaye de retrouver la caméra en cours dans la nouvelle liste
+      if (mainPlayer && !mainPlayer.isDisposed()) {
+        const src = mainPlayer.currentSrc();
+        return src && c.stream === src;
+      }
+      return false;
+    });
+    BEACH_CAMS = liveCams;
+    window._BEACH_CAMS = BEACH_CAMS;
+    buildCamStrip(liveCams);
+    // Reprendre sur la même caméra si toujours dispo, sinon la première
+    const newIdx = Math.max(0, currentIdx < liveCams.length ? currentIdx : 0);
+    switchCam(newIdx);
+  }, 5 * 60 * 1000);
 })();
 </script>
 </div><!-- /sec-cams -->

@@ -930,6 +930,7 @@ body { top:0 !important; }
   // kind:'direct' → URL HLS fixe vérifiée par HEAD fetch
   // kind:'ipcam'  → alias ipcamlive, résolu en temps réel via leur API
   const CAM_POOL = [
+    { kind:'ipcam',  alias:'freegullsouth', targetdomain:'wind.co.il', name:'Sédot Yam · Césarée', lat:32.4994, lon:34.9006, locName:'Césarée' },
     { kind:'direct', name:'Haïfa · Krayot',          stream:'https://s122.ipcamlive.com/streams/7ayowdseo0x27undj/stream.m3u8', lat:32.8466, lon:35.0085, locName:'Haïfa · Krayot' },
     { kind:'ipcam',  alias:'634548590c353', name:'Herzliya · Zvulun',      lat:32.1648, lon:34.8274, locName:'Herzliya' },
     { kind:'ipcam',  alias:'63454584c4c3c', name:'Tel Aviv · Hilton',      lat:32.0853, lon:34.7718, locName:'Tel Aviv' },
@@ -948,7 +949,8 @@ body { top:0 !important; }
       return { name:cam.name, type:'hls', stream:cam.stream, lat:cam.lat, lon:cam.lon, locName:cam.locName };
     } else {
       try {
-        const api = `https://player.ipcamlive.com/player/getcamerastreamstate.php?_=${Date.now()}&alias=${cam.alias}&targetdomain=beachcam.co.il&getstreaminfo=1`;
+        const td = cam.targetdomain || 'beachcam.co.il';
+        const api = `https://player.ipcamlive.com/player/getcamerastreamstate.php?_=${Date.now()}&alias=${cam.alias}&targetdomain=${td}&getstreaminfo=1`;
         const r = await fetch(api, { signal:AbortSignal.timeout(8000) });
         const d = await r.json();
         const det = d.details;

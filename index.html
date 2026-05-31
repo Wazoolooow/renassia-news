@@ -945,11 +945,8 @@ body { top:0 !important; }
   // Résolution d'une caméra : retourne un objet {name,type:'hls',stream,lat,lon,locName} ou null
   async function resolveCamera(cam) {
     if (cam.kind === 'direct') {
-      try {
-        const r = await fetch(cam.stream, { method:'HEAD', signal:AbortSignal.timeout(6000) });
-        if (r.ok) return { name:cam.name, type:'hls', stream:cam.stream, lat:cam.lat, lon:cam.lon, locName:cam.locName };
-      } catch(e) {}
-      return null;
+      // URL fixe connue — pas de vérification CORS (le player HLS gère les erreurs)
+      return { name:cam.name, type:'hls', stream:cam.stream, lat:cam.lat, lon:cam.lon, locName:cam.locName };
     } else {
       try {
         const api = `https://player.ipcamlive.com/player/getcamerastreamstate.php?_=${Date.now()}&alias=${cam.alias}&targetdomain=beachcam.co.il&getstreaminfo=1`;

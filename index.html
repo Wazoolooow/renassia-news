@@ -952,7 +952,7 @@ body { top:0 !important; }
       return null;
     } else {
       try {
-        const api = `https://player.ipcamlive.com/player/getcamerastreamstate.php?_=${Date.now()}&alias=${cam.alias}&targetdomain=&getstreaminfo=1`;
+        const api = `https://player.ipcamlive.com/player/getcamerastreamstate.php?_=${Date.now()}&alias=${cam.alias}&targetdomain=beachcam.co.il&getstreaminfo=1`;
         const r = await fetch(api, { signal:AbortSignal.timeout(8000) });
         const d = await r.json();
         const det = d.details;

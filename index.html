@@ -2310,11 +2310,11 @@ async function generateEditorial() {
     const res = await fetch('/news/billet.php?t=' + Date.now(), { cache: 'no-store', signal: abortSignal(6000) });
     if (res.ok) {
       const data = await res.json();
-      if (data && data.date === todayKey && data.html) {
+      if (data && data.html) {
         el.innerHTML = data.html;
         _editorialOrigHTML = data.html;
         document.querySelectorAll('#editorial-flags .trans-flag-btn').forEach(b => b.classList.remove('active'));
-        _saveToEditoArchive(todayKey, data.dateStr || _getTodayDateStr(), data.html);
+        _saveToEditoArchive(data.date || todayKey, data.dateStr || _getTodayDateStr(), data.html);
         renderEditorialArchive();
         return;
       }

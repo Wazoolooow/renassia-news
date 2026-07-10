@@ -84,7 +84,9 @@ Mieux vaut 4 paragraphes nets que 6 paragraphes creux.
 
 **La phrase de fermeture** (`editorial-closing`) : courte, elle noue les fils du jour, et doit sembler inévitable une fois lue. Affichée en doré (`style="color:#f0c040;"`).
 
-> Exemple : *« Un cessez-le-feu qui cesse, une candidate qui pointe, un aéroport qui se sacre : tout va très vite, sauf la paix. »*
+> Exemple : *« Un cessez-le-feu qui cesse, une candidate qui pointe, un aéroport qui se sacre : tout va très vite, sauf le monde. »*
+>
+> (Première version : *« tout va très vite, sauf la paix »* — corrigée par Hillel : « la paix » ferme le sens, « le monde » l'ouvre. Préférer la chute qui laisse le lecteur finir la pensée à celle qui la finit pour lui.)
 
 ---
 

@@ -70,6 +70,18 @@ Le billet part à 6h : il doit couvrir **les infos de la nuit et du matin même*
 
 Croiser au moins deux sources sur chaque fait chiffré. Ne rien inventer. Une info incertaine se formule avec distance — mais avec la voix Dionysos, pas avec la prudence journalistique plate.
 
+### Pas de réchauffé — vérifier avant d'écrire
+
+C'est un billet **quotidien** : le lecteur d'aujourd'hui a lu celui d'hier. Avant de rédiger, relire les billets des derniers jours :
+
+```bash
+cd /Users/hillelrenassia/Sites/renassia.com/news
+git log --oneline -7 -- billet.json          # les sujets des 7 derniers billets sont dans les messages de commit
+git show HEAD:billet.json | head -50          # relire le billet d'hier en entier
+```
+
+Un sujet déjà traité ne revient **que s'il y a du nouveau** — et alors on écrit le développement, pas le rappel. Exemple d'erreur réelle : la visite de Macron à Damas, ouverture du billet de mardi, resservie le samedi comme une nouvelle fraîche (« première visite depuis 2008 »). Le lecteur qui l'a lue mardi conclut que la chronique radote — c'est la pire chose qu'on puisse faire penser à un lecteur de chronique. Si l'actu du jour est maigre, mieux vaut un paragraphe de moins qu'un paragraphe recyclé.
+
 ---
 
 ## Structure du billet
@@ -95,11 +107,13 @@ Mieux vaut 4 paragraphes nets que 6 paragraphes creux.
 Relire le billet une fois et vérifier :
 
 1. Deux phrases consécutives ont-elles la même construction ? → réécrire l'une des deux
-2. Y a-t-il au moins une phrase très courte et une très longue ?
+2. Y a-t-il au moins une phrase très courte (moins de six mots) et une très longue ? → sinon, en casser une
 3. Ai-je annoncé quelque part ma gravité ou mon humour au lieu de les pratiquer ? → couper l'annonce
 4. Chaque paragraphe attaque-t-il différemment du précédent ?
-5. La phrase de fermeture noue-t-elle réellement les fils du jour, ou est-elle interchangeable avec celle d'hier ?
-6. Est-ce que je me suis fait plaisir en l'écrivant ? Si non, le lecteur s'ennuiera aussi.
+5. Un de mes sujets figure-t-il déjà dans les billets des jours précédents sans élément nouveau ? → le couper
+6. La phrase de fermeture noue-t-elle réellement les fils du jour, ou est-elle interchangeable avec celle d'hier ?
+7. Les guillemets sont-ils bien en `«&nbsp;` / `&nbsp;»` (jamais `&laquo;` / `&raquo;`) ?
+8. Est-ce que je me suis fait plaisir en l'écrivant ? Si non, le lecteur s'ennuiera aussi.
 
 ---
 

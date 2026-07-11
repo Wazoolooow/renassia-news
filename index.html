@@ -931,14 +931,19 @@ body { top:0 !important; }
   // kind:'ipcam'  → alias ipcamlive, résolu en temps réel via leur API
   const CAM_POOL = [
     { kind:'ipcam',  alias:'freegullsouth', targetdomain:'wind.co.il', name:'Sédot Yam · Césarée', lat:32.4994, lon:34.9006, locName:'Césarée' },
-{ kind:'ipcam',  alias:'634548590c353', name:'Herzliya · Zvulun',      lat:32.1648, lon:34.8274, locName:'Herzliya' },
+    { kind:'ipcam',  alias:'6469b4554f45e', targetdomain:'israelbeachcams.co.il', name:'Kiryat Yam',        lat:32.8497, lon:35.0687, locName:'Kiryat Yam' },
+    { kind:'ipcam',  alias:'633ef1ad3453e', name:'Haïfa · Meridian',       lat:32.8320, lon:34.9960, locName:'Haïfa' },
+    { kind:'ipcam',  alias:'5ffd9eb29b665', targetdomain:'israelbeachcams.co.il', name:'Haïfa · Bakedor',   lat:32.8255, lon:34.9573, locName:'Haïfa' },
+    { kind:'ipcam',  alias:'60997a5d22ca9', name:'Haïfa · Bat Galim',     lat:32.8199, lon:34.9680, locName:'Haïfa' },
+    { kind:'ipcam',  alias:'60acaa1aeee83', targetdomain:'israelbeachcams.co.il', name:'Haïfa · Nirvana',   lat:32.7908, lon:34.9490, locName:'Haïfa' },
+    { kind:'ipcam',  alias:'5b17c8292282c', targetdomain:'israelbeachcams.co.il', name:'Maagan Michael',    lat:32.5586, lon:34.9130, locName:'Maagan Michael' },
+    { kind:'ipcam',  alias:'634548590c353', name:'Herzliya · Zvulun',      lat:32.1648, lon:34.8274, locName:'Herzliya' },
+    { kind:'ipcam',  alias:'63454a0f442fc', name:'Herzliya · Marina Nord', lat:32.1520, lon:34.8020, locName:'Herzliya' },
+    { kind:'ipcam',  alias:'6994cb060b270', name:'Herzliya · South',       lat:32.1450, lon:34.8000, locName:'Herzliya' },
     { kind:'ipcam',  alias:'63454584c4c3c', name:'Tel Aviv · Hilton',      lat:32.0853, lon:34.7718, locName:'Tel Aviv' },
     { kind:'ipcam',  alias:'5f6364b5551d7', name:'Tel Aviv · Aviv Beach',  lat:32.0703, lon:34.7635, locName:'Tel Aviv' },
     { kind:'ipcam',  alias:'664cd75b7639c', name:'Tel Aviv · Yafo',        lat:32.0167, lon:34.7516, locName:'Yafo' },
-    { kind:'ipcam',  alias:'63454a0f442fc', name:'Herzliya · Marina Nord', lat:32.1520, lon:34.8020, locName:'Herzliya' },
-    { kind:'ipcam',  alias:'6994cb060b270', name:'Herzliya · South',       lat:32.1450, lon:34.8000, locName:'Herzliya' },
-    { kind:'ipcam',  alias:'60997a5d22ca9', name:'Haïfa · Bat Galim',     lat:32.8199, lon:34.9680, locName:'Haïfa' },
-    { kind:'ipcam',  alias:'633ef1ad3453e', name:'Haïfa · Meridian',       lat:32.8320, lon:34.9960, locName:'Haïfa' },
+    { kind:'ipcam',  alias:'surfcenterkite', targetdomain:'israelbeachcams.co.il', name:'Eilat · Surf Center', lat:29.5480, lon:34.9520, locName:'Eilat' },
   ];
 
   // Résolution d'une caméra : retourne un objet {name,type:'hls',stream,lat,lon,locName} ou null
@@ -2572,6 +2577,66 @@ function translateTo(lang) {
   location.reload();
 }
 </script>
+
+<!-- Cookie banner -->
+<style>
+#ck-bar {
+  display: none; position: fixed; bottom: 28px; left: 0; right: 0; z-index: 9999;
+  background: rgba(10,10,12,0.97);
+  border-top: 1px solid #1a1a1e;
+  padding: 12px 24px;
+  font-size: 0.68rem; font-weight: 300;
+  letter-spacing: 0.12em; color: #666;
+  align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+  font-family: 'Inter', sans-serif;
+}
+#ck-bar a { color: #888; border-bottom: 1px solid #333; text-decoration: none; }
+.ck-btns { display: flex; gap: 10px; flex-shrink: 0; }
+.ck-btns button {
+  background: none; border: 1px solid #222; color: #666;
+  cursor: pointer; padding: 4px 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.65rem; letter-spacing: 0.15em;
+  text-transform: uppercase; transition: all 0.3s;
+}
+.ck-btns button:hover { border-color: #d4af37; color: #e8c97a; }
+</style>
+<div id="ck-bar" role="alertdialog">
+  <span>Ce site utilise Google Fonts. En naviguant, votre IP peut être transmise à Google.
+    <a href="/privacy.html"> Politique de confidentialité</a></span>
+  <div class="ck-btns">
+    <button id="ck-ok">Accepter</button>
+    <button id="ck-no">Refuser</button>
+  </div>
+</div>
+<script>
+(function(){
+  var bar = document.getElementById('ck-bar');
+  if (!localStorage.getItem('rn_cookie_consent')) { bar.style.display = 'flex'; }
+  document.getElementById('ck-ok').onclick = function(){
+    localStorage.setItem('rn_cookie_consent','accepted'); bar.style.display='none';
+  };
+  document.getElementById('ck-no').onclick = function(){
+    localStorage.setItem('rn_cookie_consent','refused'); bar.style.display='none';
+  };
+})();
+</script>
+
+<!-- Accessibility button -->
+<style>
+#acc-btn {
+  position: fixed; bottom: 110px; right: 16px; z-index: 9998;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(20,20,24,0.95); border: 1px solid #3a3a3a;
+  color: #888; font-size: 1rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  text-decoration: none;
+}
+#acc-btn:hover { border-color: #d4af37; color: #e8c97a; }
+</style>
+<a id="acc-btn" href="/nagishut.html" title="Accessibilité · נגישות" aria-label="Déclaration d'accessibilité">♿</a>
 
 </body>
 </html>

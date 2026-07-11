@@ -39,7 +39,6 @@ body {
   font-family: var(--font-body);
   min-height: 100vh;
   overflow-x: hidden;
-  padding-bottom: 80px;
 }
 
 /* ─── AMBIENT BACKGROUND ─── */
@@ -415,36 +414,6 @@ canvas#btc-spark { width:100%; height:50px; border-radius:8px; background:rgba(0
 .loading { color:var(--muted); font-size:12px; letter-spacing:2px; animation:blink 1.2s infinite; }
 @keyframes blink { 0%,100%{opacity:.25} 50%{opacity:1} }
 
-/* ─── RADIO — EUROPE 1 ─── */
-#radio-bar {
-  position:fixed; bottom:0; left:0; right:0; z-index:9999;
-  background:linear-gradient(135deg, #08081a 0%, #10102a 100%);
-  border-top:1px solid rgba(201,168,76,.3);
-  display:flex; align-items:center; gap:20px;
-  padding:10px 28px; box-shadow:0 -4px 30px rgba(0,0,0,.7);
-  backdrop-filter:blur(10px);
-}
-#radio-bar .radio-logo { font-size:13px; font-weight:800; letter-spacing:3px; text-transform:uppercase; color:#ffffff; white-space:nowrap; }
-#radio-bar .radio-logo span { color:#fff; }
-#radio-bar .radio-wave { display:flex; align-items:flex-end; gap:3px; height:22px; }
-#radio-bar .radio-wave .bar { width:3px; background:var(--gold); border-radius:2px; animation:wave-bar 1.1s ease-in-out infinite; }
-#radio-bar .radio-wave .bar:nth-child(1){height:8px;animation-delay:0s}
-#radio-bar .radio-wave .bar:nth-child(2){height:16px;animation-delay:.15s}
-#radio-bar .radio-wave .bar:nth-child(3){height:22px;animation-delay:.3s}
-#radio-bar .radio-wave .bar:nth-child(4){height:14px;animation-delay:.45s}
-#radio-bar .radio-wave .bar:nth-child(5){height:10px;animation-delay:.6s}
-#radio-bar .radio-wave.paused .bar { animation-play-state:paused; }
-@keyframes wave-bar { 0%,100%{transform:scaleY(.35)} 50%{transform:scaleY(1)} }
-#radio-bar .radio-info { flex:1; font-size:12px; color:var(--muted); letter-spacing:1px; }
-#radio-bar .radio-info strong { color:var(--text); font-size:13px; }
-#radio-toggle { background:none; border:1px solid rgba(201,168,76,.45); border-radius:50%; width:40px; height:40px; cursor:pointer; color:var(--gold); font-size:16px; display:flex; align-items:center; justify-content:center; transition:all .2s; }
-#radio-toggle:hover { background:rgba(201,168,76,.15); border-color:var(--gold); transform:scale(1.1); }
-#radio-vol { -webkit-appearance:none; appearance:none; width:90px; height:3px; background:rgba(255,255,255,.15); border-radius:3px; outline:none; cursor:pointer; }
-#radio-vol::-webkit-slider-thumb { -webkit-appearance:none; width:13px; height:13px; border-radius:50%; background:var(--gold); cursor:pointer; }
-#radio-close { background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer; padding:4px 8px; transition:color .2s; }
-#radio-close:hover { color:#fff; }
-
-
 /* ─── REFRESH BTN ─── */
 .refresh-btn {
   position:fixed; bottom:80px; right:22px;
@@ -496,10 +465,6 @@ canvas#btc-spark { width:100%; height:50px; border-radius:8px; background:rgba(0
   .forecast-day { min-width:70px; flex:0 0 auto; }
   .actions-bar { padding:10px 12px 80px; gap:10px; }
   .action-btn { min-width:140px; padding:12px 14px; }
-  #radio-bar { padding:8px 14px; gap:10px; }
-  #radio-bar .radio-info { display:none; }
-  #radio-vol { width:60px; }
-  #radio-vol { width:60px; }
   .refresh-btn { bottom:76px; right:14px; }
   .section-sep { padding:14px 16px 0; }
 }
@@ -2491,50 +2456,6 @@ async function refreshAll() {
 // Auto-refresh toutes les 4 heures
 setInterval(refreshAll, 4 * 60 * 60 * 1000);
 refreshAll();
-</script>
-
-<!-- ══════════════════════════════════════
-     RADIO EUROPE 1
-     ══════════════════════════════════════ -->
-<div id="radio-bar">
-  <div class="radio-logo"><span>Europe</span> 1</div>
-  <div class="radio-wave" id="radio-wave">
-    <div class="bar"></div><div class="bar"></div><div class="bar"></div>
-    <div class="bar"></div><div class="bar"></div>
-  </div>
-  <div class="radio-info">
-    <strong>🔴 EN DIRECT</strong><br>
-    <span>Radio Europe 1 — Actualités &amp; Débats</span>
-  </div>
-  <input type="range" id="radio-vol" min="0" max="1" step="0.05" value="0.5" title="Volume">
-  <button id="radio-toggle" title="Play / Pause">⏸</button>
-  <button id="radio-close" title="Fermer la radio" onclick="closeRadio()">✕</button>
-</div>
-<audio id="europe1-audio" preload="none">
-  <source src="https://stream.europe1.fr/europe1.mp3" type="audio/mpeg">
-</audio>
-<script>
-(function(){
-  const audio=document.getElementById('europe1-audio');
-  const btn=document.getElementById('radio-toggle');
-  const vol=document.getElementById('radio-vol');
-  const wave=document.getElementById('radio-wave');
-  audio.volume=0.5;
-  audio.play().catch(()=>{});
-  btn.addEventListener('click',()=>{
-    if (audio.paused) { audio.play(); btn.textContent='⏸'; wave.classList.remove('paused'); }
-    else { audio.pause(); btn.textContent='▶'; wave.classList.add('paused'); }
-  });
-  vol.addEventListener('input',()=>{ audio.volume=parseFloat(vol.value); });
-  audio.addEventListener('playing',()=>{ btn.textContent='⏸'; wave.classList.remove('paused'); });
-  audio.addEventListener('pause',()=>{ btn.textContent='▶'; wave.classList.add('paused'); });
-})();
-
-function closeRadio(){
-  document.getElementById('europe1-audio').pause();
-  document.getElementById('radio-bar').style.display='none';
-  document.body.style.paddingBottom='0';
-}
 </script>
 
 <script>

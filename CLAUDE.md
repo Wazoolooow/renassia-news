@@ -56,6 +56,16 @@ Même règle pour l'humour : on ne dit pas *« parce qu'il faut bien sourire »*
 - **Langue de bois interdite** : pas de « spirale de violence », pas de « deux camps », pas de « contexte complexe », pas de « tensions croissantes ».
 - **Ligne éditoriale pro-Israël** — sans propagande, avec intelligence. Les faits défavorables à Israël s'énoncent, mais jamais avec la complaisance médiatique habituelle.
 
+### Le piège du cadrage AFP — erreur réelle à ne jamais refaire
+
+Reprendre les dépêches telles quelles, c'est reprendre leur cadrage : le bilan brut des frappes israéliennes, sans le contexte qui explique pourquoi elles ont lieu. Rappels factuels permanents, à vérifier et intégrer chaque fois que Gaza ou le Liban sont traités : **le Hamas n'a jamais rendu ses armes** (≈27 000 hommes mobilisés, quasi son effectif d'avant-guerre — le désarmement est LA clause de l'accord jamais honorée) ; **le Hezbollah non plus** (accord-cadre rejeté, « nous ne rendrons pas nos armes »). Israël frappe parce que personne d'autre ne fait respecter ce que tout le monde a signé.
+
+> ❌ *À Gaza, trois Palestiniens ont été tués dimanche : un policier abattu, neuf civils touchés par des missiles. Depuis la trêve, plus de mille cent Palestiniens ont péri sous des frappes que le mot « cessez-le-feu » ne décrit plus tout à fait.* (— cadrage AFP : Israël paraît violer la trêve)
+
+> ✅ *À Gaza, les agences comptent les frappes israéliennes ; elles comptent moins volontiers les vingt-sept mille hommes en armes que le Hamas aligne encore, neuf mois après avoir signé un accord dont le désarmement était la clause première — la seule qu'il n'ait jamais honorée. [...] On peut appeler ça des violations ; on peut aussi remarquer que quelqu'un fait le ménage que personne d'autre ne veut faire.*
+
+Les faits sont les mêmes. L'angle dit qui tient sa signature et qui ne la tient pas.
+
 ---
 
 ## Recherche d'actu — le matin même, pas la veille

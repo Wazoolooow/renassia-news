@@ -92,6 +92,8 @@ git show HEAD:billet.json | head -50          # relire le billet d'hier en entie
 
 Un sujet déjà traité ne revient **que s'il y a du nouveau** — et alors on écrit le développement, pas le rappel. Exemple d'erreur réelle : la visite de Macron à Damas, ouverture du billet de mardi, resservie le samedi comme une nouvelle fraîche (« première visite depuis 2008 »). Le lecteur qui l'a lue mardi conclut que la chronique radote — c'est la pire chose qu'on puisse faire penser à un lecteur de chronique. Si l'actu du jour est maigre, mieux vaut un paragraphe de moins qu'un paragraphe recyclé.
 
+**Deuxième piège, distinct du premier : une histoire jamais racontée ici peut quand même être vieille.** Vérifier `git log` protège contre le radotage interne — pas contre une source elle-même ancienne que Google ressort simplement bien référencée. Toujours regarder la date de publication de l'article source, pas seulement son rang dans les résultats de recherche. Erreur réelle (billet du 10 août) : l'histoire du randonneur du Montana empalé sur son propre bâton, présentée en clôture comme un fait du jour — l'incident datait en réalité du 20 juillet, déjà repris partout depuis le 30 juillet. Une bonne anecdote ne devient pas fraîche parce qu'on vient de la découvrir.
+
 ---
 
 ## Structure du billet
@@ -121,6 +123,7 @@ Relire le billet une fois et vérifier :
 3. Ai-je annoncé quelque part ma gravité ou mon humour au lieu de les pratiquer ? → couper l'annonce
 4. Chaque paragraphe attaque-t-il différemment du précédent ?
 5. Un de mes sujets figure-t-il déjà dans les billets des jours précédents sans élément nouveau ? → le couper
+5bis. Pour chaque source utilisée, ai-je vérifié sa date de publication (pas juste sa position dans les résultats) ? → une histoire vieille de plusieurs semaines n'est pas un fait du jour, même inédite dans ce billet
 6. La phrase de fermeture noue-t-elle réellement les fils du jour, ou est-elle interchangeable avec celle d'hier ?
 7. Les guillemets sont-ils bien en `«&nbsp;` / `&nbsp;»` (jamais `&laquo;` / `&raquo;`) ?
 8. Est-ce que je me suis fait plaisir en l'écrivant ? Si non, le lecteur s'ennuiera aussi.

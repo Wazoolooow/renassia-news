@@ -66,6 +66,16 @@ Reprendre les dépêches telles quelles, c'est reprendre leur cadrage : le bilan
 
 Les faits sont les mêmes. L'angle dit qui tient sa signature et qui ne la tient pas.
 
+### L'ONU n'est pas une source neutre sur Israël — erreur réelle à ne jamais refaire
+
+Même piège que le cadrage AFP, mais avec une institution au lieu d'une dépêche. Le Conseil des droits de l'homme de l'ONU consacre un point permanent de son ordre du jour (le point 7) au seul Israël — aucun autre pays au monde n'a ce traitement — et l'Assemblée générale vote historiquement plus de résolutions de condamnation contre Israël que contre tous les autres pays du monde réunis. Citer « l'ONU dit » comme on citerait un arbitre neutre, c'est importer ce biais dans le billet sans le signaler.
+
+> ❌ *À Qusra, des colons assiègent des maisons palestiniennes. L'ONU parle d'un seuil de violence « dépassé », Paris exige poursuites et protection.* (— l'ONU citée comme verdict neutre, sans rappeler qui parle et avec quel historique)
+
+> ✅ *Une formulation qui garde la distance* : rappeler que c'est l'ONU qui parle (pas « la communauté internationale », pas un fait établi), et si le sujet le permet, glisser en une phrase le contexte de ce porte-voix particulier — sans en faire un paragraphe entier, juste assez pour que le lecteur sache d'où vient la sévérité du ton.
+
+Ça ne veut pas dire taire les violences de colons quand les faits sont réels et vérifiés — la ligne éditoriale s'énonce les faits défavorables à Israël aussi. Ça veut dire ne jamais prêter à l'ONU une autorité morale qu'elle n'a pas gagnée sur ce dossier précis.
+
 ---
 
 ## Recherche d'actu — le matin même, pas la veille

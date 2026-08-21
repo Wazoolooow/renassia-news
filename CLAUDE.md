@@ -76,6 +76,21 @@ Même piège que le cadrage AFP, mais avec une institution au lieu d'une dépêc
 
 Ça ne veut pas dire taire les violences de colons quand les faits sont réels et vérifiés — la ligne éditoriale s'énonce les faits défavorables à Israël aussi. Ça veut dire ne jamais prêter à l'ONU une autorité morale qu'elle n'a pas gagnée sur ce dossier précis.
 
+### Le 7 octobre a commencé cette guerre — les pertes palestiniennes ne sont pas notre sujet de compassion
+
+C'est la règle la plus importante des trois, et celle qui prime sur les deux précédentes en cas de doute. Les deux pièges ci-dessus (cadrage AFP, ONU) parlent de *comment formuler* un fait défavorable à Israël quand il faut le mentionner. Celui-ci parle d'un choix plus en amont : *si* ce fait mérite d'être le sujet d'un paragraphe.
+
+Hillel, en toutes lettres, après le billet du 21 août&nbsp;: *«&nbsp;j'en ai rien à foutre des victimes collatérales de cette guerre — ils n'avaient pas à nous tuer en premier&nbsp;»*. Le 7 octobre a déclenché cette guerre. Tout ce qui arrive aux civils de Gaza depuis est une conséquence du choix du Hamas de commencer, de se cacher parmi eux, et de refuser de rendre les armes neuf mois après l'avoir promis — pas une faute qu'Israël doit expier ni un dossier qu'Israël doit instruire pour se faire pardonner.
+
+Concrètement, ça interdit :
+- **Un paragraphe qui prend pour sujet principal la mort d'un enfant palestinien ou d'un civil palestinien**, même traité avec toute la retenue du monde — la retenue sur la forme ne change rien au fait que le fond choisit de faire pleurer le lecteur sur la mauvaise victime.
+- **Une enquête, un procès ou un mea culpa israélien présenté comme un sujet en soi**, surtout avec une chute qui laisse planer le doute sur la sincérité ou la suffisance du geste (*«&nbsp;elle a seulement ouvert le tiroir&nbsp;»* — erreur réelle, billet du 21 août). Si la justice militaire israélienne fait quelque chose, c'est la preuve qu'une armée démocratique s'applique des règles que personne d'autre dans la région ne s'impose — un point pour Israël, jamais un aveu.
+- **Toute formulation qui fait porter à Israël la charge de la preuve** de sa propre légitimité à se défendre.
+
+> ❌ *Mercredi, pour la première fois depuis le début de la guerre, l'armée israélienne a ouvert une enquête pénale sur la mort d'Hind Rajab, cinq ans [...] Une armée qui instruit son propre dossier n'a encore rien tranché ; elle a seulement ouvert le tiroir.* (— fait d'un deuil palestinien individuel le sujet du paragraphe, et suggère qu'Israël se dérobe)
+
+Le bon réflexe n'est pas de reformuler ce paragraphe avec plus de nuance — c'est de **ne pas le choisir**. Une frappe, une victime, une enquête côté Gaza ne sont pas un sujet de chronique en soi. Le sujet, ce sont les décisions du Hamas et du Hezbollah (désarmement refusé, boucliers humains, calendrier de guerre qu'ils dictent), l'Iran, et ce qu'Israël fait pour gagner — pas ce qu'Israël doit se faire pardonner.
+
 ---
 
 ## Recherche d'actu — le matin même, pas la veille

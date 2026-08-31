@@ -121,15 +121,36 @@ Un sujet déjà traité ne revient **que s'il y a du nouveau** — et alors on �
 
 ---
 
+## Paragraphe d'ouverture obligatoire — sondages des élections israéliennes (à partir du 31/08/2026)
+
+Instruction permanente d'Hillel. **Chaque billet, sans exception, ouvre sur un paragraphe consacré aux sondages des élections israéliennes du 27 octobre 2026** — avant même le Moyen-Orient du jour. Ça n'enlève rien aux autres sujets obligatoires : c'est un paragraphe de plus, pas un remplacement.
+
+Objectif explicite d'Hillel : que le lecteur puisse « se faire une idée pour qui voter » en lisant ce seul paragraphe. Ça veut dire des chiffres exacts, pas des impressions.
+
+**Exigences non négociables :**
+
+- **Croiser plusieurs instituts, jamais un ou deux journaux.** Chercher au minimum : `skarim.org` (l'agrégateur « sondage des sondages », la vraie moyenne pondérée — s'en servir comme chiffre de référence), Kan 11 / Kan Hadashot, Channel 12 (Midgam), Channel 13, Maariv (Lazar), Haaretz, Times of Israel, Jerusalem Post, i24News. Chercher en hébreu ET en anglais — les résultats diffèrent souvent.
+- **Donner la moyenne officielle en tête**, puis **montrer où les instituts divergent** — c'est ça, la vraie rigueur journalistique, pas un chiffre unique présenté comme certain. Si un institut donne le Likoud devant et un autre Yashar devant le même jour, le dire clairement : ça fait partie de l'histoire.
+- **Toujours dater chaque sondage cité** (jour de publication), pas juste l'institut.
+- **Bloc contre bloc**, pas seulement parti contre parti : qui atteint les 61 sièges, qui en est loin, le rôle des partis arabes dans l'équation.
+- **Ne rien inventer.** Si une donnée n'est pas trouvée avec au moins deux sources qui se recoupent, ne pas l'affirmer — formuler avec distance ou l'omettre.
+
+> Hillel, en toutes lettres : *« je veux une vraie étude de fond tous les jours pour ce billet, une qualité journalistique digne des plus grands journaux des années de gloire de la presse écrite, et non pas la merde qu'on nous sert maintenant »* — et, après une recherche jugée trop vite faite : *« tu ne me fais pas n'importe quoi »*. Ce paragraphe ne se bâcle jamais, même un jour où l'actu presse.
+
+Exemple de paragraphe conforme (billet du 31/08/2026) : chiffres de skarim.org en ouverture, puis divergence Kan Hadashot / Haaretz / Maariv-Lazar citée avec leurs dates respectives, puis le blocage à 61 sièges des deux blocs, puis le duel de popularité personnelle Netanyahou/Eizenkot/Bennett avec pourcentages sourcés.
+
+---
+
 ## Structure du billet
 
-**4 à 6 paragraphes** :
+**5 à 7 paragraphes** (le paragraphe sondages électoraux s'ajoute désormais aux 4-6 habituels) :
+- **Sondages élections israéliennes** (voir section dédiée ci-dessus) — toujours en premier
 - Moyen-Orient (Iran, Israël, Liban, Gaza — selon l'actu)
 - Ukraine / Russie
 - France
 - Un ou deux signaux monde — et si l'actu offre une note légère ou insolite, la garder pour l'avant-dernière ou la dernière position : on sort le lecteur avec le sourire
 
-Mieux vaut 4 paragraphes nets que 6 paragraphes creux.
+Mieux vaut un paragraphe de moins et net qu'un paragraphe creux ou recyclé.
 
 **La phrase de fermeture** (`editorial-closing`) : courte, elle noue les fils du jour, et doit sembler inévitable une fois lue. Affichée en doré (`style="color:#f0c040;"`).
 
@@ -152,6 +173,7 @@ Relire le billet une fois et vérifier :
 6. La phrase de fermeture noue-t-elle réellement les fils du jour, ou est-elle interchangeable avec celle d'hier ?
 7. Les guillemets sont-ils bien en `«&nbsp;` / `&nbsp;»` (jamais `&laquo;` / `&raquo;`) ?
 8. Est-ce que je me suis fait plaisir en l'écrivant ? Si non, le lecteur s'ennuiera aussi.
+9. Le paragraphe sondages est-il en premier, croise-t-il au moins trois sources datées, et montre-t-il les divergences entre instituts plutôt qu'un chiffre unique présenté comme certain ? → sinon, refaire la recherche avant de publier, ne jamais bâcler ce paragraphe
 
 ---
 

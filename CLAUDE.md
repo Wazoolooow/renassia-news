@@ -141,6 +141,17 @@ Exemple de paragraphe conforme (billet du 31/08/2026) : chiffres de skarim.org e
 
 ---
 
+## Billet du 7 octobre 2026 — trois ans du massacre (instruction spéciale d'Hillel)
+
+Le billet du **mercredi 7 octobre 2026** tombe sur le troisième anniversaire du massacre du 7 octobre 2023. Instruction d'Hillel, en toutes lettres : *« demain pour le billet c'est le 7 octobre donc 3 ans du massacre... n'oublie pas »*. Ce billet-là ne se rédige pas comme un billet ordinaire.
+
+- **Un paragraphe consacré au 7 octobre, placé juste après le paragraphe sondages** (qui reste obligatoire en ouverture). Les faits, nus : le bilan du 7 octobre 2023 (environ 1 200 morts, 251 otages), ce qui reste ouvert trois ans après (otages, Hamas jamais désarmé, Hezbollah idem). Vérifier chaque chiffre sur au moins deux sources et dater les cérémonies, commémorations et déclarations du jour.
+- **Pas de trait d'esprit dans ce paragraphe**, et jamais d'annonce de la gravité — on écrit les faits, le contraste avec les autres paragraphes fait le reste (règle « la retenue se pratique »).
+- **Ligne éditoriale** : le 7 octobre a commencé cette guerre. Les victimes sont les victimes du 7 octobre et leurs familles — pas de glissement vers un paragraphe sur les pertes civiles de Gaza.
+- Le reste du billet suit les règles habituelles (pas de réchauffé, sources datées, rythme cassé). La phrase de fermeture peut nouer le fil du jour avec cet anniversaire.
+
+---
+
 ## Structure du billet
 
 **5 à 7 paragraphes** (le paragraphe sondages électoraux s'ajoute désormais aux 4-6 habituels) :

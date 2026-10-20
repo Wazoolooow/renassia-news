@@ -1660,7 +1660,7 @@ async function fetchNewsWorld(retryCount=0) {
   el.innerHTML=`<div class="loading">⏳ Chargement de la presse mondiale…</div>`;
   const WORLD_SOURCES = [
     {url:'https://feeds.bbci.co.uk/news/world/rss.xml', name:'BBC Monde'},
-    {url:'https://feeds.reuters.com/reuters/worldNews',  name:'Reuters'},
+    {url:'https://feeds.nbcnews.com/nbcnews/public/world', name:'NBC News'},
     {url:'https://www.theguardian.com/world/rss',        name:'The Guardian'},
     {url:'https://rss.nytimes.com/services/xml/rss/nyt/World.xml', name:'NY Times'},
     {url:'https://www.lemonde.fr/rss/une.xml',           name:'Le Monde'},
@@ -1757,7 +1757,7 @@ async function fetchNewsIntl(retryCount=0) {
   el.innerHTML=`<div class="loading">⏳ Chargement de la presse internationale…</div>`;
   const INTL_REGIONS = [
     { flag:'🇺🇸', name:'États-Unis', sources:[
-      {url:'https://feeds.washingtonpost.com/rss/world', name:'Washington Post'},
+      {url:'https://feeds.npr.org/1004/rss.xml',           name:'NPR World'},
       {url:'https://www.cbsnews.com/latest/rss/world',     name:'CBS News World'},
       {url:'https://moxie.foxnews.com/google-publisher/world.xml', name:'Fox News'},
     ]},

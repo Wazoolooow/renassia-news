@@ -9,7 +9,7 @@ header('Content-Type: application/json; charset=utf-8');
 
 $ALLOWED = [
     'deadline.com', 'feeds.bbci.co.uk', 'feeds.feedburner.com', 'feeds.reuters.com',
-    'feeds.washingtonpost.com', 'moxie.foxnews.com', 'rss.cnn.com', 'rss.nytimes.com',
+    'feeds.washingtonpost.com', 'moxie.foxnews.com', 'www.cbsnews.com', 'rss.nytimes.com',
     'sputnikglobe.com', 'timesofindia.indiatimes.com', 'variety.com', 'www.billboard.com',
     'www.haaretz.com', 'www.hollywoodreporter.com', 'www.i24news.tv', 'www.iranintl.com',
     'www.israelhayom.com', 'www.jpost.com', 'www.lefigaro.fr', 'www.lemonde.fr',

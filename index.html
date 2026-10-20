@@ -1626,7 +1626,7 @@ function abortSignal(ms) {
 
 async function fetchRSS(url, maxItems=6) {
   try {
-    const api = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`;
+    const api = `https://renassia.com/news/rss.php?url=${encodeURIComponent(url)}`;
     const r = await fetch(api, {signal:abortSignal(12000)});
     const d = await r.json();
     if (d.status !== 'ok' || !d.items?.length) return [];

@@ -1,6 +1,7 @@
 <?php
 // ════════════════════════════════════════════
-// HAL — Proxy cours boursiers (Stooq.com)
+// HAL — Proxy cours boursiers (Cboe delayed quotes)
+// Remplace Stooq (endpoint supprimé) puis Yahoo (HTTP 429 sur l'hébergeur).
 // ════════════════════════════════════════════
 
 header('Access-Control-Allow-Origin: *');
@@ -8,71 +9,34 @@ header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: max-age=60, must-revalidate');
 
 $TICKERS = [
-    ['sym' => 'QQQ',    'stooq' => 'qqq.us',  'label' => 'QQQ'],
-    ['sym' => '^GSPC',  'stooq' => '%5espx',  'label' => 'S&P 500'],
-    ['sym' => 'TSLA',   'stooq' => 'tsla.us', 'label' => 'Tesla'],
-    ['sym' => 'NVDA',   'stooq' => 'nvda.us', 'label' => 'NVDA'],
+    ['sym' => 'QQQ',   'cboe' => 'QQQ',  'label' => 'QQQ'],
+    ['sym' => '^GSPC', 'cboe' => '_SPX', 'label' => 'S&P 500'],
+    ['sym' => 'TSLA',  'cboe' => 'TSLA', 'label' => 'Tesla'],
+    ['sym' => 'NVDA',  'cboe' => 'NVDA', 'label' => 'NVDA'],
 ];
 
-function fetchStooq($stooqSym) {
-    $url = "https://stooq.com/q/l/?s={$stooqSym}&f=sd2t2ohlcv&h&e=csv";
-    $ch = curl_init();
-    curl_setopt_array($ch, [
-        CURLOPT_URL            => $url,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_TIMEOUT        => 8,
-        CURLOPT_SSL_VERIFYPEER => false,
-        CURLOPT_SSL_VERIFYHOST => false,
-        CURLOPT_USERAGENT      => 'Mozilla/5.0 (compatible)',
-    ]);
-    $raw  = curl_exec($ch);
-    $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-    if ($raw === false || $code !== 200) return null;
-
-    // Parse CSV: Symbol,Date,Time,Open,High,Low,Close,Volume
-    $lines = array_filter(explode("\n", trim($raw)));
-    if (count($lines) < 2) return null;
-    $headers = str_getcsv(array_shift($lines));
-    $row     = str_getcsv(reset($lines));
-    if (count($row) < count($headers)) return null;
-    $data = array_combine($headers, $row);
-
-    $close = (float)($data['Close'] ?? 0);
-    $open  = (float)($data['Open']  ?? 0);
-    $chgPct = ($open > 0) ? (($close - $open) / $open * 100) : 0;
-
-    return [
-        'close'  => $close,
-        'open'   => $open,
-        'chgPct' => round($chgPct, 2),
-        'date'   => $data['Date'] ?? '',
-        'time'   => $data['Time'] ?? '',
-    ];
-}
-
-// Curl multi pour requêtes parallèles
 $mh      = curl_multi_init();
 $handles = [];
 
 foreach ($TICKERS as $i => $t) {
-    $url = "https://stooq.com/q/l/?s={$t['stooq']}&f=sd2t2ohlcv&h&e=csv";
-    $ch  = curl_init();
+    $ch = curl_init();
     curl_setopt_array($ch, [
-        CURLOPT_URL            => $url,
+        CURLOPT_URL            => "https://cdn.cboe.com/api/global/delayed_quotes/quotes/{$t['cboe']}.json",
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_MAXREDIRS      => 5,
         CURLOPT_TIMEOUT        => 8,
+        CURLOPT_CONNECTTIMEOUT => 5,
         CURLOPT_SSL_VERIFYPEER => false,
         CURLOPT_SSL_VERIFYHOST => false,
-        CURLOPT_USERAGENT      => 'Mozilla/5.0 (compatible)',
+        CURLOPT_ENCODING       => '',
+        CURLOPT_USERAGENT      => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
+        CURLOPT_HTTPHEADER     => ['Accept: application/json, text/plain, */*'],
     ]);
     curl_multi_add_handle($mh, $ch);
     $handles[$i] = $ch;
 }
 
-// Exécution parallèle
 $running = null;
 do {
     curl_multi_exec($mh, $running);
@@ -85,37 +49,22 @@ foreach ($TICKERS as $i => $t) {
     $code = curl_getinfo($handles[$i], CURLINFO_HTTP_CODE);
     curl_multi_remove_handle($mh, $handles[$i]);
 
-    if (!$raw || $code !== 200) {
-        $results[] = ['symbol' => $t['sym'], 'label' => $t['label'], 'error' => true];
-        continue;
-    }
+    $err = ['symbol' => $t['sym'], 'label' => $t['label'], 'error' => true];
+    if (!$raw || $code !== 200) { $results[] = $err; continue; }
 
-    $lines = array_filter(explode("\n", trim($raw)));
-    if (count($lines) < 2) {
-        $results[] = ['symbol' => $t['sym'], 'label' => $t['label'], 'error' => true];
-        continue;
-    }
-    $headers = str_getcsv(array_shift($lines));
-    $row     = str_getcsv(reset($lines));
-    if (count($row) < count($headers)) {
-        $results[] = ['symbol' => $t['sym'], 'label' => $t['label'], 'error' => true];
-        continue;
-    }
-    $data  = array_combine($headers, $row);
-    $close = (float)($data['Close'] ?? 0);
-    $open  = (float)($data['Open']  ?? 0);
-    $chg   = ($open > 0) ? round(($close - $open) / $open * 100, 2) : 0;
+    $d     = json_decode($raw, true)['data'] ?? null;
+    $price = (float)($d['current_price'] ?? 0);
+    if (!$d || $price <= 0) { $results[] = $err; continue; }
 
     $results[] = [
         'symbol'                     => $t['sym'],
         'label'                      => $t['label'],
-        'regularMarketPrice'         => $close,
-        'regularMarketChangePercent' => $chg,
-        'date'                       => $data['Date'] ?? '',
+        'regularMarketPrice'         => $price,
+        'regularMarketChangePercent' => round((float)($d['price_change_percent'] ?? 0), 2),
+        'date'                       => substr((string)($d['last_trade_time'] ?? ''), 0, 10),
     ];
 }
 
 curl_multi_close($mh);
 
 echo json_encode(['quoteResponse' => ['result' => $results, 'error' => null]]);
-?>

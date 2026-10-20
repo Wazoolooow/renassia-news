@@ -16,6 +16,14 @@ $ALLOWED = [
     'www.lesinrocks.com', 'www.liberation.fr', 'www.nme.com', 'www.rollingstone.com',
     'www.rt.com', 'www.scmp.com', 'www.theguardian.com', 'www.timesofisrael.com',
     'www.ynetnews.com',
+    'www.israelnationalnews.com',
+    'www.jns.org',
+    'www.ynet.co.il',
+    'www.maariv.co.il',
+    'rss.walla.co.il',
+    'www.haaretz.co.il',
+    'www.now14.co.il',
+    'www.infos-israel.news',
 ];
 $CACHE_TTL = 300;
 

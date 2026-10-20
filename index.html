@@ -1703,12 +1703,16 @@ async function fetchNewsIsrael(retryCount=0) {
   // Mode public : RSS direct via proxy
   el.innerHTML=`<div class="loading">⏳ Chargement de la presse israélienne…</div>`;
   const ISRAEL_SOURCES = [
-    {url:'https://www.israelhayom.com/feed/',                    name:'Israel Hayom',    orientation:'🔴 Droite',      color:'#c0392b'},
-    {url:'https://www.jpost.com/rss/rssfeedsfrontpage.aspx',    name:'Jerusalem Post',   orientation:'🟢 Centre-D',    color:'#27ae60'},
-    {url:'https://www.timesofisrael.com/feed/',                  name:'Times of Israel', orientation:'🟢 Centre',      color:'#2980b9'},
-    {url:'https://www.ynetnews.com/Integration/StoryRss2.xml',   name:'Ynet News',       orientation:'🟡 Centre',      color:'#f39c12'},
-    {url:'https://www.haaretz.com/cmlink/1.628765',              name:'Haaretz',         orientation:'🔵 Gauche',      color:'#8e44ad'},
-    {url:'https://www.i24news.tv/fr/rss',                        name:'i24 News FR',     orientation:'📺 Chaîne info', color:'#e74c3c'},
+    {url:'https://www.israelnationalnews.com/Rss.aspx',          name:'Arutz Sheva',           orientation:'🔴 Droite nat.',  color:'#7d3c98'},
+    {url:'https://www.jpost.com/rss/rssfeedsfrontpage.aspx',     name:'Jerusalem Post',        orientation:'🟢 Centre-D',     color:'#27ae60'},
+    {url:'https://www.timesofisrael.com/feed/',                  name:'Times of Israel',       orientation:'🟢 Centre',       color:'#2980b9'},
+    {url:'https://www.jns.org/feed/',                            name:'JNS',                   orientation:'🟢 Pro-Israël',   color:'#16a085'},
+    {url:'https://www.ynet.co.il/Integration/StoryRss2.xml',     name:'Ynet / ידיעות',        orientation:'🟡 Centre',       color:'#f39c12'},
+    {url:'https://www.maariv.co.il/rss/rss.aspx?id=2',           name:'Maariv / מעריב',       orientation:'🔴 Droite',       color:'#c0392b'},
+    {url:'https://rss.walla.co.il/feed/1',                       name:'Walla / וואלה',        orientation:'🟡 Centre',       color:'#1a5276'},
+    {url:'https://www.haaretz.co.il/cmlink/1.1470869',           name:'Haaretz / הארץ',       orientation:'🔵 Gauche',       color:'#8e44ad'},
+    {url:'https://www.now14.co.il/feed/',                        name:'Channel 14 / ערוץ 14', orientation:'📺 Droite',       color:'#e74c3c'},
+    {url:'https://www.infos-israel.news/feed/',                  name:'Infos-Israël',          orientation:'🇫🇷 Francophone', color:'#2471a3'},
   ];
   try {
     const results = await Promise.all(ISRAEL_SOURCES.map(async s => ({...s, items: await fetchRSS(s.url)})));

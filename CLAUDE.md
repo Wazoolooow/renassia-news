@@ -152,6 +152,22 @@ Le billet du **mercredi 7 octobre 2026** tombe sur le troisième anniversaire du
 
 ---
 
+## Billet du samedi 24 octobre 2026 — l'attentat de Judée et la phrase de Macron (instruction spéciale d'Hillel)
+
+Instruction d'Hillel le 23/10 : *« tu me le mettras en détail demain matin avec le fait que Macron a déclaré que le Hamas ne sévit pas en Judée-Samarie »*. Le billet du 24 octobre contient, **juste après le paragraphe sondages** (qui reste en ouverture), un paragraphe détaillé sur l'attentat, qui rapproche l'attaque de la phrase de Macron.
+
+**Les faits de l'attentat (vendredi 23 octobre, vers le matin — PAS de nuit, PAS en Samarie) :**
+- Lieu : près du carrefour de Judée (Judea junction), **au sud d'Hébron, en Judée**.
+- Deux hommes armés, arrivés en voiture, ont ouvert le feu (M16 et pistolet selon Tsahal ; i24NEWS cite un M4). Cinq blessés selon le MDA (deux dans un état critique dont un jeune d'une vingtaine d'années inconscient, un modéré, deux légers) ; un premier décompte parlait de six.
+- Fusillade de plus de 20 minutes ; les deux assaillants abattus par le commandant adjoint du bataillon Ari (Commandement du Front intérieur) et un commandant de compagnie accourus sur place. Le chef d'état-major Eyal Zamir : leur réaction a évité une attaque plus grave ; beaucoup de munitions retrouvées dans le véhicule. Hébron bouclée, villages alentour fermés, chasse à l'homme pour d'éventuels complices.
+- **À compléter le matin même par une recherche** : bilan final et état des blessés, identité et **appartenance des assaillants**, revendication éventuelle (Hamas, Jihad islamique, autre), réactions officielles. **Ne jamais affirmer l'appartenance des assaillants avant que Tsahal, le Shin Bet ou une revendication ne l'établisse** — le 23/10 elle n'était pas connue.
+
+**La phrase de Macron (à citer avec le libellé vérifié) :** à la tribune de l'ONU, le mardi 22 septembre 2026, Emmanuel Macron a affirmé que le Hamas « n'a jamais sévi en Cisjordanie » (franceinfo, polémique du jour). Le cabinet de Netanyahou a répondu par une « absurdité grotesque », rappelant les attentats du Hamas en Cisjordanie, dont une double attaque à la voiture piégée en août 2024 revendiquée par sa branche armée. L'Élysée a répondu que Macron avait été mal compris sur le mot « sévir », qu'il employait au sens de « diriger ». Trois jours avant ce discours, Netanel Shukrun, père de six enfants, était abattu près de Neve Tzuf par un homme de Biddu que Tsahal rattache au Hamas (billet du 25/09). Éviter la formule approximative « le Hamas n'a jamais frappé en Cisjordanie » (utilisée dans des billets antérieurs) : ce n'est pas le libellé de la citation.
+
+Ton : faits nus pour l'attentat (règle « la retenue se pratique »), pas de trait d'esprit sur les blessés ; l'ironie peut viser la phrase de Macron et l'explication de l'Élysée, pas les victimes. Ligne éditoriale : le Hamas a bien frappé en Judée-Samarie ; le rappeler par les faits datés, sans surjouer.
+
+---
+
 ## Structure du billet
 
 **5 à 7 paragraphes** (le paragraphe sondages électoraux s'ajoute désormais aux 4-6 habituels) :

@@ -637,6 +637,121 @@ canvas#btc-spark { width:100%; height:50px; border-radius:8px; background:rgba(0
 .rec-cancel-btn { background: none; border: 1px solid rgba(255,255,255,0.1); color: var(--muted); }
 .rec-cancel-btn:hover { border-color: rgba(255,255,255,0.3); color: var(--text); }
 [contenteditable="true"] { outline: 1px solid rgba(201,168,76,0.35) !important; border-radius: 4px; padding: 8px !important; }
+
+/* ─── SPORT ─── */
+.sport-grid { grid-template-columns:repeat(2,1fr); gap:16px; }
+.sp-card { min-width:0; --sp:#00c8d4; --spg:rgba(0,200,212,.16); padding:0; display:flex; flex-direction:column; }
+.sp-card::before { background:linear-gradient(90deg,transparent,var(--sp),transparent); opacity:.85; }
+.sp-card::after {
+  content:''; position:absolute; inset:0; pointer-events:none; z-index:0;
+  background:radial-gradient(ellipse at 0% 0%, var(--spg), transparent 52%);
+}
+.sp-card > * { position:relative; z-index:1; }
+.sp-golf { --sp:#3fb27f; --spg:rgba(63,178,127,.17); }
+.sp-nfl  { --sp:#5b9cff; --spg:rgba(91,156,255,.17); }
+.sp-nba  { --sp:#ff8a3d; --spg:rgba(255,138,61,.17); }
+.sp-surf { --sp:#00d4e8; --spg:rgba(0,212,232,.16); }
+
+.sp-head { display:flex; align-items:center; gap:14px; padding:18px 20px 14px; border-bottom:1px solid rgba(255,255,255,.05); }
+.sp-ico {
+  width:44px; height:44px; border-radius:13px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; font-size:22px;
+  background:linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.01));
+  border:1px solid color-mix(in srgb, var(--sp) 45%, transparent);
+  box-shadow:0 0 22px var(--spg), inset 0 1px 0 rgba(255,255,255,.1);
+}
+.sp-titles { flex:1; min-width:0; }
+.sp-title { font-family:var(--font-title); font-size:17px; letter-spacing:3px; color:#fff; font-weight:600; text-transform:uppercase; }
+.sp-sub   { font-family:var(--font-data); font-size:10px; letter-spacing:1.5px; color:var(--muted); margin-top:4px; text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sp-badge { font-family:var(--font-data); font-size:9px; letter-spacing:2px; padding:4px 9px; border-radius:20px; white-space:nowrap; text-transform:uppercase;
+  color:var(--sp); border:1px solid color-mix(in srgb, var(--sp) 40%, transparent); background:color-mix(in srgb, var(--sp) 9%, transparent); }
+.sp-badge.live { color:#ff5a5a; border-color:rgba(255,90,90,.45); background:rgba(255,90,90,.1); }
+.sp-badge.live::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; background:#ff5a5a; margin-right:6px; box-shadow:0 0 8px #ff5a5a; animation:pulse 1.3s ease-in-out infinite; vertical-align:middle; }
+
+.sp-body { padding:14px 20px 4px; flex:1; }
+.sp-sec  { font-family:var(--font-data); font-size:9px; letter-spacing:3px; color:var(--sp); text-transform:uppercase; margin:6px 0 10px; display:flex; align-items:center; gap:10px; opacity:.9; }
+.sp-sec::after { content:''; flex:1; height:1px; background:linear-gradient(90deg, color-mix(in srgb, var(--sp) 35%, transparent), transparent); }
+
+.sp-tabs { display:flex; gap:6px; margin:0 0 12px; flex-wrap:wrap; }
+.sp-tab { cursor:pointer; font-family:var(--font-data); font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted);
+  background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08); border-radius:20px; padding:6px 13px; transition:all .2s; }
+.sp-tab:hover { color:var(--text); border-color:rgba(255,255,255,.2); }
+.sp-tab.active { color:#06100c; background:var(--sp); border-color:var(--sp); font-weight:600; box-shadow:0 0 18px var(--spg); }
+
+.sp-event { display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:10px; }
+.sp-event-name { font-size:14px; color:#fff; font-weight:500; }
+.sp-event-status { font-family:var(--font-data); font-size:10px; letter-spacing:1px; color:var(--muted); white-space:nowrap; }
+
+.sp-lb { display:flex; flex-direction:column; gap:3px; }
+.sp-lb-row { display:grid; grid-template-columns:34px 22px 1fr auto; align-items:center; gap:10px; padding:8px 10px; border-radius:9px; background:rgba(0,0,0,.22); border-left:2px solid transparent; transition:background .2s; }
+.sp-lb-row:hover { background:rgba(255,255,255,.04); }
+.sp-lb-row:first-child { border-left-color:var(--sp); background:linear-gradient(90deg, var(--spg), rgba(0,0,0,.22) 70%); }
+.sp-lb-pos { font-family:var(--font-data); font-size:12px; color:var(--muted); }
+.sp-lb-row:first-child .sp-lb-pos { color:var(--sp); font-weight:600; }
+.sp-lb-flag { width:20px; height:14px; object-fit:cover; border-radius:2px; opacity:.92; }
+.sp-lb-name { font-size:13px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sp-lb-score { font-family:var(--font-data); font-size:13px; font-weight:600; min-width:38px; text-align:right; color:var(--text); }
+.sp-lb-score.under { color:#6ee7a8; }
+.sp-lb-score.over  { color:#9fb4c7; }
+
+.sp-games { -webkit-mask-image:linear-gradient(180deg,#000 88%,transparent); mask-image:linear-gradient(180deg,#000 88%,transparent); padding-bottom:18px; display:flex; flex-direction:column; gap:6px; max-height:352px; overflow-y:auto; padding-right:4px; scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.15) transparent; }
+.sp-games::-webkit-scrollbar { width:5px; }
+.sp-games::-webkit-scrollbar-thumb { background:rgba(255,255,255,.14); border-radius:3px; }
+.sp-game { display:grid; grid-template-columns:88px 1fr; gap:12px; align-items:center; padding:9px 12px; border-radius:11px; background:rgba(0,0,0,.24); border:1px solid rgba(255,255,255,.04); transition:border-color .2s, background .2s; }
+.sp-game:hover { border-color:color-mix(in srgb, var(--sp) 40%, transparent); background:rgba(255,255,255,.035); }
+.sp-game.live { border-color:rgba(255,90,90,.35); background:linear-gradient(90deg, rgba(255,90,90,.07), rgba(0,0,0,.24) 60%); }
+.sp-g-stat { font-family:var(--font-data); font-size:10px; line-height:1.4; letter-spacing:.8px; color:var(--muted); text-transform:uppercase; }
+.sp-game.live .sp-g-stat { color:#ff7a7a; font-weight:600; }
+.sp-game.post .sp-g-stat { color:#6f8aa3; }
+.sp-g-teams { display:flex; flex-direction:column; gap:5px; min-width:0; }
+.sp-team { display:grid; grid-template-columns:24px 1fr auto 30px; align-items:center; gap:9px; font-size:13px; color:#a9c1d4; }
+.sp-team img { width:22px; height:22px; object-fit:contain; filter:drop-shadow(0 1px 3px rgba(0,0,0,.5)); }
+.sp-team .n { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sp-team .rec { font-family:var(--font-data); font-size:10px; color:var(--muted); }
+.sp-team .s { font-family:var(--font-data); font-size:15px; text-align:right; color:#a9c1d4; }
+.sp-team.win { color:#fff; }
+.sp-team.win .s { color:#fff; font-weight:600; }
+.sp-day { font-family:var(--font-data); font-size:9px; letter-spacing:2.5px; color:var(--muted); text-transform:uppercase; margin:6px 2px 2px; }
+
+.sp-news { margin:2px 0 8px; display:flex; flex-direction:column; }
+.sp-news-item { display:flex; gap:11px; align-items:flex-start; padding:10px 2px; border-top:1px solid rgba(255,255,255,.05); }
+.sp-news-item:first-child { border-top:none; }
+.sp-news-item::before { content:''; width:5px; height:5px; margin-top:8px; border-radius:50%; background:var(--sp); flex-shrink:0; box-shadow:0 0 8px var(--sp); }
+.sp-news-item a { color:var(--text); text-decoration:none; font-size:13px; line-height:1.45; }
+.sp-news-item a:hover .item-title { color:var(--sp); }
+.sp-news-meta { font-family:var(--font-data); font-size:9.5px; color:var(--muted); letter-spacing:.8px; margin-top:4px; display:flex; align-items:center; gap:4px; text-transform:uppercase; }
+.sp-empty { font-size:12.5px; line-height:1.6; color:var(--muted); padding:14px 16px; border-radius:11px; border:1px dashed rgba(255,255,255,.12); background:rgba(0,0,0,.18); }
+.sp-empty b { color:var(--text); font-weight:500; }
+.sp-foot { padding:10px 20px 14px; font-family:var(--font-data); font-size:9px; letter-spacing:1.8px; color:rgba(74,112,144,.7); text-transform:uppercase; }
+
+.sp-spots { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:10px; }
+.sp-spot { padding:13px 14px 10px; border-radius:13px; background:linear-gradient(160deg, rgba(0,212,232,.07), rgba(0,0,0,.28) 70%); border:1px solid rgba(0,212,232,.12); overflow:hidden; }
+.sp-spot-top { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.sp-spot-name { font-family:var(--font-title); font-size:12px; letter-spacing:2px; color:var(--goldl); text-transform:uppercase; }
+.sp-chip { font-family:var(--font-data); font-size:9px; letter-spacing:1.2px; padding:3px 8px; border-radius:12px; text-transform:uppercase; white-space:nowrap; }
+.sp-chip.c0 { color:#8aa1b5; background:rgba(138,161,181,.12); }
+.sp-chip.c1 { color:#7dd3fc; background:rgba(125,211,252,.12); }
+.sp-chip.c2 { color:#6ee7a8; background:rgba(110,231,168,.13); }
+.sp-chip.c3 { color:#fcd34d; background:rgba(252,211,77,.13); }
+.sp-chip.c4 { color:#ff8a8a; background:rgba(255,138,138,.14); }
+.sp-spot-h { font-family:var(--font-data); font-size:32px; color:#fff; margin:8px 0 2px; line-height:1; }
+.sp-spot-h small { font-size:13px; color:var(--muted); margin-left:3px; }
+.sp-spot-d { font-size:11px; color:var(--muted); line-height:1.6; }
+.sp-spot-d b { color:var(--text); font-weight:500; }
+.sp-spark { width:100%; height:30px; margin-top:6px; display:block; }
+
+@media (max-width:900px) {
+  .sport-grid { grid-template-columns:minmax(0,1fr) !important; }
+}
+@media (max-width:480px) {
+  .sp-head { padding:14px 14px 12px; gap:11px; }
+  .sp-ico { width:38px; height:38px; font-size:19px; }
+  .sp-title { font-size:15px; letter-spacing:2px; }
+  .sp-body { padding:12px 14px 2px; }
+  .sp-game { grid-template-columns:1fr; gap:6px; }
+  .sp-spots { grid-template-columns:1fr 1fr; }
+  .sp-badge { display:none; }
+}
 </style>
 <!-- Google Translate -->
 <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
@@ -1132,6 +1247,77 @@ body { top:0 !important; }
 </script>
 </div><!-- /sec-cams -->
 </div><!-- /sections-reorder -->
+
+<!-- ══════════════════════════════════════
+     SPORT — GOLF · NFL · NBA · SURF
+     ══════════════════════════════════════ -->
+<div class="section-sep"><span class="section-sep-label">Sport</span></div>
+<div class="grid sport-grid">
+
+  <div class="panel sp-card sp-golf">
+    <div class="sp-head">
+      <div class="sp-ico">⛳</div>
+      <div class="sp-titles"><div class="sp-title">Golf</div><div class="sp-sub" id="sp-golf-sub">PGA · DP World Tour · Israël</div></div>
+      <div class="sp-badge" id="sp-golf-badge">Circuit</div>
+    </div>
+    <div class="sp-body">
+      <div class="sp-tabs" id="sp-golf-tabs">
+        <button class="sp-tab active" data-tab="pga">PGA Tour</button>
+        <button class="sp-tab" data-tab="eur">DP World Tour</button>
+        <button class="sp-tab" data-tab="lpga">LPGA</button>
+        <button class="sp-tab" data-tab="il">🇮🇱 Israël</button>
+      </div>
+      <div id="sp-golf-body"><div class="loading">Chargement du circuit…</div></div>
+    </div>
+    <div class="sp-foot">ESPN · BBC Sport · CBS Sports · Google Actualités</div>
+  </div>
+
+  <div class="panel sp-card sp-nfl">
+    <div class="sp-head">
+      <div class="sp-ico">🏈</div>
+      <div class="sp-titles"><div class="sp-title">NFL</div><div class="sp-sub" id="sp-nfl-sub">National Football League</div></div>
+      <div class="sp-badge" id="sp-nfl-badge">Saison</div>
+    </div>
+    <div class="sp-body">
+      <div class="sp-sec">Scores &amp; programme</div>
+      <div id="sp-nfl-games"><div class="loading">Chargement des matchs…</div></div>
+      <div class="sp-sec">À la une</div>
+      <div id="sp-nfl-news"><div class="loading">Chargement…</div></div>
+    </div>
+    <div class="sp-foot">ESPN · CBS Sports · Google Actualités · Horaires d'Israël</div>
+  </div>
+
+  <div class="panel sp-card sp-nba">
+    <div class="sp-head">
+      <div class="sp-ico">🏀</div>
+      <div class="sp-titles"><div class="sp-title">NBA</div><div class="sp-sub" id="sp-nba-sub">National Basketball Association</div></div>
+      <div class="sp-badge" id="sp-nba-badge">Saison</div>
+    </div>
+    <div class="sp-body">
+      <div class="sp-sec">Scores &amp; programme</div>
+      <div id="sp-nba-games"><div class="loading">Chargement des matchs…</div></div>
+      <div class="sp-sec">À la une</div>
+      <div id="sp-nba-news"><div class="loading">Chargement…</div></div>
+    </div>
+    <div class="sp-foot">ESPN · CBS Sports · Google Actualités · Horaires d'Israël</div>
+  </div>
+
+  <div class="panel sp-card sp-surf">
+    <div class="sp-head">
+      <div class="sp-ico">🏄</div>
+      <div class="sp-titles"><div class="sp-title">Surf</div><div class="sp-sub" id="sp-surf-sub">Conditions sur la côte israélienne</div></div>
+      <div class="sp-badge" id="sp-surf-badge">Houle</div>
+    </div>
+    <div class="sp-body">
+      <div class="sp-sec">Sur la côte, maintenant</div>
+      <div id="sp-surf-spots"><div class="loading">Lecture de la houle…</div></div>
+      <div class="sp-sec">Circuit &amp; actualité</div>
+      <div id="sp-surf-news"><div class="loading">Chargement…</div></div>
+    </div>
+    <div class="sp-foot">Open-Meteo · Surfer · World Surf League</div>
+  </div>
+
+</div>
 
 <!-- ══════════════════════════════════════
      SYNTHÈSE DE PRESSE
@@ -2444,6 +2630,283 @@ async function translateEditorial(btn, lang) {
 }
 // ════════════════════════════════════════════════════════════════════════
 
+// ═══ SPORT — GOLF · NFL · NBA · SURF ═══
+const SP_ESPN = 'https://site.api.espn.com/apis/site/v2/sports/';
+const SP_GOLF_TOURS = {
+  pga:  {label:'PGA Tour',      url:SP_ESPN+'golf/pga/scoreboard'},
+  eur:  {label:'DP World Tour', url:SP_ESPN+'golf/eur/scoreboard'},
+  lpga: {label:'LPGA',          url:SP_ESPN+'golf/lpga/scoreboard'},
+};
+const SP_SURF_SPOTS = [
+  {n:'Haïfa',    lat:32.82, lon:34.95},
+  {n:'Netanya',  lat:32.33, lon:34.84},
+  {n:'Tel-Aviv', lat:32.08, lon:34.76},
+  {n:'Ashdod',   lat:31.80, lon:34.62},
+];
+let _spGolfTab = 'pga';
+
+function spEsc(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+async function spJSON(url, ms=15000){
+  const r = await fetch(url, {signal:abortSignal(ms)});
+  if (!r.ok) throw new Error('HTTP '+r.status);
+  return r.json();
+}
+function spWhen(iso){
+  try {
+    return new Date(iso).toLocaleString('fr-FR',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',timeZone:TZ}).replace('.','');
+  } catch { return ''; }
+}
+function spAgo(dateStr){
+  const t = new Date(dateStr).getTime();
+  if (!t) return '';
+  const m = Math.round((Date.now()-t)/60000);
+  if (m < 1) return "à l'instant";
+  if (m < 60) return m+' min';
+  const h = Math.round(m/60);
+  if (h < 36) return h+' h';
+  return Math.round(h/24)+' j';
+}
+function spSetBadge(id, txt, live){
+  const b = document.getElementById(id); if (!b) return;
+  b.textContent = txt; b.classList.toggle('live', !!live);
+}
+
+// ─── Actualités (RSS via proxy) ───
+const SP_JUNK = /bonus|promo code|promo|betting|odds|parlay|picks|prediction|fanduel|draftkings|betmgm|sportsbook|caesars|bet365|fantasy|how to watch|live stream/i;
+const gnews = (q, lang='en-US', gl='US', ceid='US:en') => 'https://news.google.com/rss/search?q='+encodeURIComponent(q)+'&hl='+lang+'&gl='+gl+'&ceid='+ceid;
+async function spNews(elId, feeds, max, keep){
+  const el = document.getElementById(elId); if (!el) return;
+  try {
+    const lists = await Promise.all(feeds.map(f => fetchRSS(f.url, f.n||8).then(a => a.map(it => ({...it, source:f.name})))));
+    let items = lists.flat();
+    items = items.filter(it => !SP_JUNK.test(it.title));
+    if (keep) items = items.filter(keep);
+    const seen = new Set();
+    items = items.filter(it => { const k = it.title.toLowerCase().slice(0,60); if (seen.has(k)) return false; seen.add(k); return true; })
+                 .sort((a,b) => new Date(b.date)-new Date(a.date)).slice(0,max);
+    if (!items.length) { el.innerHTML = ''; return false; }
+    const TF = `<span class="trans-flags"><button class="trans-flag-btn" onclick="translateItem(this,'fr')">🇫🇷</button><button class="trans-flag-btn" onclick="translateItem(this,'iw')">🇮🇱</button></span>`;
+    el.innerHTML = `<div class="sp-news">` + items.map(it => {
+      let title = it.title, src = it.source;
+      const gm = title.match(/^(.*) - ([^-]{2,40})$/);
+      if (gm && it.source==='Actualité') { title = gm[1]; src = gm[2]; }
+      const link = it.link ? `<a href="${spEsc(it.link)}" target="_blank" rel="noopener"><span class="item-title">${spEsc(title)}</span></a>` : `<span class="item-title">${spEsc(title)}</span>`;
+      return `<div class="sp-news-item" data-orig="${spEsc(title)}"><div style="flex:1;min-width:0">${link}<div class="sp-news-meta"><span>${spEsc(src)}</span><span>·</span><span>${spAgo(it.date)}</span>${TF}</div></div></div>`;
+    }).join('') + `</div>`;
+    return true;
+  } catch(e) { el.innerHTML = `<div class="sp-empty">Actualités momentanément indisponibles.</div>`; return false; }
+}
+
+// ─── GOLF ───
+function spGolfStatus(txt){
+  if (!txt) return '';
+  return txt.replace(/Round (\d)/i,'Tour $1').replace(/In Progress/i,'en cours').replace(/Suspended/i,'suspendu')
+            .replace(/Complete|Final|Official/i,'terminé').replace(/Scheduled/i,'à venir').replace(/Play Complete/i,'jeu terminé').replace(/ - /,' · ');
+}
+async function spGolfBoard(tab){
+  const body = document.getElementById('sp-golf-body');
+  const cfg = SP_GOLF_TOURS[tab];
+  try {
+    const d = await spJSON(cfg.url);
+    const evs = d.events || [];
+    const ev = evs.find(e => e.status?.type?.state==='in') || evs[0];
+    if (!ev) throw new Error('aucun tournoi');
+    const comp = ev.competitions?.[0] || {};
+    const state = ev.status?.type?.state || comp.status?.type?.state;
+    const detail = comp.status?.type?.detail || ev.status?.type?.description || '';
+    const cs = (comp.competitors||[]).slice().sort((a,b)=>(a.order||999)-(b.order||999));
+    spSetBadge('sp-golf-badge', state==='in' ? 'En direct' : state==='post' ? 'Terminé' : 'À venir', state==='in');
+    document.getElementById('sp-golf-sub').textContent = cfg.label + ' · ' + (ev.shortName || ev.name);
+    let rows = '';
+    if (cs.length) {
+      const top = cs.slice(0,8);
+      rows = top.map((c,i) => {
+        const sc = c.score ?? '';
+        const same = cs.filter(x => x.score===c.score).length;
+        const firstIdx = cs.findIndex(x => x.score===c.score);
+        const pos = (same>1 ? 'T' : '') + (firstIdx+1);
+        const cls = String(sc).startsWith('-') ? 'under' : (String(sc).startsWith('+') ? 'over' : '');
+        const flag = c.athlete?.flag?.href ? `<img class="sp-lb-flag" src="${spEsc(c.athlete.flag.href)}" alt="${spEsc(c.athlete.flag.alt||'')}" loading="lazy">` : '<span></span>';
+        return `<div class="sp-lb-row"><div class="sp-lb-pos">${pos}</div>${flag}<div class="sp-lb-name">${spEsc(c.athlete?.displayName||c.team?.displayName||'—')}</div><div class="sp-lb-score ${cls}">${spEsc(sc||'—')}</div></div>`;
+      }).join('');
+    } else {
+      rows = `<div class="sp-empty">Classement indisponible pour le moment. ${evs[0]?.date ? 'Début : <b>'+spWhen(evs[0].date)+'</b>' : ''}</div>`;
+    }
+    body.innerHTML = `
+      <div class="sp-event"><div class="sp-event-name">${spEsc(ev.name)}</div><div class="sp-event-status">${spEsc(spGolfStatus(detail))}</div></div>
+      <div class="sp-lb">${rows}</div>
+      <div class="sp-sec" style="margin-top:16px">À la une du golf</div>
+      <div id="sp-golf-news"></div>`;
+    spNews('sp-golf-news', [
+      {url:'https://feeds.bbci.co.uk/sport/golf/rss.xml', name:'BBC Sport'},
+      {url:'https://www.cbssports.com/rss/headlines/golf/', name:'CBS Sports'},
+    ], 4);
+  } catch(e) {
+    body.innerHTML = `<div class="sp-empty">Classement indisponible pour le moment.</div><div class="sp-sec" style="margin-top:16px">À la une du golf</div><div id="sp-golf-news"></div>`;
+    spNews('sp-golf-news', [{url:'https://feeds.bbci.co.uk/sport/golf/rss.xml', name:'BBC Sport'},{url:'https://www.cbssports.com/rss/headlines/golf/', name:'CBS Sports'}], 4);
+  }
+}
+async function spGolfIsrael(){
+  const body = document.getElementById('sp-golf-body');
+  spSetBadge('sp-golf-badge', 'Israël', false);
+  document.getElementById('sp-golf-sub').textContent = 'Golf israélien · Caesarea · Laetitia Beck';
+  body.innerHTML = `<div class="sp-sec">Golf en Israël</div><div id="sp-golf-il"><div class="loading">Recherche…</div></div>`;
+  const q1 = encodeURIComponent('"Laetitia Beck" OR "Israel Golf" OR "Caesarea Golf" OR "Israeli golfer" OR "golf in Israel" when:120d');
+  const q2 = encodeURIComponent('גולף (קיסריה OR טורניר OR אלוף OR התאחדות) when:120d');
+  const ok = await spNews('sp-golf-il', [
+    {url:`https://news.google.com/rss/search?q=${q1}&hl=en-US&gl=US&ceid=US:en`, name:'Actualité', n:10},
+    {url:`https://news.google.com/rss/search?q=${q2}&hl=he&gl=IL&ceid=IL:he`, name:'Actualité', n:10},
+  ], 6, it => /golf|גולף/i.test(it.title) && /israel|caesarea|beck|ישראל|קיסריה|לטישיה|מכבי/i.test(it.title) && !/restaurant|dining|vietnam|מסעדה/i.test(it.title));
+  if (!ok) {
+    document.getElementById('sp-golf-il').innerHTML = `<div class="sp-empty"><b>Rien de neuf sur le golf israélien</b> ces 4 derniers mois. Le golf reste rare en Israël — un seul parcours de 18 trous, à Caesarea — et la couverture se concentre sur <b>Laetitia Beck</b>, première Israélienne sur le circuit LPGA. Cette rubrique se remplit dès qu'une actualité sort.</div>`;
+  }
+}
+function spGolfInit(){
+  document.querySelectorAll('#sp-golf-tabs .sp-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#sp-golf-tabs .sp-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      _spGolfTab = btn.dataset.tab;
+      spGolfRender();
+    });
+  });
+}
+function spGolfRender(){ return _spGolfTab==='il' ? spGolfIsrael() : spGolfBoard(_spGolfTab); }
+
+// ─── NFL / NBA ───
+function spGameRow(ev){
+  const comp = ev.competitions?.[0]; if (!comp) return '';
+  const st = comp.status?.type || ev.status?.type || {};
+  const state = st.state; // pre | in | post
+  const away = comp.competitors.find(c => c.homeAway==='away'), home = comp.competitors.find(c => c.homeAway==='home');
+  const team = c => {
+    const t = c.team||{};
+    const win = state==='post' && c.winner;
+    const rec = (c.records||[]).find(r => r.type==='total' || r.name==='overall')?.summary || '';
+    const score = state==='pre' ? '' : (c.score ?? '');
+    return `<div class="sp-team ${win?'win':''}"><img src="${spEsc(t.logo||'')}" alt="" loading="lazy"><span class="n">${spEsc(t.shortDisplayName||t.displayName||t.abbreviation)}</span><span class="rec">${spEsc(rec)}</span><span class="s">${spEsc(score)}</span></div>`;
+  };
+  let stat;
+  if (state==='in') stat = (st.shortDetail||'En cours').replace('Halftime','Mi-temps').replace('End of','Fin').replace(/(\d)(st|nd|rd|th)/,'$1');
+  else if (state==='post') stat = ((st.shortDetail||'Final').replace(/^Final\/OT.*/,'Terminé · prol.').replace(/^Final.*/,'Terminé'));
+  else stat = spWhen(ev.date);
+  return `<div class="sp-game ${state}" data-state="${state}" data-t="${new Date(ev.date).getTime()}"><div class="sp-g-stat">${spEsc(stat)}</div><div class="sp-g-teams">${team(away)}${team(home)}</div></div>`;
+}
+function spOrderGames(evs){
+  const rank = e => { const s=e.competitions?.[0]?.status?.type?.state||e.status?.type?.state; return s==='in'?0:s==='pre'?1:2; };
+  return evs.slice().sort((a,b) => rank(a)-rank(b) || (rank(a)===2 ? new Date(b.date)-new Date(a.date) : new Date(a.date)-new Date(b.date)));
+}
+async function spGames(sport, league, gamesId, subId, badgeId){
+  const el = document.getElementById(gamesId);
+  try {
+    const base = `${SP_ESPN}${sport}/${league}/scoreboard`;
+    const d = await spJSON(base);
+    let evs = d.events || [];
+    let label = '';
+    if (league==='nfl') {
+      label = d.week?.number ? 'Semaine '+d.week.number : '';
+    } else {
+      // NBA : jour courant + lendemain pour voir l'à-venir
+      try {
+        const day = (d.day?.date || '').replace(/-/g,'');
+        if (day) {
+          const dt = new Date(Date.UTC(+day.slice(0,4), +day.slice(4,6)-1, +day.slice(6,8)+1));
+          const next = dt.toISOString().slice(0,10).replace(/-/g,'');
+          const d2 = await spJSON(`${base}?dates=${next}`);
+          evs = evs.concat(d2.events||[]);
+        }
+      } catch {}
+    }
+    if (!evs.length) { el.innerHTML = `<div class="sp-empty">Aucun match au programme pour le moment.</div>`; spSetBadge(badgeId, 'Trêve', false); return; }
+    const live = evs.some(e => (e.competitions?.[0]?.status?.type?.state||e.status?.type?.state)==='in');
+    spSetBadge(badgeId, live ? 'En direct' : (label || 'Saison'), live);
+    if (label) document.getElementById(subId).textContent = (league==='nfl'?'National Football League':'NBA')+' · '+label;
+    el.innerHTML = `<div class="sp-games">${spOrderGames(evs).map(spGameRow).join('')}</div>`;
+  } catch(e) {
+    el.innerHTML = `<div class="sp-empty">Scores indisponibles pour le moment.</div>`;
+  }
+}
+
+// ─── SURF ───
+const _spDirs = ['N','NE','E','SE','S','SO','O','NO'];
+function spCompass(deg){ return _spDirs[Math.round(((deg%360)+360)%360/45)%8]; }
+function spSurfRating(h){
+  if (h < 0.3) return {c:'c0', t:'Plat'};
+  if (h < 0.6) return {c:'c1', t:'Petit'};
+  if (h < 1.2) return {c:'c2', t:'Surfable'};
+  if (h < 2.0) return {c:'c3', t:'Bon'};
+  return {c:'c4', t:'Gros'};
+}
+function spSpark(vals){
+  if (!vals?.length) return '';
+  const W=120, H=30, max=Math.max(...vals, 0.5), min=0;
+  const pts = vals.map((v,i) => [ (i/(vals.length-1))*W, H-2-((v-min)/(max-min))*(H-6) ]);
+  const line = pts.map(p => p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
+  return `<svg class="sp-spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><defs><linearGradient id="spg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#00d4e8" stop-opacity=".45"/><stop offset="1" stop-color="#00d4e8" stop-opacity="0"/></linearGradient></defs><polygon points="0,${H} ${line} ${W},${H}" fill="url(#spg)"/><polyline points="${line}" fill="none" stroke="#00d4e8" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>`;
+}
+async function spSurf(){
+  const el = document.getElementById('sp-surf-spots');
+  try {
+    const lat = SP_SURF_SPOTS.map(s=>s.lat).join(','), lon = SP_SURF_SPOTS.map(s=>s.lon).join(',');
+    const [m, w] = await Promise.all([
+      spJSON(`https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&current=wave_height,wave_period,wave_direction&hourly=wave_height&forecast_hours=24&timezone=${encodeURIComponent(TZ)}`),
+      spJSON(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=wind_speed_10m,wind_direction_10m&wind_speed_unit=kn&timezone=${encodeURIComponent(TZ)}`),
+    ]);
+    const M = Array.isArray(m) ? m : [m], W_ = Array.isArray(w) ? w : [w];
+    let best = null;
+    const cards = SP_SURF_SPOTS.map((s,i) => {
+      const c = M[i]?.current || {}, wd = W_[i]?.current || {};
+      const h = c.wave_height, per = c.wave_period;
+      if (h==null) return '';
+      const rt = spSurfRating(h);
+      const wdir = wd.wind_direction_10m, wsp = wd.wind_speed_10m;
+      let windTxt = '';
+      if (wsp != null) {
+        const off = wdir>=45 && wdir<=135, on = wdir>=225 && wdir<=315;
+        windTxt = `<b>${Math.round(wsp)}</b> nds ${spCompass(wdir)} · ${wsp<4 ? 'quasi nul' : off ? 'offshore' : on ? 'onshore' : 'latéral'}`;
+      }
+      if (!best || h > best.h) best = {n:s.n, h};
+      return `<div class="sp-spot"><div class="sp-spot-top"><div class="sp-spot-name">${s.n}</div><div class="sp-chip ${rt.c}">${rt.t}</div></div>
+        <div class="sp-spot-h">${h.toFixed(1)}<small>m</small></div>
+        <div class="sp-spot-d">Période <b>${Math.round(per||0)} s</b> · houle ${spCompass(c.wave_direction||0)}<br>${windTxt}</div>
+        ${spSpark(M[i]?.hourly?.wave_height)}</div>`;
+    }).join('');
+    el.innerHTML = cards ? `<div class="sp-spots">${cards}</div>` : `<div class="sp-empty">Données de houle indisponibles.</div>`;
+    if (best) spSetBadge('sp-surf-badge', best.h < 0.3 ? 'Plat' : 'Max '+best.h.toFixed(1)+' m', false);
+  } catch(e) {
+    el.innerHTML = `<div class="sp-empty">Données de houle indisponibles pour le moment.</div>`;
+  }
+}
+
+// ─── Orchestration ───
+async function spLive(){
+  await Promise.all([
+    spGolfRender(),
+    spGames('football','nfl','sp-nfl-games','sp-nfl-sub','sp-nfl-badge'),
+    spGames('basketball','nba','sp-nba-games','sp-nba-sub','sp-nba-badge'),
+  ]);
+}
+async function fetchSport(){
+  if (!window._spInit) { window._spInit = true; spGolfInit(); }
+  await Promise.all([
+    spLive(),
+    spSurf(),
+    spNews('sp-nfl-news', [
+      {url:'https://www.cbssports.com/rss/headlines/nfl/', name:'CBS Sports', n:12},
+      {url:gnews('NFL when:2d'), name:'Actualité', n:12},
+    ], 4),
+    spNews('sp-nba-news', [
+      {url:'https://www.cbssports.com/rss/headlines/nba/', name:'CBS Sports', n:12},
+      {url:gnews('NBA when:2d'), name:'Actualité', n:12},
+    ], 4),
+    spNews('sp-surf-news', [
+      {url:'https://www.surfer.com/feed/', name:'Surfer', n:8},
+      {url:'https://news.google.com/rss/search?q='+encodeURIComponent('"World Surf League" OR WSL surfing when:14d')+'&hl=en-US&gl=US&ceid=US:en', name:'Actualité', n:8},
+    ], 4),
+  ]);
+}
+setInterval(spLive, 3 * 60 * 1000);
+
 async function refreshAll() {
   const btn=document.getElementById('refresh-btn');
   btn.classList.add('spinning');
@@ -2451,6 +2914,7 @@ async function refreshAll() {
     fetchWeather(), fetchMarine(), fetchBitcoin(), fetchStocks(),
     fetchSeaWeek(),
     fetchNewsWorld(), fetchNewsIsrael(), fetchNewsIntl(), fetchShowbiz(),
+    fetchSport(),
   ]);
   generateRevueDePresse();
   await generateEditorial();

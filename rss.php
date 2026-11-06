@@ -24,6 +24,10 @@ $ALLOWED = [
     'www.haaretz.co.il',
     'www.now14.co.il',
     'www.infos-israel.news',
+    'www.espn.com',
+    'www.cbssports.com',
+    'www.surfer.com',
+    'news.google.com',
 ];
 $CACHE_TTL = 300;
 

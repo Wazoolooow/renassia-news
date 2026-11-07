@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dionysos — Passerelle de Commandement</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Roboto+Mono:wght@300;400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Roboto+Mono:wght@300;400&family=Inter:wght@300;400;500&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg:     #030508;
@@ -798,6 +798,61 @@ body { top:0 !important; }
   text-transform: uppercase;
   color: var(--muted);
 }
+
+/* ─── EN-TÊTE FUSIONNÉ Dionysos × Caesarea ─── */
+:root{--cae-red:#cc1100;--cae-redl:#e84444;--cae-black:#08090a;--font-serif:'Playfair Display',serif;}
+.hx-bar{position:sticky;top:0;z-index:101;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:9px 32px;background:rgba(1,1,4,.94);border-bottom:1px solid rgba(255,255,255,.05);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.hx-switch{display:flex;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:40px;padding:3px;gap:2px}
+.hx-sw{display:flex;align-items:center;gap:9px;padding:8px 18px;border-radius:30px;text-decoration:none;font-family:var(--font-data);font-size:10.5px;letter-spacing:2.2px;text-transform:uppercase;color:#7b93a8;transition:all .3s;white-space:nowrap}
+.hx-sw i{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.55}
+.hx-sw small{font-size:9px;opacity:.6;letter-spacing:1.4px}
+.hx-sw:hover{color:#fff}
+.hx-sw.on{color:#031014;background:linear-gradient(135deg,var(--teal),#5eeaf0);font-weight:500;box-shadow:0 0 22px rgba(0,200,212,.35)}
+.hx-sw.on i{background:#031014;opacity:1}
+.hx-sw.re:hover{color:#fff;background:linear-gradient(135deg,rgba(204,17,0,.9),rgba(232,68,68,.75));box-shadow:0 0 22px rgba(204,17,0,.4)}
+.hx-sw .arr{font-size:12px;transition:transform .3s}
+.hx-sw.re:hover .arr{transform:translate(2px,-2px)}
+.hx-tag{font-family:var(--font-data);font-size:10px;letter-spacing:2px;color:var(--muted);display:flex;align-items:center;gap:8px;text-transform:uppercase}
+header.hx{position:relative;display:block;padding:0;background:linear-gradient(180deg,#010104,rgba(3,6,14,.97));border-bottom:1px solid rgba(255,255,255,.05);flex-wrap:nowrap;z-index:50}
+header.hx::after{content:'';position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,transparent 0%,var(--teal) 18%,var(--gold) 50%,var(--cae-red) 82%,transparent 100%);opacity:.85}
+.hx-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px;padding:18px 32px}
+.hx-press{display:flex;align-items:center;gap:18px}
+.hx-press img{width:96px;height:96px;object-fit:contain;filter:drop-shadow(0 0 18px rgba(56,182,255,.6))}
+.hx-press .t{font-family:var(--font-title);font-size:26px;letter-spacing:5px;color:#fff;font-weight:700;text-shadow:0 0 18px rgba(201,168,76,.4)}
+.hx-press .s{font-size:10px;letter-spacing:5px;color:var(--muted);text-transform:uppercase;margin-top:4px}
+header.hx .lang-switcher{margin-top:10px}
+header.hx .lang-btn{font-size:15px;padding:4px 10px}
+.hx-mid{text-align:center}
+.hx-mid #clock-time{font-size:34px}
+.hx-cae{justify-self:end;display:flex;align-items:stretch;text-decoration:none;border-radius:14px;overflow:hidden;border:1px solid rgba(204,17,0,.35);box-shadow:0 10px 40px rgba(0,0,0,.5),0 0 40px rgba(204,17,0,.12);transition:transform .35s,box-shadow .35s}
+.hx-cae:hover{transform:translateY(-2px);box-shadow:0 14px 48px rgba(0,0,0,.6),0 0 54px rgba(204,17,0,.28)}
+.hx-cae .blk{background:var(--cae-black);padding:14px 20px;display:flex;flex-direction:column;justify-content:center;gap:3px}
+.hx-cae .co{font-family:var(--font-serif);font-size:15px;letter-spacing:3px;color:#fff;font-weight:700}
+.hx-cae .he{font-size:13px;color:rgba(255,255,255,.7);direction:rtl}
+.hx-cae .si{font-family:var(--font-data);font-size:9px;letter-spacing:3px;color:var(--cae-redl);text-transform:uppercase;margin-top:2px}
+.hx-cae .rd{background:linear-gradient(160deg,#d81500,#9a0e00);padding:14px 20px;display:flex;flex-direction:column;justify-content:center;gap:3px;min-width:170px}
+.hx-cae .nm{font-family:var(--font-serif);font-size:15px;color:#fff}
+.hx-cae .nm strong{letter-spacing:2px}
+.hx-cae .cta{font-family:var(--font-data);font-size:9.5px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.85);margin-top:5px;display:flex;align-items:center;gap:7px}
+.hx-cae .cta em{font-style:normal;transition:transform .3s}
+.hx-cae:hover .cta em{transform:translateX(4px)}
+.hx-strip{display:flex;align-items:center;justify-content:center;gap:22px;padding:9px 32px;background:linear-gradient(90deg,transparent,rgba(204,17,0,.1),transparent);border-top:1px solid rgba(204,17,0,.12);font-size:12px;color:rgba(255,255,255,.7)}
+.hx-strip b{font-family:var(--font-serif);color:#fff;font-weight:500;font-style:italic}
+.hx-strip a{font-family:var(--font-data);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--cae-redl);text-decoration:none;border-bottom:1px solid rgba(232,68,68,.4);padding-bottom:1px}
+.hx-strip a:hover{color:#fff;border-color:#fff}
+@media(max-width:900px){
+  .hx-row{grid-template-columns:1fr;gap:16px;padding:14px 16px}
+  .hx-mid,.hx-strip,.hx-tag,.hx-sw small{display:none}
+  .hx-bar{justify-content:center;padding:8px 12px}
+  .hx-sw{padding:8px 14px;font-size:9.5px;letter-spacing:1.4px}
+  .hx-press img{width:64px;height:64px}
+  .hx-press .t{font-size:18px;letter-spacing:3px}
+  .hx-press .s{display:none}
+  .hx-cae{justify-self:stretch}
+  .hx-cae .blk,.hx-cae .rd{flex:1;padding:10px 12px;min-width:0}
+  .hx-cae .co{font-size:11.5px;letter-spacing:2px}
+  .hx-cae .nm{font-size:13px}
+}
 </style>
 </head>
 <body>
@@ -805,38 +860,40 @@ body { top:0 !important; }
 <!-- ══════════════════════════════════════
      HEADER
      ══════════════════════════════════════ -->
-<header>
-  <div class="header-logo">
-
-    <!-- LOGO RENASSIA/A -->
-    <img src="logo_dionysos3.png" alt="Renassia" style="height:140px;width:140px;object-fit:contain;filter:drop-shadow(0 0 20px rgba(56,182,255,0.65));">
-
-    <div>
-      <div class="header-title">Revue de Presse</div>
-      <div class="lang-switcher">
-        <button class="lang-btn active" id="lang-fr" onclick="translateTo('fr')" title="Tout en Français">
-          🇫🇷 <span class="lang-label">FR</span>
-        </button>
-        <button class="lang-btn" id="lang-iw" onclick="translateTo('iw')" title="הכל בעברית">
-          🇮🇱 <span class="lang-label">עב</span>
-        </button>
-        <button class="lang-btn" id="lang-en" onclick="translateTo('en')" title="All in English">
-          🇺🇸 <span class="lang-label">EN</span>
-        </button>
+<div class="hx-bar">
+  <nav class="hx-switch" aria-label="Changer de site">
+    <a class="hx-sw on" href="https://renassia.com/news/"><i></i>Presse <small>Dionysos</small></a>
+    <a class="hx-sw re" href="https://caesarea.tv" target="_blank" rel="noopener">Immobilier <small>Caesarea</small><span class="arr">↗</span></a>
+  </nav>
+  <div class="hx-tag"><span class="status-dot"></span><span id="status-text">Systèmes en ligne</span> · 📍 <span id="loc-name">Césarée, Israël</span></div>
+</div>
+<header class="hx">
+  <div class="hx-row">
+    <div class="hx-press">
+      <img src="logo_dionysos_240.png" alt="Dionysos">
+      <div>
+        <div class="t">Revue de Presse</div>
+        <div class="s">Rédaction Dionysos</div>
+        <div class="lang-switcher">
+          <button class="lang-btn active" id="lang-fr" onclick="translateTo('fr')" title="Tout en Français">🇫🇷 <span class="lang-label">FR</span></button>
+          <button class="lang-btn" id="lang-iw" onclick="translateTo('iw')" title="הכל בעברית">🇮🇱 <span class="lang-label">עב</span></button>
+          <button class="lang-btn" id="lang-en" onclick="translateTo('en')" title="All in English">🇺🇸 <span class="lang-label">EN</span></button>
+        </div>
       </div>
     </div>
+    <div id="google_translate_element"></div>
+    <div class="hx-mid header-clock">
+      <div id="clock-time">--:--:--</div>
+      <div id="clock-date">Chargement…</div>
+    </div>
+    <a class="hx-cae" href="https://caesarea.tv" target="_blank" rel="noopener" aria-label="Caesarea Real Estate — voir les biens">
+      <div class="blk"><div class="co">CAESAREA REAL ESTATE</div><div class="he">תיווך קיסריה</div><div class="si">Since 1985</div></div>
+      <div class="rd"><div class="nm">Hillel <strong>RENASSIA</strong></div><div class="cta">Voir nos biens d'exception <em>→</em></div></div>
+    </a>
   </div>
-  <!-- Google Translate hidden element -->
-  <div id="google_translate_element"></div>
-
-  <div class="header-clock">
-    <div id="clock-time">--:--:--</div>
-    <div id="clock-date">Chargement…</div>
-  </div>
-
-  <div class="header-loc">
-    <strong>📍 <span id="loc-name">Césarée, Israël</span></strong>
-    <span class="status-dot"></span><span id="status-text" style="font-size:11px">Systèmes en ligne</span>
+  <div class="hx-strip">
+    <span>Villas, penthouses &amp; terrains à <b>Césarée, Herzliya, Tel-Aviv</b></span>
+    <a href="https://caesarea.tv/properties" target="_blank" rel="noopener">Découvrir les biens</a>
   </div>
 </header>
 

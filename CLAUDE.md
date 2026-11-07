@@ -168,6 +168,10 @@ Ton : faits nus pour l'attentat (règle « la retenue se pratique »), pas de tr
 
 ---
 
+## Règle générale : tout texte du site que Claude écrit est traduit par Claude (instruction d'Hillel, 07/11/2026)
+
+Valable pour tout ce que Claude ajoute au site (encarts, résumés, libellés) et pas seulement le billet : les versions hébreu et anglais sont rédigées à la main par Claude, jamais par Google Translate / MyMemory. Pour un encart à texte généré par le code (ex. l'encart Bourse, `MK_L` dans `index.html`), on écrit un jeu de phrases par langue (fr / en / he), avec les tournures naturelles de chaque langue, et on marque l'encart `translate="no"` pour que Google ne retraduise pas par-dessus. Les titres d'actualité de sources tierces restent dans leur langue d'origine.
+
 ## Nombres en chiffres (instruction d'Hillel, 30/10/2026)
 
 Tous les nombres s'écrivent en chiffres, pas en toutes lettres : « 6 sièges », « 52 violations », « 3 jours », pas « six », « cinquante-deux ». Exceptions naturelles : « un » article/pronom, expressions figées (« deux ou trois fois », « en une seconde »).

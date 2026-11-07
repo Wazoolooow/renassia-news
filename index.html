@@ -832,6 +832,10 @@ body { top:0 !important; }
 .mk-row b { font-family:var(--font-data); font-weight:600; font-size:11.5px; white-space:nowrap; }
 .mk-note { font-size:11.5px; line-height:1.55; color:var(--muted); }
 .mk-pane { animation:mkfade .25s ease; }
+.mk-rtl .mk-hero-name, .mk-rtl .mk-chip .n, .mk-rtl .sp-sec, .mk-rtl .sp-title, .mk-rtl .mk-reg-h { letter-spacing:0; }
+.mk-rtl .mk-sum, .mk-rtl .mk-note { line-height:1.8; font-size:13px; }
+.mk-rtl .sp-tab { letter-spacing:0; }
+.mk-rtl .sp-news-item a { direction:ltr; text-align:left; }
 @keyframes mkfade { from{opacity:0;transform:translateY(3px)} to{opacity:1;transform:none} }
 @media (min-width:901px) {
   .sec-conditions .grid { grid-auto-rows:minmax(390px,auto); }
@@ -2804,7 +2808,7 @@ function spSetBadge(id, txt, live){
 // ─── Actualités (RSS via proxy) ───
 const SP_JUNK = /bonus|promo code|promo|betting|odds|parlay|picks|prediction|fanduel|draftkings|betmgm|sportsbook|caesars|bet365|fantasy|how to watch|live stream/i;
 const gnews = (q, lang='en-US', gl='US', ceid='US:en') => 'https://news.google.com/rss/search?q='+encodeURIComponent(q)+'&hl='+lang+'&gl='+gl+'&ceid='+ceid;
-async function spNews(elId, feeds, max, keep){
+async function spNews(elId, feeds, max, keep, noFlags){
   const el = document.getElementById(elId); if (!el) return;
   try {
     const lists = await Promise.all(feeds.map(f => fetchRSS(f.url, f.n||8).then(a => a.map(it => ({...it, source:f.name})))));
@@ -2821,7 +2825,7 @@ async function spNews(elId, feeds, max, keep){
       const gm = title.match(/^(.*) - ([^-]{2,40})$/);
       if (gm && it.source==='Actualité') { title = gm[1]; src = gm[2]; }
       const link = it.link ? `<a href="${spEsc(it.link)}"><span class="item-title">${spEsc(title)}</span></a>` : `<span class="item-title">${spEsc(title)}</span>`;
-      return `<div class="sp-news-item" data-orig="${spEsc(title)}"><div style="flex:1;min-width:0">${link}<div class="sp-news-meta"><span>${spEsc(src)}</span><span>·</span><span>${spAgo(it.date)}</span>${TF}</div></div></div>`;
+      return `<div class="sp-news-item" data-orig="${spEsc(title)}"><div style="flex:1;min-width:0">${link}<div class="sp-news-meta"><span>${spEsc(src)}</span><span>·</span><span>${spAgo(it.date)}</span>${noFlags?'':TF}</div></div></div>`;
     }).join('') + `</div>`;
     return true;
   } catch(e) { el.innerHTML = `<div class="sp-empty">Actualités momentanément indisponibles.</div>`; return false; }
@@ -3039,9 +3043,96 @@ setInterval(spLive, 3 * 60 * 1000);
 
 
 // ═══ BOURSE — RÉSUMÉ DU JOUR (Nasdaq puis grandes places mondiales) ═══
-function mkPct(p, d=2){ if (p==null || isNaN(p)) return '—'; const s = Math.abs(p).toLocaleString('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d}); return (p>0.0049?'+':(p<-0.0049?'−':''))+s+' %'; }
+// Textes FR / עב / EN rédigés à la main (pas de traduction automatique) : chaque langue a ses propres tournures.
+const MK_REG_ORDER = [
+  {k:'eu', items:[['.FCHI','cac'],['.GDAXI','dax'],['.FTSE','ftse'],['.STOXX50E','stoxx']]},
+  {k:'as', items:[['.N225','nikkei'],['.HSI','hsi'],['.SSEC','sse'],['.KS11','kospi'],['.AXJO','asx']]},
+  {k:'il', items:[['.TA35','ta35']]},
+];
+const MK_STARS = [['NVDA','nvda'],['AAPL','aapl'],['MSFT','msft'],['AMZN','amzn'],['GOOGL','googl'],['META','meta'],['TSLA','tsla'],['AVGO','avgo']];
+
+const MK_L = {
+  fr: {
+    dir:'ltr', loc:'fr-FR', title:'Bourse', foot:'CNBC · cours différés · Google Actualités', loading:'Lecture des marchés…', err:'Cours indisponibles pour le moment.',
+    live:'En direct', closed:'Clôture', subLive:'Séance en cours', subClosed:d=>'Séance du '+d,
+    tabs:{nq:'Nasdaq', wd:'Monde', nw:'À la une'}, stars:'Valeurs vedettes', composite:'Nasdaq Composite', hi:'HAUT', lo:'BAS',
+    idx:{'.NDX':'Nasdaq 100','.SPX':'S&P 500','.DJI':'Dow Jones','.RUT':'Russell 2000','.VIX':'VIX'},
+    nm:{cac:'CAC 40',dax:'DAX',ftse:'FTSE 100',stoxx:'Euro Stoxx 50',nikkei:'Nikkei 225',hsi:'Hang Seng',sse:'Shanghai',kospi:'Kospi',asx:'ASX 200',ta35:'TA-35',
+        nvda:'Nvidia',aapl:'Apple',msft:'Microsoft',amzn:'Amazon',googl:'Alphabet',meta:'Meta',tsla:'Tesla',avgo:'Broadcom'},
+    reg:{eu:'Europe', as:'Asie-Pacifique', il:'Israël'},
+    pct:(p,d=2)=>{ if (p==null||isNaN(p)) return '—'; return (p>0.0049?'+':(p<-0.0049?'−':''))+Math.abs(p).toLocaleString('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d})+' %'; },
+    date:dt=>dt.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'long'}).replace('.',''),
+    verb:p=> p>=1.5?'bondit':(p>=0.3?'progresse':(p>-0.3?'stagne':(p>-1.5?'recule':'décroche'))),
+    tone:a=> a>=1?'nettement dans le vert':(a>=0.2?'dans le vert':(a>-0.2?"proche de l'équilibre":(a>-1?'dans le rouge':(a>-2?'en net repli':'en forte chute')))),
+    usTone:t=> t==='up'?'dans le vert':(t==='down'?'dans le rouge':'en ordre dispersé'),
+    sumUS:(c)=>{
+      let s = `Wall Street ${c.open?'évolue':'termine'} <b>${c.usTone}</b> : le Nasdaq ${c.verb} (<b>${c.p(c.nq)}</b>), le S&amp;P 500 ${c.p(c.spx)}, le Dow Jones ${c.p(c.dji)}.`;
+      if (c.best) s += ` Chez les vedettes du Nasdaq, <b>${c.best.n}</b> ${c.p(c.best.p,1)} en tête, <b>${c.worst.n}</b> ${c.p(c.worst.p,1)} en queue de peloton.`;
+      if (c.vix) s += ` Le VIX, baromètre de la peur, ${c.vix.p<0?'reflue':'monte'} (${c.p(c.vix.p,1)}) à ${c.num(c.vix.v,1)}.`;
+      return s;
+    },
+    regNote:(c)=>{
+      c.pa = c.pa || c.p;
+      if (c.k==='il') return `Tel-Aviv ${c.p0>=0.3?'grimpe':(c.p0<=-0.3?'recule':'stagne')} : TA-35 <b>${c.p(c.p0)}</b> à ${c.num(c.v0,0)} points.`;
+      const lead = c.k==='eu' ? "L'Europe" : "L'Asie";
+      return `${lead} ${c.open&&c.k==='eu'?'évolue':'termine'} <b>${c.tone}</b>`+(c.hi?` : ${c.hi.n} (${c.p(c.hi.p)}) en tête, ${c.lo.n} (${c.p(c.lo.p)}) en queue.`:'.');
+    },
+  },
+
+  en: {
+    dir:'ltr', loc:'en-US', title:'Markets', foot:'CNBC · delayed quotes · Google News', loading:'Reading the markets…', err:'Quotes are unavailable right now.',
+    live:'Live', closed:'Closed', subLive:'Session in progress', subClosed:d=>'Close · '+d,
+    tabs:{nq:'Nasdaq', wd:'World', nw:'Headlines'}, stars:'Big names', composite:'Nasdaq Composite', hi:'HIGH', lo:'LOW',
+    idx:{'.NDX':'Nasdaq 100','.SPX':'S&P 500','.DJI':'Dow Jones','.RUT':'Russell 2000','.VIX':'VIX'},
+    nm:{cac:'CAC 40',dax:'DAX',ftse:'FTSE 100',stoxx:'Euro Stoxx 50',nikkei:'Nikkei 225',hsi:'Hang Seng',sse:'Shanghai',kospi:'Kospi',asx:'ASX 200',ta35:'TA-35',
+        nvda:'Nvidia',aapl:'Apple',msft:'Microsoft',amzn:'Amazon',googl:'Alphabet',meta:'Meta',tsla:'Tesla',avgo:'Broadcom'},
+    reg:{eu:'Europe', as:'Asia-Pacific', il:'Israel'},
+    pct:(p,d=2)=>{ if (p==null||isNaN(p)) return '—'; return (p>0.0049?'+':(p<-0.0049?'−':''))+Math.abs(p).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})+'%'; },
+    date:dt=>dt.toLocaleDateString('en-US',{weekday:'short',month:'long',day:'numeric'}),
+    verb:p=> p>=1.5?'jumps':(p>=0.3?'gains':(p>-0.3?'is flat':(p>-1.5?'slips':'tumbles'))),
+    tone:a=> a>=1?'sharply higher':(a>=0.2?'higher':(a>-0.2?'roughly flat':(a>-1?'lower':(a>-2?'sharply lower':'in freefall')))),
+    usTone:t=> t==='up'?'in the green':(t==='down'?'in the red':'mixed'),
+    sumUS:(c)=>{
+      let s = `Wall Street ${c.open?'trades':'closes'} <b>${c.usTone}</b>: the Nasdaq ${c.verb} (<b>${c.p(c.nq)}</b>), the S&amp;P 500 ${c.p(c.spx)}, the Dow Jones ${c.p(c.dji)}.`;
+      if (c.best) s += ` Among the Nasdaq's big names, <b>${c.best.n}</b> (${c.p(c.best.p,1)}) leads and <b>${c.worst.n}</b> (${c.p(c.worst.p,1)}) trails.`;
+      if (c.vix) s += ` The VIX, Wall Street's fear gauge, ${c.vix.p<0?'eases':'climbs'} (${c.p(c.vix.p,1)}) to ${c.num(c.vix.v,1)}.`;
+      return s;
+    },
+    regNote:(c)=>{
+      if (c.k==='il') return `Tel Aviv ${c.p0>=0.3?'rises':(c.p0<=-0.3?'falls':'is flat')}: the TA-35 ${c.p0>=0.3?'gains':(c.p0<=-0.3?'loses':'moves')} <b>${c.pa(Math.abs(c.p0))}</b> to ${c.num(c.v0,0)} points.`;
+      const lead = c.k==='eu' ? 'Europe' : 'Asia';
+      return `${lead} ${c.open&&c.k==='eu'?'trades':'closes'} <b>${c.tone}</b>`+(c.hi?`, with the ${c.hi.n} (${c.p(c.hi.p)}) the strongest and the ${c.lo.n} (${c.p(c.lo.p)}) the weakest.`:'.');
+    },
+  },
+
+  he: {
+    dir:'rtl', loc:'he-IL', title:'הבורסה', foot:'CNBC · נתונים מושהים · Google News', loading:'קורא את השווקים…', err:'הנתונים אינם זמינים כרגע.',
+    live:'חי', closed:'סגירה', subLive:'המסחר בעיצומו', subClosed:d=>'סגירת '+d,
+    tabs:{nq:'נאסד"ק', wd:'העולם', nw:'כותרות'}, stars:'מניות הדגל', composite:'נאסד"ק קומפוזיט', hi:'גבוה', lo:'נמוך',
+    idx:{'.NDX':'נאסד"ק 100','.SPX':'S&P 500','.DJI':"דאו ג'ונס",'.RUT':'ראסל 2000','.VIX':'VIX'},
+    nm:{cac:'CAC 40',dax:'DAX',ftse:'FTSE 100',stoxx:'יורו סטוקס 50',nikkei:'ניקיי 225',hsi:'האנג סנג',sse:'שנגחאי',kospi:'קוספי',asx:'ASX 200',ta35:'ת"א-35',
+        nvda:'אנבידיה',aapl:'אפל',msft:'מיקרוסופט',amzn:'אמזון',googl:'אלפבית',meta:'מטא',tsla:'טסלה',avgo:'ברודקום'},
+    reg:{eu:'אירופה', as:'אסיה-פסיפיק', il:'ישראל'},
+    pct:(p,d=2)=>{ if (p==null||isNaN(p)) return '—'; return '<bdi dir="ltr">'+(p>0.0049?'+':(p<-0.0049?'−':''))+Math.abs(p).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})+'%</bdi>'; },
+    date:dt=>dt.toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long'}),
+    verb:p=> p>=1.5?'מזנק':(p>=0.3?'עולה':(p>-0.3?'כמעט ללא שינוי':(p>-1.5?'יורד':'צונח'))),
+    tone:a=> a>=1?'בעליות חדות':(a>=0.2?'בעליות':(a>-0.2?'כמעט ללא שינוי':(a>-1?'בירידות':(a>-2?'בירידות חדות':'בצניחה חדה')))),
+    usTone:t=> t==='up'?'בעליות':(t==='down'?'בירידות':'בכיוונים מעורבים'),
+    sumUS:(c)=>{
+      let s = `וול סטריט ${c.open?'נסחרת':'סוגרת'} <b>${c.usTone}</b>: הנאסד"ק ${c.verb} (<b>${c.p(c.nq)}</b>), ה-S&amp;P 500 ${c.p(c.spx)}, הדאו ג'ונס ${c.p(c.dji)}.`;
+      if (c.best) s += ` בין מניות הדגל של הנאסד"ק, מניית <b>${c.best.n}</b> (${c.p(c.best.p,1)}) מובילה, ומניית <b>${c.worst.n}</b> (${c.p(c.worst.p,1)}) סוגרת את הרשימה.`;
+      if (c.vix) s += ` מדד הפחד (VIX) ${c.vix.p<0?'יורד':'עולה'} (${c.p(c.vix.p,1)}) ל-${c.num(c.vix.v,1)}.`;
+      return s;
+    },
+    regNote:(c)=>{
+      if (c.k==='il') return `תל אביב ${c.p0>=0.3?'בעליות':(c.p0<=-0.3?'בירידות':'יציבה')}: מדד ת"א-35 ${c.p0>=0.3?'עולה ב-':(c.p0<=-0.3?'יורד ב-':'כמעט ללא שינוי, ')}<b>${c.pa(Math.abs(c.p0))}</b> ל-${c.num(c.v0,0)} נקודות.`;
+      const lead = c.k==='eu' ? 'אירופה' : 'אסיה';
+      return `${lead} ${c.open&&c.k==='eu'?'נסחרת':'סוגרת'} <b>${c.tone}</b>`+(c.hi?`: ${c.hi.n} (${c.p(c.hi.p)}) החזיק מעמד הכי טוב, ${c.lo.n} (${c.p(c.lo.p)}) נפגע הכי הרבה.`:'.');
+    },
+  },
+};
+function mkLang(){ const g = (typeof _gtLang==='function') ? _gtLang() : 'fr'; return g==='iw' ? 'he' : (g==='en' ? 'en' : 'fr'); }
 function mkCls(p){ return p>0.0049?'mk-up':(p<-0.0049?'mk-dn':'mk-fl'); }
-function mkNum(v, d=2){ return v==null?'—':v.toLocaleString('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d}); }
 function mkUSOpen(){
   try {
     const p = new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',hour:'numeric',minute:'numeric',hour12:false}).formatToParts(new Date());
@@ -3051,84 +3142,68 @@ function mkUSOpen(){
     return m >= 9*60+30 && m < 16*60;
   } catch { return false; }
 }
-function mkTone(avg, strong){ // pour une région (féminin)
-  if (avg >= 1)    return 'nettement dans le vert';
-  if (avg >= 0.2)  return 'dans le vert';
-  if (avg > -0.2)  return 'proche de l\'équilibre';
-  if (avg > -1)    return 'dans le rouge';
-  if (avg > -2)    return 'en net repli';
-  return 'en forte chute';
-}
-function mkVerb(p){
-  if (p >= 1.5)  return 'bondit';
-  if (p >= 0.3)  return 'progresse';
-  if (p > -0.3)  return 'stagne';
-  if (p > -1.5)  return 'recule';
-  return 'décroche';
-}
 let _mkTab='nq';
 function mkTab(t){
   _mkTab=t;
   document.querySelectorAll('#mk-tabs .sp-tab').forEach(b=>b.classList.toggle('active',b.dataset.t===t));
   document.querySelectorAll('#mk-main .mk-pane').forEach(p=>p.style.display=(p.dataset.p===t?'block':'none'));
 }
+function mkStatic(L){
+  const card = document.getElementById('mk-card'); if (!card) return;
+  card.setAttribute('translate','no'); card.classList.add('notranslate');   // Google ne touche pas à nos textes rédigés
+  card.setAttribute('dir', L.dir); card.classList.toggle('mk-rtl', L.dir==='rtl');
+  const t = card.querySelector('.sp-title'); if (t) t.textContent = L.title;
+  const f = card.querySelector('.sp-foot'); if (f) f.textContent = L.foot;
+}
 async function fetchMarkets(){
   const el = document.getElementById('mk-main'); if (!el) return;
+  const L = MK_L[mkLang()]; mkStatic(L);
   try {
     const r = await fetch('/news/markets.php', {signal:abortSignal(12000)});
     const d = await r.json(); const Q = d.q; if (!Q || !Q['.IXIC']) throw new Error('no data');
     const C = Q['.IXIC'];
-    const P = s => Q[s]?.pct;
+    const P = s => Q[s]?.pct, p = L.pct, num = (v,dg=2)=>v==null?'—':v.toLocaleString(L.loc==='he-IL'?'en-US':L.loc,{minimumFractionDigits:dg,maximumFractionDigits:dg});
     const open = mkUSOpen();
-    // — en-tête
     const dt = C.date ? new Date(C.date+'T12:00:00') : null;
-    const dtLbl = dt ? dt.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'long'}).replace('.','') : '';
-    const sub = document.getElementById('mk-sub'); if (sub) sub.textContent = (open?'Séance en cours':'Séance du ')+(open?'':dtLbl);
-    spSetBadge('mk-badge', open?'En direct':'Clôture', open);
-    // — Nasdaq héros
-    const chips = [['.NDX','Nasdaq 100'],['.SPX','S&P 500'],['.DJI','Dow Jones'],['.RUT','Russell 2000'],['.VIX','VIX']].filter(x=>Q[x[0]])
-      .map(([s,l])=>`<div class="mk-chip"><div class="n">${l}</div><div class="p ${s==='.VIX'?mkCls(-Q[s].pct):mkCls(Q[s].pct)}">${mkPct(Q[s].pct)}</div></div>`).join('');
-    const hl = (C.high&&C.low) ? `<span style="font-family:var(--font-data);font-size:9.5px;color:var(--muted);letter-spacing:1px">HAUT ${mkNum(C.high,0)} · BAS ${mkNum(C.low,0)}</span>` : '';
-    const hero = `<div class="mk-hero"><div><div class="mk-hero-name">Nasdaq Composite</div><div class="mk-hero-val">${mkNum(C.last,2)}</div></div><div class="mk-pill ${mkCls(C.pct)}">${C.pct>0.0049?'▲':(C.pct<-0.0049?'▼':'■')} ${mkPct(C.pct)}</div></div><div style="margin:-4px 0 10px">${hl}</div><div class="mk-chips">${chips}</div>`;
-    // — valeurs vedettes
-    const STARS = [['NVDA','Nvidia'],['AAPL','Apple'],['MSFT','Microsoft'],['AMZN','Amazon'],['GOOGL','Alphabet'],['META','Meta'],['TSLA','Tesla'],['AVGO','Broadcom']].filter(x=>Q[x[0]]);
-    const stars = STARS.map(([s,l])=>`<div class="mk-star"><div class="n">${s}</div><div class="p ${mkCls(Q[s].pct)}">${mkPct(Q[s].pct,1)}</div></div>`).join('');
-    const best = [...STARS].sort((a,b)=>Q[b[0]].pct-Q[a[0]].pct)[0], worst = [...STARS].sort((a,b)=>Q[a[0]].pct-Q[b[0]].pct)[0];
-    // — résumé US
+    const sub = document.getElementById('mk-sub'); if (sub) sub.textContent = open ? L.subLive : (dt ? L.subClosed(L.date(dt)) : '');
+    spSetBadge('mk-badge', open?L.live:L.closed, open);
+    // — héros
+    const chips = ['.NDX','.SPX','.DJI','.RUT','.VIX'].filter(s=>Q[s])
+      .map(s=>`<div class="mk-chip"><div class="n">${L.idx[s]}</div><div class="p ${s==='.VIX'?mkCls(-Q[s].pct):mkCls(Q[s].pct)}">${p(Q[s].pct)}</div></div>`).join('');
+    const hl = (C.high&&C.low) ? `<span style="font-family:var(--font-data);font-size:9.5px;color:var(--muted);letter-spacing:1px"><bdi dir="ltr">${L.hi} ${num(C.high,0)} · ${L.lo} ${num(C.low,0)}</bdi></span>` : '';
+    const hero = `<div class="mk-hero"><div><div class="mk-hero-name">${L.composite}</div><div class="mk-hero-val"><bdi dir="ltr">${num(C.last,2)}</bdi></div></div><div class="mk-pill ${mkCls(C.pct)}">${C.pct>0.0049?'▲':(C.pct<-0.0049?'▼':'■')} ${p(C.pct)}</div></div><div style="margin:-4px 0 10px">${hl}</div><div class="mk-chips">${chips}</div>`;
+    // — vedettes
+    const stars = MK_STARS.filter(x=>Q[x[0]]);
+    const starsHTML = stars.map(([s])=>`<div class="mk-star"><div class="n">${s}</div><div class="p ${mkCls(Q[s].pct)}">${p(Q[s].pct,1)}</div></div>`).join('');
+    const sorted = [...stars].sort((a,b)=>Q[b[0]].pct-Q[a[0]].pct);
+    const bestS = sorted[0], worstS = sorted[sorted.length-1];
     const us = ['.IXIC','.SPX','.DJI'].map(P).filter(x=>x!=null);
-    const tone = us.every(x=>x>0.05) ? (open?'dans le vert':'dans le vert') : us.every(x=>x<-0.05) ? 'dans le rouge' : 'en ordre dispersé';
-    let sumUS = `Wall Street ${open?'évolue':'termine'} <b>${tone}</b> : le Nasdaq ${mkVerb(C.pct)} (<b>${mkPct(C.pct)}</b>), le S&amp;P 500 ${mkPct(P('.SPX'))}, le Dow Jones ${mkPct(P('.DJI'))}.`;
-    if (best && worst && best[0]!==worst[0]) sumUS += ` Chez les vedettes du Nasdaq, <b>${best[1]}</b> ${mkPct(Q[best[0]].pct,1)} en tête, <b>${worst[1]}</b> ${mkPct(Q[worst[0]].pct,1)} en queue de peloton.`;
-    if (Q['.VIX']) sumUS += ` Le VIX, baromètre de la peur, ${Q['.VIX'].pct<0?'reflue':'monte'} (${mkPct(Q['.VIX'].pct,1)}) à ${mkNum(Q['.VIX'].last,1)}.`;
+    const usT = us.every(x=>x>0.05)?'up':(us.every(x=>x<-0.05)?'down':'mixed');
+    const sumUS = L.sumUS({open, p, num, usTone:L.usTone(usT), verb:L.verb(C.pct), nq:C.pct, spx:P('.SPX'), dji:P('.DJI'),
+      best:(bestS&&worstS&&bestS[0]!==worstS[0])?{n:L.nm[bestS[1]],p:Q[bestS[0]].pct}:null, worst:worstS?{n:L.nm[worstS[1]],p:Q[worstS[0]].pct}:null,
+      vix:Q['.VIX']?{p:Q['.VIX'].pct,v:Q['.VIX'].last}:null});
     // — régions
-    const REG = [
-      {t:'Europe', items:[['.FCHI','CAC 40'],['.GDAXI','DAX'],['.FTSE','FTSE 100'],['.STOXX50E','Euro Stoxx 50']], lead:"L'Europe"},
-      {t:'Asie-Pacifique', items:[['.N225','Nikkei 225'],['.HSI','Hang Seng'],['.SSEC','Shanghai'],['.KS11','Kospi'],['.AXJO','ASX 200']], lead:"L'Asie"},
-      {t:'Israël', items:[['.TA35','TA-35']], lead:'Tel-Aviv'},
-    ];
-    const regHTML = REG.map(g=>{
+    const regHTML = MK_REG_ORDER.map(g=>{
       const it = g.items.filter(x=>Q[x[0]]); if (!it.length) return '';
       const avg = it.reduce((a,x)=>a+Q[x[0]].pct,0)/it.length;
-      const rows = it.map(([s,l])=>`<div class="mk-row"><span>${l}</span><b class="${mkCls(Q[s].pct)}">${mkPct(Q[s].pct)}</b></div>`).join('');
-      let note;
-      if (g.t==='Israël') { const p=Q['.TA35'].pct; note = `${g.lead} ${p>=0.3?'grimpe':(p<=-0.3?'recule':'stagne')} : TA-35 <b>${mkPct(p)}</b> à ${mkNum(Q['.TA35'].last,0)} points.`; }
-      else {
-        const hi = [...it].sort((a,b)=>Q[b[0]].pct-Q[a[0]].pct)[0], lo = [...it].sort((a,b)=>Q[a[0]].pct-Q[b[0]].pct)[0];
-        note = `${g.lead} ${open&&g.t==='Europe'?'évolue':'termine'} <b>${mkTone(avg)}</b>`+(hi[0]!==lo[0] ? ` : ${hi[1]} (${mkPct(Q[hi[0]].pct)}) en tête, ${lo[1]} (${mkPct(Q[lo[0]].pct)}) en queue.` : '.');
-      }
-      return `<div class="mk-reg"><div class="mk-reg-h">${g.t}<span class="${mkCls(avg)}">${mkPct(avg,1)}</span></div><div class="mk-rows">${rows}</div><div class="mk-note">${note}</div></div>`;
+      const rows = it.map(([s,k])=>`<div class="mk-row"><span>${L.nm[k]}</span><b class="${mkCls(Q[s].pct)}">${p(Q[s].pct)}</b></div>`).join('');
+      const so = [...it].sort((a,b)=>Q[b[0]].pct-Q[a[0]].pct), hiI = so[0], loI = so[so.length-1];
+      const note = L.regNote({k:g.k, open, p, pa:(v,dg=2)=>p(v,dg).replace('+',''), num, tone:L.tone(avg), p0:Q[it[0][0]].pct, v0:Q[it[0][0]].last,
+        hi:(hiI[0]!==loI[0])?{n:L.nm[hiI[1]],p:Q[hiI[0]].pct}:null, lo:{n:L.nm[loI[1]],p:Q[loI[0]].pct}});
+      return `<div class="mk-reg"><div class="mk-reg-h">${L.reg[g.k]}<span class="${mkCls(avg)}">${p(avg,1)}</span></div><div class="mk-rows">${rows}</div><div class="mk-note">${note}</div></div>`;
     }).join('');
-    el.innerHTML = `<div class="sp-tabs" id="mk-tabs"><button class="sp-tab" data-t="nq" onclick="mkTab('nq')">Nasdaq</button><button class="sp-tab" data-t="wd" onclick="mkTab('wd')">Monde</button><button class="sp-tab" data-t="nw" onclick="mkTab('nw')">À la une</button></div>
-      <div class="mk-pane" data-p="nq">${hero}<p class="mk-sum">${sumUS}</p><div class="sp-sec">Valeurs vedettes</div><div class="mk-stars">${stars}</div></div>
+    el.innerHTML = `<div class="sp-tabs" id="mk-tabs"><button class="sp-tab" data-t="nq" onclick="mkTab('nq')">${L.tabs.nq}</button><button class="sp-tab" data-t="wd" onclick="mkTab('wd')">${L.tabs.wd}</button><button class="sp-tab" data-t="nw" onclick="mkTab('nw')">${L.tabs.nw}</button></div>
+      <div class="mk-pane" data-p="nq">${hero}<p class="mk-sum">${sumUS}</p><div class="sp-sec">${L.stars}</div><div class="mk-stars">${starsHTML}</div></div>
       <div class="mk-pane" data-p="wd">${regHTML}</div>
-      <div class="mk-pane" data-p="nw"><div id="mk-news"><div class="loading">Chargement…</div></div></div>`;
+      <div class="mk-pane" data-p="nw"><div id="mk-news"><div class="loading">…</div></div></div>`;
     mkTab(_mkTab);
+    // Titres d'actualité : originaux (anglais), sans boutons de traduction automatique
     spNews('mk-news', [
       {url:gnews('Nasdaq stocks close when:1d'), name:'Actualité', n:10},
       {url:gnews('Wall Street stocks market when:1d'), name:'Actualité', n:10},
-    ], 3);
+    ], 3, null, true);
   } catch(e) {
-    el.innerHTML = `<div class="sp-empty">Cours indisponibles pour le moment.</div>`;
+    el.innerHTML = `<div class="sp-empty">${L.err}</div>`;
   }
 }
 setInterval(() => { if (!document.hidden) fetchMarkets(); }, 180000);

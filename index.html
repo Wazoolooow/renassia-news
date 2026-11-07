@@ -580,6 +580,9 @@ canvas#btc-spark { width:100%; height:50px; border-radius:8px; background:rgba(0
   margin-top: 10px; font-size: 12px; color: rgba(201,168,76,0.6);
   letter-spacing: 2px; text-transform: uppercase;
 }
+.edito-rtl { direction:rtl; text-align:right; }
+.edito-rtl .editorial-body { line-height:1.95; font-size:15px; }
+.edito-rtl .editorial-lede { border-left:none; border-right:2px solid rgba(201,168,76,0.4); padding-left:0; padding-right:12px; }
 /* ── ARCHIVE ÉDITORIAL ── */
 .edito-archive { margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 14px; }
 .edito-archive-header {
@@ -2466,6 +2469,21 @@ function toggleArchiveItem(i) {
 }
 
 let _editorialOrigHTML = '';
+let _editorialTr = {iw:null, en:null};   // traductions rédigées à la main (billet.json: html_he / html_en)
+function _gtLang(){ const m=document.cookie.match(/googtrans=\/fr\/(\w+)/); return m?m[1]:'fr'; }
+function _showEditorialLang(lang){
+  const el=document.getElementById('editorial-content'); if(!el) return false;
+  const h=_editorialTr[lang];
+  if(lang==='fr' || !h){
+    el.removeAttribute('dir'); el.classList.remove('edito-rtl');
+    if(lang==='fr' && _editorialOrigHTML) el.innerHTML=_editorialOrigHTML;
+    return lang==='fr';
+  }
+  el.innerHTML=h;
+  el.setAttribute('translate','no'); el.classList.add('notranslate');
+  if(lang==='iw'){ el.setAttribute('dir','rtl'); el.classList.add('edito-rtl'); } else { el.removeAttribute('dir'); el.classList.remove('edito-rtl'); }
+  return true;
+}
 let _recGenExtra = 0; // incrément pour générations d'urgence
 
 // ── Construit et affiche le billet à partir d'un seed ──
@@ -2530,7 +2548,9 @@ async function generateEditorial() {
       if (data && data.html) {
         el.innerHTML = data.html;
         _editorialOrigHTML = data.html;
+        _editorialTr = {iw: data.html_he || null, en: data.html_en || null};
         document.querySelectorAll('#editorial-flags .trans-flag-btn').forEach(b => b.classList.remove('active'));
+        { const gl=_gtLang(); if(gl!=='fr' && _showEditorialLang(gl)){ const bi=document.querySelectorAll('#editorial-flags .trans-flag-btn')[gl==='iw'?1:2]; if(bi) bi.classList.add('active'); } }
         _saveToEditoArchive(data.date || todayKey, data.dateStr || _getTodayDateStr(), data.html);
         renderEditorialArchive();
         return;
@@ -2606,7 +2626,7 @@ async function recSaveBillet() {
     const res = await fetch('/news/billet.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ date: todayKey, html: newHTML, dateStr, password: 'hdr2012' })
+      body: JSON.stringify({ date: todayKey, html: newHTML, html_he: _editorialTr.iw, html_en: _editorialTr.en, dateStr, password: 'hdr2012' })
     });
     const data = await res.json();
     if (data && data.ok) {
@@ -2654,9 +2674,13 @@ async function translateEditorial(btn, lang) {
   if (wasActive || lang === 'fr') {
     // Restaure l'original
     const editoEl = document.getElementById('editorial-content');
+    if (editoEl) { editoEl.removeAttribute('dir'); editoEl.classList.remove('edito-rtl'); }
     if (editoEl && _editorialOrigHTML) editoEl.innerHTML = _editorialOrigHTML.replace(/id="editorial-body"/,'id="editorial-body"');
     return;
   }
+
+  // Traduction rédigée à la main disponible → on l'affiche (jamais de traduction automatique)
+  if (_editorialTr[lang]) { btn.classList.add('active'); _showEditorialLang(lang); return; }
 
   btn.classList.add('active');
   const savedEmoji = btn.textContent;

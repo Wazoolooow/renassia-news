@@ -168,6 +168,24 @@ Ton : faits nus pour l'attentat (règle « la retenue se pratique »), pas de tr
 
 ---
 
+## Nombres en chiffres (instruction d'Hillel, 30/10/2026)
+
+Tous les nombres s'écrivent en chiffres, pas en toutes lettres : « 6 sièges », « 52 violations », « 3 jours », pas « six », « cinquante-deux ». Exceptions naturelles : « un » article/pronom, expressions figées (« deux ou trois fois », « en une seconde »).
+
+## Traductions hébreu et anglais — écrites par toi, jamais par un traducteur automatique (instruction d'Hillel, 07/11/2026)
+
+Chaque billet est publié en **3 versions** : français (original), hébreu (`html_he`), anglais (`html_en`). **Tu traduis toi-même**, avec le même soin que l'original. Google Translate / MyMemory ne sont pas au niveau de rédaction exigé : ne jamais s'en servir pour le billet.
+
+Règles de traduction :
+- **Le sens reste exact** : chiffres, noms, dates, probabilités, sièges, scores identiques à l'original. Relire chaque version contre le français avant de publier (un chiffre qui change = billet raté).
+- **L'esprit passe avant les mots.** Un trait d'esprit, un jeu de mots, une ironie ne se traduisent pas mot à mot si le résultat ne veut rien dire : retrouver dans la langue cible l'effet équivalent (tournure, image, chute) en gardant le même sens et la même cible de l'ironie. Si une expression idiomatique française n'a pas d'équivalent, la réécrire avec une image qui marche dans la langue d'arrivée.
+- **Même voix Dionysos** dans les trois langues : sec, précis, ironique, même rythme (phrases courtes / longues), même chute. Une traduction plate est un échec.
+- **Hébreu** : hébreu journalistique naturel (registre Haaretz / Yedioth, pas calque du français), chiffres en chiffres, noms propres usuels en hébreu (נתניהו, איזנקוט, הרצוג, ליברמן…), guillemets « » → "…" selon l'usage hébreu. Pas de nikud. Le HTML garde la même structure ; l'affichage RTL est géré par le site.
+- **Anglais** : anglais de chronique (type Economist / Times of Israel), pas de calque ; dates au format « Saturday, November 7, 2026 ».
+- Le bloc `editorial-header` est traduit aussi (byline « Column · The Dionysos Newsroom » / « טור · מערכת דיוניסוס », date localisée).
+- La phrase de fermeture (`editorial-closing`) est ce qui doit le mieux survivre : la retravailler pour que la chute fonctionne dans chaque langue.
+- Mise à jour partielle d'un billet (ex. paragraphe Route du Rhum) : **mettre à jour les trois versions** (`html`, `html_he`, `html_en`), pas seulement le français.
+
 ## Structure du billet
 
 **5 à 7 paragraphes** (le paragraphe sondages électoraux s'ajoute désormais aux 4-6 habituels) :
@@ -210,6 +228,8 @@ Relire le billet une fois et vérifier :
 {
   "date": "hal_billet_v3_YYYY-MM-DD",
   "html": "...",
+  "html_he": "...",
+  "html_en": "...",
   "dateStr": "jour DD mois YYYY",
   "savedAt": "YYYY-MM-DDTHH:MM:SS+00:00"
 }
@@ -234,6 +254,8 @@ Relire le billet une fois et vérifier :
 </div>
 ```
 
+`html_he` et `html_en` ont exactement la même structure HTML que `html` (mêmes `div`, mêmes classes, même nombre de paragraphes), texte traduit. Un billet sans `html_he`/`html_en` est incomplet : ne pas publier.
+
 Utiliser `&mdash;` pour les tirets longs, `«&nbsp;` et `&nbsp;»` pour les guillemets français.
 
 ---
@@ -242,7 +264,7 @@ Utiliser `&mdash;` pour les tirets longs, `«&nbsp;` et `&nbsp;»` pour les guil
 
 ```bash
 cd /Users/hillelrenassia/Sites/renassia.com/news
-git add billet.json
+git add billet.json   # contient html, html_he, html_en
 git commit -m "billet: [jour date] — [3-4 mots résumant les sujets]"
 git push
 ```

@@ -802,6 +802,43 @@ body { top:0 !important; }
   color: var(--muted);
 }
 
+
+/* ─── BOURSE · RÉSUMÉ DU JOUR ─── */
+.mk-card { --sp:#e8c97a; --spg:rgba(232,201,122,.15); }
+.mk-body { padding:12px 18px 6px; }
+.mk-hero { display:flex; align-items:flex-end; justify-content:space-between; gap:10px; margin:2px 0 10px; }
+.mk-hero-name { font-family:var(--font-data); font-size:9px; letter-spacing:2.5px; color:var(--muted); text-transform:uppercase; }
+.mk-hero-val { font-family:var(--font-data); font-size:30px; color:#fff; line-height:1.05; margin-top:4px; letter-spacing:.5px; }
+.mk-pill { font-family:var(--font-data); font-size:14px; font-weight:600; padding:6px 11px; border-radius:20px; white-space:nowrap; }
+.mk-up { color:#5fe0a0; } .mk-dn { color:#ff7a7a; } .mk-fl { color:#9fb4c7; }
+.mk-pill.mk-up { background:rgba(95,224,160,.11); border:1px solid rgba(95,224,160,.3); }
+.mk-pill.mk-dn { background:rgba(255,122,122,.11); border:1px solid rgba(255,122,122,.3); }
+.mk-pill.mk-fl { background:rgba(159,180,199,.1); border:1px solid rgba(159,180,199,.25); }
+.mk-chips { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-bottom:12px; }
+.mk-chip { background:rgba(0,0,0,.28); border:1px solid rgba(255,255,255,.05); border-radius:9px; padding:7px 9px; min-width:0; }
+.mk-chip .n { font-family:var(--font-data); font-size:8.5px; letter-spacing:1.4px; color:var(--muted); text-transform:uppercase; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.mk-chip .p { font-family:var(--font-data); font-size:12.5px; font-weight:600; margin-top:3px; }
+.mk-sum { font-size:12.5px; line-height:1.62; color:rgba(216,236,245,.86); margin:0 0 12px; }
+.mk-sum b { color:#fff; font-weight:500; }
+.mk-stars { display:grid; grid-template-columns:repeat(4,1fr); gap:5px; margin-bottom:12px; }
+.mk-star { text-align:center; background:rgba(0,0,0,.24); border-radius:8px; padding:6px 2px; border:1px solid rgba(255,255,255,.04); }
+.mk-star .n { font-family:var(--font-data); font-size:9.5px; color:var(--text); letter-spacing:.5px; }
+.mk-star .p { font-family:var(--font-data); font-size:10.5px; font-weight:600; margin-top:2px; }
+.mk-reg { margin-bottom:11px; }
+.mk-reg-h { display:flex; align-items:baseline; justify-content:space-between; gap:8px; font-family:var(--font-title); font-size:11px; letter-spacing:2.5px; color:var(--goldl); text-transform:uppercase; margin-bottom:5px; }
+.mk-reg-h span { font-family:var(--font-data); font-size:11px; letter-spacing:.5px; font-weight:600; }
+.mk-rows { display:grid; grid-template-columns:1fr 1fr; gap:3px 14px; margin-bottom:6px; }
+.mk-row { display:flex; justify-content:space-between; gap:6px; font-size:11.5px; color:#a9c1d4; padding:3px 0; border-bottom:1px solid rgba(255,255,255,.04); }
+.mk-row b { font-family:var(--font-data); font-weight:600; font-size:11.5px; white-space:nowrap; }
+.mk-note { font-size:11.5px; line-height:1.55; color:var(--muted); }
+.mk-pane { animation:mkfade .25s ease; }
+@keyframes mkfade { from{opacity:0;transform:translateY(3px)} to{opacity:1;transform:none} }
+@media (min-width:901px) {
+  .sec-conditions .grid { grid-auto-rows:minmax(390px,auto); }
+  .mk-card { contain:size; display:flex; flex-direction:column; }
+  .mk-card .mk-body { flex:1; min-height:0; overflow-y:auto; scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.14) transparent; padding-bottom:10px; }
+}
+
 /* ─── EN-TÊTE FUSIONNÉ Dionysos × Caesarea ─── */
 :root{--cae-red:#cc1100;--cae-redl:#e84444;--cae-black:#08090a;--font-serif:'Playfair Display',serif;}
 .hx-bar{position:sticky;top:0;z-index:101;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:9px 32px;background:rgba(1,1,4,.94);border-bottom:1px solid rgba(255,255,255,.05);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
@@ -1011,6 +1048,18 @@ header.hx .lang-btn{font-size:15px;padding:4px 10px}
     <div class="panel-title">📈 Cours Live</div>
     <div id="btc-content"><div class="loading">Connexion aux marchés…</div></div>
     <div id="stocks-content" style="margin-top:14px;"></div>
+  </div>
+
+  <div class="panel sp-card mk-card" id="mk-card">
+    <div class="sp-head">
+      <div class="sp-ico">📊</div>
+      <div class="sp-titles"><div class="sp-title">Bourse</div><div class="sp-sub" id="mk-sub">Résumé de la séance</div></div>
+      <div class="sp-badge" id="mk-badge">…</div>
+    </div>
+    <div class="sp-body mk-body">
+      <div id="mk-main"><div class="loading">Lecture des marchés…</div></div>
+    </div>
+    <div class="sp-foot">CNBC · cours différés · Google Actualités</div>
   </div>
 
 
@@ -2988,6 +3037,102 @@ async function fetchSport(){
 }
 setInterval(spLive, 3 * 60 * 1000);
 
+
+// ═══ BOURSE — RÉSUMÉ DU JOUR (Nasdaq puis grandes places mondiales) ═══
+function mkPct(p, d=2){ if (p==null || isNaN(p)) return '—'; const s = Math.abs(p).toLocaleString('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d}); return (p>0.0049?'+':(p<-0.0049?'−':''))+s+' %'; }
+function mkCls(p){ return p>0.0049?'mk-up':(p<-0.0049?'mk-dn':'mk-fl'); }
+function mkNum(v, d=2){ return v==null?'—':v.toLocaleString('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d}); }
+function mkUSOpen(){
+  try {
+    const p = new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',hour:'numeric',minute:'numeric',hour12:false}).formatToParts(new Date());
+    const g = t => p.find(x=>x.type===t)?.value;
+    if (['Sat','Sun'].includes(g('weekday'))) return false;
+    const m = (+g('hour')%24)*60 + (+g('minute'));
+    return m >= 9*60+30 && m < 16*60;
+  } catch { return false; }
+}
+function mkTone(avg, strong){ // pour une région (féminin)
+  if (avg >= 1)    return 'nettement dans le vert';
+  if (avg >= 0.2)  return 'dans le vert';
+  if (avg > -0.2)  return 'proche de l\'équilibre';
+  if (avg > -1)    return 'dans le rouge';
+  if (avg > -2)    return 'en net repli';
+  return 'en forte chute';
+}
+function mkVerb(p){
+  if (p >= 1.5)  return 'bondit';
+  if (p >= 0.3)  return 'progresse';
+  if (p > -0.3)  return 'stagne';
+  if (p > -1.5)  return 'recule';
+  return 'décroche';
+}
+let _mkTab='nq';
+function mkTab(t){
+  _mkTab=t;
+  document.querySelectorAll('#mk-tabs .sp-tab').forEach(b=>b.classList.toggle('active',b.dataset.t===t));
+  document.querySelectorAll('#mk-main .mk-pane').forEach(p=>p.style.display=(p.dataset.p===t?'block':'none'));
+}
+async function fetchMarkets(){
+  const el = document.getElementById('mk-main'); if (!el) return;
+  try {
+    const r = await fetch('/news/markets.php', {signal:abortSignal(12000)});
+    const d = await r.json(); const Q = d.q; if (!Q || !Q['.IXIC']) throw new Error('no data');
+    const C = Q['.IXIC'];
+    const P = s => Q[s]?.pct;
+    const open = mkUSOpen();
+    // — en-tête
+    const dt = C.date ? new Date(C.date+'T12:00:00') : null;
+    const dtLbl = dt ? dt.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'long'}).replace('.','') : '';
+    const sub = document.getElementById('mk-sub'); if (sub) sub.textContent = (open?'Séance en cours':'Séance du ')+(open?'':dtLbl);
+    spSetBadge('mk-badge', open?'En direct':'Clôture', open);
+    // — Nasdaq héros
+    const chips = [['.NDX','Nasdaq 100'],['.SPX','S&P 500'],['.DJI','Dow Jones'],['.RUT','Russell 2000'],['.VIX','VIX']].filter(x=>Q[x[0]])
+      .map(([s,l])=>`<div class="mk-chip"><div class="n">${l}</div><div class="p ${s==='.VIX'?mkCls(-Q[s].pct):mkCls(Q[s].pct)}">${mkPct(Q[s].pct)}</div></div>`).join('');
+    const hl = (C.high&&C.low) ? `<span style="font-family:var(--font-data);font-size:9.5px;color:var(--muted);letter-spacing:1px">HAUT ${mkNum(C.high,0)} · BAS ${mkNum(C.low,0)}</span>` : '';
+    const hero = `<div class="mk-hero"><div><div class="mk-hero-name">Nasdaq Composite</div><div class="mk-hero-val">${mkNum(C.last,2)}</div></div><div class="mk-pill ${mkCls(C.pct)}">${C.pct>0.0049?'▲':(C.pct<-0.0049?'▼':'■')} ${mkPct(C.pct)}</div></div><div style="margin:-4px 0 10px">${hl}</div><div class="mk-chips">${chips}</div>`;
+    // — valeurs vedettes
+    const STARS = [['NVDA','Nvidia'],['AAPL','Apple'],['MSFT','Microsoft'],['AMZN','Amazon'],['GOOGL','Alphabet'],['META','Meta'],['TSLA','Tesla'],['AVGO','Broadcom']].filter(x=>Q[x[0]]);
+    const stars = STARS.map(([s,l])=>`<div class="mk-star"><div class="n">${s}</div><div class="p ${mkCls(Q[s].pct)}">${mkPct(Q[s].pct,1)}</div></div>`).join('');
+    const best = [...STARS].sort((a,b)=>Q[b[0]].pct-Q[a[0]].pct)[0], worst = [...STARS].sort((a,b)=>Q[a[0]].pct-Q[b[0]].pct)[0];
+    // — résumé US
+    const us = ['.IXIC','.SPX','.DJI'].map(P).filter(x=>x!=null);
+    const tone = us.every(x=>x>0.05) ? (open?'dans le vert':'dans le vert') : us.every(x=>x<-0.05) ? 'dans le rouge' : 'en ordre dispersé';
+    let sumUS = `Wall Street ${open?'évolue':'termine'} <b>${tone}</b> : le Nasdaq ${mkVerb(C.pct)} (<b>${mkPct(C.pct)}</b>), le S&amp;P 500 ${mkPct(P('.SPX'))}, le Dow Jones ${mkPct(P('.DJI'))}.`;
+    if (best && worst && best[0]!==worst[0]) sumUS += ` Chez les vedettes du Nasdaq, <b>${best[1]}</b> ${mkPct(Q[best[0]].pct,1)} en tête, <b>${worst[1]}</b> ${mkPct(Q[worst[0]].pct,1)} en queue de peloton.`;
+    if (Q['.VIX']) sumUS += ` Le VIX, baromètre de la peur, ${Q['.VIX'].pct<0?'reflue':'monte'} (${mkPct(Q['.VIX'].pct,1)}) à ${mkNum(Q['.VIX'].last,1)}.`;
+    // — régions
+    const REG = [
+      {t:'Europe', items:[['.FCHI','CAC 40'],['.GDAXI','DAX'],['.FTSE','FTSE 100'],['.STOXX50E','Euro Stoxx 50']], lead:"L'Europe"},
+      {t:'Asie-Pacifique', items:[['.N225','Nikkei 225'],['.HSI','Hang Seng'],['.SSEC','Shanghai'],['.KS11','Kospi'],['.AXJO','ASX 200']], lead:"L'Asie"},
+      {t:'Israël', items:[['.TA35','TA-35']], lead:'Tel-Aviv'},
+    ];
+    const regHTML = REG.map(g=>{
+      const it = g.items.filter(x=>Q[x[0]]); if (!it.length) return '';
+      const avg = it.reduce((a,x)=>a+Q[x[0]].pct,0)/it.length;
+      const rows = it.map(([s,l])=>`<div class="mk-row"><span>${l}</span><b class="${mkCls(Q[s].pct)}">${mkPct(Q[s].pct)}</b></div>`).join('');
+      let note;
+      if (g.t==='Israël') { const p=Q['.TA35'].pct; note = `${g.lead} ${p>=0.3?'grimpe':(p<=-0.3?'recule':'stagne')} : TA-35 <b>${mkPct(p)}</b> à ${mkNum(Q['.TA35'].last,0)} points.`; }
+      else {
+        const hi = [...it].sort((a,b)=>Q[b[0]].pct-Q[a[0]].pct)[0], lo = [...it].sort((a,b)=>Q[a[0]].pct-Q[b[0]].pct)[0];
+        note = `${g.lead} ${open&&g.t==='Europe'?'évolue':'termine'} <b>${mkTone(avg)}</b>`+(hi[0]!==lo[0] ? ` : ${hi[1]} (${mkPct(Q[hi[0]].pct)}) en tête, ${lo[1]} (${mkPct(Q[lo[0]].pct)}) en queue.` : '.');
+      }
+      return `<div class="mk-reg"><div class="mk-reg-h">${g.t}<span class="${mkCls(avg)}">${mkPct(avg,1)}</span></div><div class="mk-rows">${rows}</div><div class="mk-note">${note}</div></div>`;
+    }).join('');
+    el.innerHTML = `<div class="sp-tabs" id="mk-tabs"><button class="sp-tab" data-t="nq" onclick="mkTab('nq')">Nasdaq</button><button class="sp-tab" data-t="wd" onclick="mkTab('wd')">Monde</button><button class="sp-tab" data-t="nw" onclick="mkTab('nw')">À la une</button></div>
+      <div class="mk-pane" data-p="nq">${hero}<p class="mk-sum">${sumUS}</p><div class="sp-sec">Valeurs vedettes</div><div class="mk-stars">${stars}</div></div>
+      <div class="mk-pane" data-p="wd">${regHTML}</div>
+      <div class="mk-pane" data-p="nw"><div id="mk-news"><div class="loading">Chargement…</div></div></div>`;
+    mkTab(_mkTab);
+    spNews('mk-news', [
+      {url:gnews('Nasdaq stocks close when:1d'), name:'Actualité', n:10},
+      {url:gnews('Wall Street stocks market when:1d'), name:'Actualité', n:10},
+    ], 3);
+  } catch(e) {
+    el.innerHTML = `<div class="sp-empty">Cours indisponibles pour le moment.</div>`;
+  }
+}
+setInterval(() => { if (!document.hidden) fetchMarkets(); }, 180000);
+
 async function refreshAll() {
   const btn=document.getElementById('refresh-btn');
   btn.classList.add('spinning');
@@ -2995,7 +3140,7 @@ async function refreshAll() {
     fetchWeather(), fetchMarine(), fetchBitcoin(), fetchStocks(),
     fetchSeaWeek(),
     fetchNewsWorld(), fetchNewsIsrael(), fetchNewsIntl(), fetchShowbiz(),
-    fetchSport(),
+    fetchSport(), fetchMarkets(),
   ]);
   generateRevueDePresse();
   await generateEditorial();

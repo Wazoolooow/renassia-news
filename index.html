@@ -835,7 +835,17 @@ body { top:0 !important; }
 .mk-rtl .mk-hero-name, .mk-rtl .mk-chip .n, .mk-rtl .sp-sec, .mk-rtl .sp-title, .mk-rtl .mk-reg-h { letter-spacing:0; }
 .mk-rtl .mk-sum, .mk-rtl .mk-note { line-height:1.8; font-size:13px; }
 .mk-rtl .sp-tab { letter-spacing:0; }
-.mk-rtl .sp-news-item a { direction:ltr; text-align:left; }
+
+/* ─── Drapeaux de langue par encart ─── */
+.sp-lang { display:flex; gap:3px; flex-shrink:0; }
+.sp-lang button { background:none; border:1px solid transparent; border-radius:7px; padding:2px 4px; font-size:13px; line-height:1; cursor:pointer; opacity:.42; filter:saturate(.7); transition:all .2s; }
+.sp-lang button:hover { opacity:.9; filter:none; }
+.sp-lang button.on { opacity:1; filter:none; border-color:color-mix(in srgb, var(--sp) 55%, transparent); background:color-mix(in srgb, var(--sp) 12%, transparent); }
+.sp-rtl .sp-title, .sp-rtl .sp-sub, .sp-rtl .sp-sec, .sp-rtl .sp-tab, .sp-rtl .sp-g-stat, .sp-rtl .sp-foot, .sp-rtl .sp-badge, .sp-rtl .sp-chip, .sp-rtl .sp-event-status, .sp-rtl .sp-spot-name { letter-spacing:0; }
+.sp-rtl .sp-title { font-family:var(--font-body); font-weight:600; }
+.sp-rtl .sp-empty, .sp-rtl .sp-spot-d, .sp-rtl .sp-news-item a { line-height:1.75; }
+.sp-rtl .sp-news-item a { unicode-bidi:plaintext; }
+.sp-rtl .sp-lb-score, .sp-rtl .sp-team .s, .sp-rtl .sp-team .rec { direction:ltr; }
 @keyframes mkfade { from{opacity:0;transform:translateY(3px)} to{opacity:1;transform:none} }
 @media (min-width:901px) {
   .sec-conditions .grid { grid-auto-rows:minmax(390px,auto); }
@@ -1058,6 +1068,7 @@ header.hx .lang-btn{font-size:15px;padding:4px 10px}
     <div class="sp-head">
       <div class="sp-ico">📊</div>
       <div class="sp-titles"><div class="sp-title">Bourse</div><div class="sp-sub" id="mk-sub">Résumé de la séance</div></div>
+      <div class="sp-lang" data-card="mk"><button data-l="fr" title="Français">🇫🇷</button><button data-l="he" title="עברית">🇮🇱</button><button data-l="en" title="English">🇬🇧</button></div>
       <div class="sp-badge" id="mk-badge">…</div>
     </div>
     <div class="sp-body mk-body">
@@ -1364,14 +1375,15 @@ header.hx .lang-btn{font-size:15px;padding:4px 10px}
 <!-- ══════════════════════════════════════
      SPORT — GOLF · NFL · NBA · SURF
      ══════════════════════════════════════ -->
-<div class="section-sep"><span class="section-sep-label">Sport</span></div>
+<div class="section-sep"><span class="section-sep-label" data-sk="sport">Sport</span></div>
 <div class="grid sport-grid">
 
-  <div class="panel sp-card sp-golf">
+  <div class="panel sp-card sp-golf" id="sp-card-golf">
     <div class="sp-head">
       <div class="sp-ico">⛳</div>
-      <div class="sp-titles"><div class="sp-title">Golf</div><div class="sp-sub" id="sp-golf-sub">PGA · DP World Tour · Israël</div></div>
-      <div class="sp-badge" id="sp-golf-badge">Circuit</div>
+      <div class="sp-titles"><div class="sp-title" data-sk="golf.title">Golf</div><div class="sp-sub" id="sp-golf-sub" data-sk="golf.sub">PGA · DP World Tour · Israël</div></div>
+      <div class="sp-lang" data-card="golf"><button data-l="fr" title="Français">🇫🇷</button><button data-l="he" title="עברית">🇮🇱</button><button data-l="en" title="English">🇬🇧</button></div>
+      <div class="sp-badge" id="sp-golf-badge" data-sk="golf.badge">Circuit</div>
     </div>
     <div class="sp-body">
       <div class="sp-tabs" id="sp-golf-tabs">
@@ -1380,54 +1392,57 @@ header.hx .lang-btn{font-size:15px;padding:4px 10px}
         <button class="sp-tab" data-tab="lpga">LPGA</button>
         <button class="sp-tab" data-tab="il">🇮🇱 Israël</button>
       </div>
-      <div id="sp-golf-body"><div class="loading">Chargement du circuit…</div></div>
+      <div id="sp-golf-body"><div class="loading">…</div></div>
     </div>
-    <div class="sp-foot">ESPN · BBC Sport · CBS Sports · Google Actualités</div>
+    <div class="sp-foot" data-sk="golf.foot">ESPN · BBC Sport · Google Actualités</div>
   </div>
 
-  <div class="panel sp-card sp-nfl">
+  <div class="panel sp-card sp-nfl" id="sp-card-nfl">
     <div class="sp-head">
       <div class="sp-ico">🏈</div>
       <div class="sp-titles"><div class="sp-title">NFL</div><div class="sp-sub" id="sp-nfl-sub">National Football League</div></div>
-      <div class="sp-badge" id="sp-nfl-badge">Saison</div>
+      <div class="sp-lang" data-card="nfl"><button data-l="fr" title="Français">🇫🇷</button><button data-l="he" title="עברית">🇮🇱</button><button data-l="en" title="English">🇬🇧</button></div>
+      <div class="sp-badge" id="sp-nfl-badge" data-sk="nfl.badge">Saison</div>
     </div>
     <div class="sp-body">
-      <div class="sp-sec">Scores &amp; programme</div>
-      <div id="sp-nfl-games"><div class="loading">Chargement des matchs…</div></div>
-      <div class="sp-sec">À la une</div>
-      <div id="sp-nfl-news"><div class="loading">Chargement…</div></div>
+      <div class="sp-sec" data-sk="secScores">Scores &amp; programme</div>
+      <div id="sp-nfl-games"><div class="loading">…</div></div>
+      <div class="sp-sec" data-sk="secTop">À la une</div>
+      <div id="sp-nfl-news"><div class="loading">…</div></div>
     </div>
-    <div class="sp-foot">ESPN · CBS Sports · Google Actualités · Horaires d'Israël</div>
+    <div class="sp-foot" data-sk="usFoot">ESPN · CBS Sports · Horaires d'Israël</div>
   </div>
 
-  <div class="panel sp-card sp-nba">
+  <div class="panel sp-card sp-nba" id="sp-card-nba">
     <div class="sp-head">
       <div class="sp-ico">🏀</div>
       <div class="sp-titles"><div class="sp-title">NBA</div><div class="sp-sub" id="sp-nba-sub">National Basketball Association</div></div>
-      <div class="sp-badge" id="sp-nba-badge">Saison</div>
+      <div class="sp-lang" data-card="nba"><button data-l="fr" title="Français">🇫🇷</button><button data-l="he" title="עברית">🇮🇱</button><button data-l="en" title="English">🇬🇧</button></div>
+      <div class="sp-badge" id="sp-nba-badge" data-sk="nba.badge">Saison</div>
     </div>
     <div class="sp-body">
-      <div class="sp-sec">Scores &amp; programme</div>
-      <div id="sp-nba-games"><div class="loading">Chargement des matchs…</div></div>
-      <div class="sp-sec">À la une</div>
-      <div id="sp-nba-news"><div class="loading">Chargement…</div></div>
+      <div class="sp-sec" data-sk="secScores">Scores &amp; programme</div>
+      <div id="sp-nba-games"><div class="loading">…</div></div>
+      <div class="sp-sec" data-sk="secTop">À la une</div>
+      <div id="sp-nba-news"><div class="loading">…</div></div>
     </div>
-    <div class="sp-foot">ESPN · CBS Sports · Google Actualités · Horaires d'Israël</div>
+    <div class="sp-foot" data-sk="usFoot">ESPN · CBS Sports · Horaires d'Israël</div>
   </div>
 
-  <div class="panel sp-card sp-surf">
+  <div class="panel sp-card sp-surf" id="sp-card-surf">
     <div class="sp-head">
       <div class="sp-ico">🏄</div>
-      <div class="sp-titles"><div class="sp-title">Surf</div><div class="sp-sub" id="sp-surf-sub">Conditions sur la côte israélienne</div></div>
-      <div class="sp-badge" id="sp-surf-badge">Houle</div>
+      <div class="sp-titles"><div class="sp-title" data-sk="surf.title">Surf</div><div class="sp-sub" id="sp-surf-sub" data-sk="surf.sub">Conditions sur la côte israélienne</div></div>
+      <div class="sp-lang" data-card="surf"><button data-l="fr" title="Français">🇫🇷</button><button data-l="he" title="עברית">🇮🇱</button><button data-l="en" title="English">🇬🇧</button></div>
+      <div class="sp-badge" id="sp-surf-badge" data-sk="surf.badge">Houle</div>
     </div>
     <div class="sp-body">
-      <div class="sp-sec">Sur la côte, maintenant</div>
-      <div id="sp-surf-spots"><div class="loading">Lecture de la houle…</div></div>
-      <div class="sp-sec">Circuit &amp; actualité</div>
-      <div id="sp-surf-news"><div class="loading">Chargement…</div></div>
+      <div class="sp-sec" data-sk="surf.secCoast">Sur la côte, maintenant</div>
+      <div id="sp-surf-spots"><div class="loading">…</div></div>
+      <div class="sp-sec" data-sk="surf.secNews">Circuit &amp; actualité</div>
+      <div id="sp-surf-news"><div class="loading">…</div></div>
     </div>
-    <div class="sp-foot">Open-Meteo · Surfer · World Surf League</div>
+    <div class="sp-foot" data-sk="surf.foot">Open-Meteo · Surfer · World Surf League</div>
   </div>
 
 </div>
@@ -2765,6 +2780,8 @@ async function translateEditorial(btn, lang) {
 // ════════════════════════════════════════════════════════════════════════
 
 // ═══ SPORT — GOLF · NFL · NBA · SURF ═══
+// Textes FR / עב / EN rédigés à la main (aucune traduction automatique pour l'interface et les résumés).
+// Chaque encart a ses drapeaux 🇫🇷 🇮🇱 🇬🇧 ; par défaut, la langue choisie en haut de page.
 const SP_ESPN = 'https://site.api.espn.com/apis/site/v2/sports/';
 const SP_GOLF_TOURS = {
   pga:  {label:'PGA Tour',      url:SP_ESPN+'golf/pga/scoreboard'},
@@ -2772,12 +2789,82 @@ const SP_GOLF_TOURS = {
   lpga: {label:'LPGA',          url:SP_ESPN+'golf/lpga/scoreboard'},
 };
 const SP_SURF_SPOTS = [
-  {n:'Haïfa',    lat:32.82, lon:34.95},
-  {n:'Netanya',  lat:32.33, lon:34.84},
-  {n:'Tel-Aviv', lat:32.08, lon:34.76},
-  {n:'Ashdod',   lat:31.80, lon:34.62},
+  {k:'haifa',   lat:32.82, lon:34.95},
+  {k:'netanya', lat:32.33, lon:34.84},
+  {k:'telaviv', lat:32.08, lon:34.76},
+  {k:'ashdod',  lat:31.80, lon:34.62},
 ];
 let _spGolfTab = 'pga';
+
+// ─── Dictionnaire des trois langues ───
+const SPT = {
+  fr: {
+    loc:'fr-FR', dateLoc:'fr-FR', dir:'ltr',
+    common:{ sport:'Sport', secScores:'Scores & programme', secTop:'À la une', usFoot:"ESPN · CBS Sports · Horaires d'Israël", newsErr:'Actualités momentanément indisponibles.' },
+    golf:{ title:'Golf', sub:'PGA · DP World Tour · Israël', badge:'Circuit', foot:'ESPN · BBC Sport · Google Actualités',
+           tabs:{pga:'PGA Tour', eur:'DP World Tour', lpga:'LPGA', il:'🇮🇱 Israël'},
+           live:'En direct', post:'Terminé', pre:'À venir', il:'Israël', unavail:'Classement indisponible pour le moment.', starts:'Début :',
+           secNews:'À la une du golf', secIl:'Golf en Israël', subIl:'Golf israélien · Caesarea · Laetitia Beck', searching:'Recherche…',
+           ilEmpty:"<b>Rien de neuf sur le golf israélien</b> ces 4 derniers mois. Le golf reste rare en Israël — un seul parcours de 18 trous, à Caesarea — et la couverture se concentre sur <b>Laetitia Beck</b>, première Israélienne sur le circuit LPGA. Cette rubrique se remplit dès qu'une actualité sort.",
+           gs:{round:'Tour', inprog:'en cours', susp:'suspendu', done:'terminé', sched:'à venir', playDone:'jeu terminé'} },
+    games:{ week:n=>'Semaine '+n, season:'Saison', brk:'Trêve', live:'En direct', none:'Aucun match au programme pour le moment.', err:'Scores indisponibles pour le moment.',
+            half:'Mi-temps', inprog:'En cours', final:'Terminé', finalOT:'Terminé · prol.', q:n=>'QT'+n, endQ:n=>'Fin du QT'+n, ot:'prol.' },
+    nfl:{ badge:'Saison' }, nba:{ badge:'Saison' },
+    surf:{ title:'Surf', sub:'Conditions sur la côte israélienne', badge:'Houle', secCoast:'Sur la côte, maintenant', secNews:'Circuit & actualité', foot:'Open-Meteo · Surfer · World Surf League',
+           spots:{haifa:'Haïfa', netanya:'Netanya', telaviv:'Tel-Aviv', ashdod:'Ashdod'},
+           rate:{c0:'Plat', c1:'Petit', c2:'Surfable', c3:'Bon', c4:'Gros'}, flat:'Plat', max:h=>'Max '+h+' m',
+           compass:['N','NE','E','SE','S','SO','O','NO'], kn:'nds', calm:'quasi nul', off:'offshore', on:'onshore', side:'latéral',
+           meta:(per,dir)=>`Période <b>${per} s</b> · houle ${dir}`, unitM:'m',
+           err:'Données de houle indisponibles pour le moment.', none:'Données de houle indisponibles.' },
+    ago:{ now:"à l'instant", min:m=>m+' min', h:h=>h+' h', d:d=>d+' j' },
+  },
+  en: {
+    loc:'en-US', dateLoc:'en-GB', dir:'ltr',
+    common:{ sport:'Sport', secScores:'Scores & schedule', secTop:'Top stories', usFoot:'ESPN · CBS Sports · Israel time', newsErr:'Headlines are temporarily unavailable.' },
+    golf:{ title:'Golf', sub:'PGA · DP World Tour · Israel', badge:'Tour', foot:'ESPN · BBC Sport · Google News',
+           tabs:{pga:'PGA Tour', eur:'DP World Tour', lpga:'LPGA', il:'🇮🇱 Israel'},
+           live:'Live', post:'Final', pre:'Upcoming', il:'Israel', unavail:'Leaderboard unavailable right now.', starts:'Starts:',
+           secNews:'Golf headlines', secIl:'Golf in Israel', subIl:'Israeli golf · Caesarea · Laetitia Beck', searching:'Searching…',
+           ilEmpty:'<b>Nothing new on Israeli golf</b> in the last 4 months. Golf remains rare in Israel — a single 18-hole course, at Caesarea — and coverage centres on <b>Laetitia Beck</b>, the first Israeli on the LPGA Tour. This section fills in as soon as a story breaks.',
+           gs:{round:'Round', inprog:'in progress', susp:'suspended', done:'final', sched:'scheduled', playDone:'play complete'} },
+    games:{ week:n=>'Week '+n, season:'Season', brk:'Offseason', live:'Live', none:'No games scheduled right now.', err:'Scores unavailable right now.',
+            half:'Halftime', inprog:'In progress', final:'Final', finalOT:'Final · OT', q:n=>'Q'+n, endQ:n=>'End of Q'+n, ot:'OT' },
+    nfl:{ badge:'Season' }, nba:{ badge:'Season' },
+    surf:{ title:'Surf', sub:'Conditions on the Israeli coast', badge:'Swell', secCoast:'On the coast, right now', secNews:'Tour & news', foot:'Open-Meteo · Surfer · World Surf League',
+           spots:{haifa:'Haifa', netanya:'Netanya', telaviv:'Tel Aviv', ashdod:'Ashdod'},
+           rate:{c0:'Flat', c1:'Small', c2:'Rideable', c3:'Good', c4:'Big'}, flat:'Flat', max:h=>'Max '+h+' m',
+           compass:['N','NE','E','SE','S','SW','W','NW'], kn:'kn', calm:'near calm', off:'offshore', on:'onshore', side:'cross-shore',
+           meta:(per,dir)=>`Period <b>${per} s</b> · swell ${dir}`, unitM:'m',
+           err:'Swell data unavailable right now.', none:'Swell data unavailable.' },
+    ago:{ now:'just now', min:m=>m+' min', h:h=>h+' h', d:d=>d===1?'1 day':d+' days' },
+  },
+  he: {
+    loc:'he-IL', dateLoc:'he-IL', dir:'rtl',
+    common:{ sport:'ספורט', secScores:'תוצאות ולוח משחקים', secTop:'כותרות', usFoot:'ESPN · CBS Sports · שעון ישראל', newsErr:'הכותרות אינן זמינות כרגע.' },
+    golf:{ title:'גולף', sub:'PGA · DP World Tour · ישראל', badge:'סבב', foot:'ESPN · BBC Sport · Google News',
+           tabs:{pga:'PGA Tour', eur:'DP World Tour', lpga:'LPGA', il:'🇮🇱 ישראל'},
+           live:'חי', post:'הסתיים', pre:'בקרוב', il:'ישראל', unavail:'הדירוג אינו זמין כרגע.', starts:'פתיחה:',
+           secNews:'כותרות הגולף', secIl:'גולף בישראל', subIl:'גולף ישראלי · קיסריה · לטישיה בק', searching:'מחפש…',
+           ilEmpty:'<b>אין חדש בגולף הישראלי</b> ב-4 החודשים האחרונים. הגולף נשאר נדיר בישראל — מגרש אחד בן 18 גומות, בקיסריה — והסיקור מתמקד ב<b>לטישיה בק</b>, הישראלית הראשונה בסבב ה-LPGA. הפינה תתמלא ברגע שתפורסם כתבה חדשה.',
+           gs:{round:'סיבוב', inprog:'מתנהל', susp:'הופסק', done:'הסתיים', sched:'מתוכנן', playDone:'המשחק הסתיים'} },
+    games:{ week:n=>'שבוע '+n, season:'עונה', brk:'הפסקה', live:'חי', none:'אין משחקים בלוח כרגע.', err:'התוצאות אינן זמינות כרגע.',
+            half:'מחצית', inprog:'מתנהל', final:'הסתיים', finalOT:'הסתיים · הארכה', q:n=>'רבע '+n, endQ:n=>'סוף רבע '+n, ot:'הארכה' },
+    nfl:{ badge:'עונה' }, nba:{ badge:'עונה' },
+    surf:{ title:'גלישה', sub:'תנאי הים בחוף הישראלי', badge:'גלים', secCoast:'בחוף, עכשיו', secNews:'הסבב והחדשות', foot:'Open-Meteo · Surfer · World Surf League',
+           spots:{haifa:'חיפה', netanya:'נתניה', telaviv:'תל אביב', ashdod:'אשדוד'},
+           rate:{c0:'שטוח', c1:'קטן', c2:'ניתן לגלוש', c3:'טוב', c4:'גדול'}, flat:'שטוח', max:h=>'מקס׳ '+h+' מ׳',
+           compass:['צפון','צפון-מזרח','מזרח','דרום-מזרח','דרום','דרום-מערב','מערב','צפון-מערב'], kn:'קשר', calm:'כמעט אין רוח', off:'אופשור', on:'אונשור', side:'צדדית',
+           meta:(per,dir)=>`מחזור <b>${per} שנ׳</b> · גל ${dir}`, unitM:'מ׳',
+           err:'נתוני הגלים אינם זמינים כרגע.', none:'נתוני הגלים אינם זמינים.' },
+    ago:{ now:'עכשיו', min:m=>`לפני ${m} דק׳`, h:h=>`לפני ${h} שע׳`, d:d=>d===1?'לפני יום':`לפני ${d} ימים` },
+  },
+};
+
+// ─── Langue par encart (par défaut : langue de la page) ───
+const SPLANG = {};
+function spPageLang(){ const g = (typeof _gtLang==='function') ? _gtLang() : 'fr'; return g==='iw' ? 'he' : (g==='en' ? 'en' : 'fr'); }
+function spLang(card){ return SPLANG[card] || spPageLang(); }
+function spT(card){ return SPT[spLang(card)]; }
 
 function spEsc(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 async function spJSON(url, ms=15000){
@@ -2785,31 +2872,53 @@ async function spJSON(url, ms=15000){
   if (!r.ok) throw new Error('HTTP '+r.status);
   return r.json();
 }
-function spWhen(iso){
+function spWhen(iso, T){
   try {
-    return new Date(iso).toLocaleString('fr-FR',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',timeZone:TZ}).replace('.','');
+    const s = new Date(iso).toLocaleString(T.dateLoc,{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',hour12:false,timeZone:TZ});
+    return T.dateLoc==='fr-FR' ? s.replace(/\./g,'') : s;
   } catch { return ''; }
 }
-function spAgo(dateStr){
+function spAgo(dateStr, T){
   const t = new Date(dateStr).getTime();
   if (!t) return '';
   const m = Math.round((Date.now()-t)/60000);
-  if (m < 1) return "à l'instant";
-  if (m < 60) return m+' min';
+  if (m < 1) return T.ago.now;
+  if (m < 60) return T.ago.min(m);
   const h = Math.round(m/60);
-  if (h < 36) return h+' h';
-  return Math.round(h/24)+' j';
+  if (h < 36) return T.ago.h(h);
+  return T.ago.d(Math.round(h/24));
 }
 function spSetBadge(id, txt, live){
   const b = document.getElementById(id); if (!b) return;
   b.textContent = txt; b.classList.toggle('live', !!live);
 }
+function spSetSub(id, txt){ const e = document.getElementById(id); if (e) e.textContent = txt; }
+
+// ─── Parties fixes de chaque encart ───
+function spStatic(card){
+  const el = document.getElementById('sp-card-'+card); if (!el) return;
+  const T = spT(card);
+  el.setAttribute('dir', T.dir); el.classList.toggle('sp-rtl', T.dir==='rtl');
+  el.setAttribute('translate','no'); el.classList.add('notranslate');
+  el.querySelectorAll('[data-sk]').forEach(n => {
+    const k = n.getAttribute('data-sk');
+    const v = k.includes('.') ? k.split('.').reduce((o,p)=>o&&o[p], T) : T.common[k];
+    if (typeof v === 'string') n.textContent = v;
+  });
+  if (card==='golf') document.querySelectorAll('#sp-golf-tabs .sp-tab').forEach(b => { b.textContent = T.golf.tabs[b.dataset.tab]; });
+  el.querySelectorAll('.sp-lang button').forEach(b => b.classList.toggle('on', b.dataset.l===spLang(card)));
+}
+function spStaticAll(){
+  ['golf','nfl','nba','surf'].forEach(spStatic);
+  const sep = document.querySelector('[data-sk="sport"]'); if (sep) sep.textContent = spT('golf').common.sport;
+}
 
 // ─── Actualités (RSS via proxy) ───
 const SP_JUNK = /bonus|promo code|promo|betting|odds|parlay|picks|prediction|fanduel|draftkings|betmgm|sportsbook|caesars|bet365|fantasy|how to watch|live stream/i;
 const gnews = (q, lang='en-US', gl='US', ceid='US:en') => 'https://news.google.com/rss/search?q='+encodeURIComponent(q)+'&hl='+lang+'&gl='+gl+'&ceid='+ceid;
-async function spNews(elId, feeds, max, keep, noFlags){
+async function spNews(elId, feeds, max, keep, card){
   const el = document.getElementById(elId); if (!el) return;
+  const T = spT(card || 'golf');
   try {
     const lists = await Promise.all(feeds.map(f => fetchRSS(f.url, f.n||8).then(a => a.map(it => ({...it, source:f.name})))));
     let items = lists.flat();
@@ -2819,29 +2928,38 @@ async function spNews(elId, feeds, max, keep, noFlags){
     items = items.filter(it => { const k = it.title.toLowerCase().slice(0,60); if (seen.has(k)) return false; seen.add(k); return true; })
                  .sort((a,b) => new Date(b.date)-new Date(a.date)).slice(0,max);
     if (!items.length) { el.innerHTML = ''; return false; }
-    const TF = `<span class="trans-flags"><button class="trans-flag-btn" onclick="translateItem(this,'fr')">🇫🇷</button><button class="trans-flag-btn" onclick="translateItem(this,'iw')">🇮🇱</button></span>`;
+    // Titres de sources tierces : boutons de traduction (automatique, car on ne peut pas traduire à la main un flux en direct)
+    const TF = `<span class="trans-flags"><button class="trans-flag-btn" onclick="translateItem(this,'fr')">🇫🇷</button><button class="trans-flag-btn" onclick="translateItem(this,'iw')">🇮🇱</button><button class="trans-flag-btn" onclick="translateItem(this,'en')">🇬🇧</button></span>`;
     el.innerHTML = `<div class="sp-news">` + items.map(it => {
       let title = it.title, src = it.source;
       const gm = title.match(/^(.*) - ([^-]{2,40})$/);
       if (gm && it.source==='Actualité') { title = gm[1]; src = gm[2]; }
       const link = it.link ? `<a href="${spEsc(it.link)}"><span class="item-title">${spEsc(title)}</span></a>` : `<span class="item-title">${spEsc(title)}</span>`;
-      return `<div class="sp-news-item" data-orig="${spEsc(title)}"><div style="flex:1;min-width:0">${link}<div class="sp-news-meta"><span>${spEsc(src)}</span><span>·</span><span>${spAgo(it.date)}</span>${noFlags?'':TF}</div></div></div>`;
+      return `<div class="sp-news-item" data-orig="${spEsc(title)}"><div style="flex:1;min-width:0">${link}<div class="sp-news-meta"><span>${spEsc(src)}</span><span>·</span><span>${spAgo(it.date, T)}</span>${TF}</div></div></div>`;
     }).join('') + `</div>`;
     return true;
-  } catch(e) { el.innerHTML = `<div class="sp-empty">Actualités momentanément indisponibles.</div>`; return false; }
+  } catch(e) { el.innerHTML = `<div class="sp-empty">${T.common.newsErr}</div>`; return false; }
 }
 
 // ─── GOLF ───
-function spGolfStatus(txt){
+function spGolfStatus(txt, T){
   if (!txt) return '';
-  return txt.replace(/Round (\d)/i,'Tour $1').replace(/In Progress/i,'en cours').replace(/Suspended/i,'suspendu')
-            .replace(/Complete|Final|Official/i,'terminé').replace(/Scheduled/i,'à venir').replace(/Play Complete/i,'jeu terminé').replace(/ - /,' · ');
+  const g = T.golf.gs;
+  return txt.replace(/Round (\d)/i, g.round+' $1').replace(/Play Complete/i, g.playDone).replace(/In Progress/i, g.inprog).replace(/Suspended/i, g.susp)
+            .replace(/Complete|Final|Official/i, g.done).replace(/Scheduled/i, g.sched).replace(/ - /,' · ');
 }
 async function spGolfBoard(tab){
   const body = document.getElementById('sp-golf-body');
+  const T = spT('golf'), G = T.golf;
   const cfg = SP_GOLF_TOURS[tab];
+  const L0 = spLang('golf'), stale = () => spLang('golf')!==L0 || _spGolfTab!==tab;
+  const golfNews = () => spNews('sp-golf-news', [
+    {url:'https://feeds.bbci.co.uk/sport/golf/rss.xml', name:'BBC Sport'},
+    {url:'https://www.cbssports.com/rss/headlines/golf/', name:'CBS Sports'},
+  ], 4, null, 'golf');
   try {
     const d = await spJSON(cfg.url);
+    if (stale()) return;
     const evs = d.events || [];
     const ev = evs.find(e => e.status?.type?.state==='in') || evs[0];
     if (!ev) throw new Error('aucun tournoi');
@@ -2849,12 +2967,11 @@ async function spGolfBoard(tab){
     const state = ev.status?.type?.state || comp.status?.type?.state;
     const detail = comp.status?.type?.detail || ev.status?.type?.description || '';
     const cs = (comp.competitors||[]).slice().sort((a,b)=>(a.order||999)-(b.order||999));
-    spSetBadge('sp-golf-badge', state==='in' ? 'En direct' : state==='post' ? 'Terminé' : 'À venir', state==='in');
-    document.getElementById('sp-golf-sub').textContent = cfg.label + ' · ' + (ev.shortName || ev.name);
+    spSetBadge('sp-golf-badge', state==='in' ? G.live : state==='post' ? G.post : G.pre, state==='in');
+    spSetSub('sp-golf-sub', cfg.label + ' · ' + (ev.shortName || ev.name));
     let rows = '';
     if (cs.length) {
-      const top = cs.slice(0,8);
-      rows = top.map((c,i) => {
+      rows = cs.slice(0,8).map(c => {
         const sc = c.score ?? '';
         const same = cs.filter(x => x.score===c.score).length;
         const firstIdx = cs.findIndex(x => x.score===c.score);
@@ -2864,36 +2981,35 @@ async function spGolfBoard(tab){
         return `<div class="sp-lb-row"><div class="sp-lb-pos">${pos}</div>${flag}<div class="sp-lb-name">${spEsc(c.athlete?.displayName||c.team?.displayName||'—')}</div><div class="sp-lb-score ${cls}">${spEsc(sc||'—')}</div></div>`;
       }).join('');
     } else {
-      rows = `<div class="sp-empty">Classement indisponible pour le moment. ${evs[0]?.date ? 'Début : <b>'+spWhen(evs[0].date)+'</b>' : ''}</div>`;
+      rows = `<div class="sp-empty">${G.unavail} ${evs[0]?.date ? G.starts+' <b>'+spWhen(evs[0].date, T)+'</b>' : ''}</div>`;
     }
     body.innerHTML = `
-      <div class="sp-event"><div class="sp-event-name">${spEsc(ev.name)}</div><div class="sp-event-status">${spEsc(spGolfStatus(detail))}</div></div>
+      <div class="sp-event"><div class="sp-event-name">${spEsc(ev.name)}</div><div class="sp-event-status">${spEsc(spGolfStatus(detail, T))}</div></div>
       <div class="sp-lb">${rows}</div>
-      <div class="sp-sec" style="margin-top:16px">À la une du golf</div>
+      <div class="sp-sec" style="margin-top:16px">${G.secNews}</div>
       <div id="sp-golf-news"></div>`;
-    spNews('sp-golf-news', [
-      {url:'https://feeds.bbci.co.uk/sport/golf/rss.xml', name:'BBC Sport'},
-      {url:'https://www.cbssports.com/rss/headlines/golf/', name:'CBS Sports'},
-    ], 4);
+    golfNews();
   } catch(e) {
-    body.innerHTML = `<div class="sp-empty">Classement indisponible pour le moment.</div><div class="sp-sec" style="margin-top:16px">À la une du golf</div><div id="sp-golf-news"></div>`;
-    spNews('sp-golf-news', [{url:'https://feeds.bbci.co.uk/sport/golf/rss.xml', name:'BBC Sport'},{url:'https://www.cbssports.com/rss/headlines/golf/', name:'CBS Sports'}], 4);
+    if (stale()) return;
+    body.innerHTML = `<div class="sp-empty">${G.unavail}</div><div class="sp-sec" style="margin-top:16px">${G.secNews}</div><div id="sp-golf-news"></div>`;
+    golfNews();
   }
 }
 async function spGolfIsrael(){
   const body = document.getElementById('sp-golf-body');
-  spSetBadge('sp-golf-badge', 'Israël', false);
-  document.getElementById('sp-golf-sub').textContent = 'Golf israélien · Caesarea · Laetitia Beck';
-  body.innerHTML = `<div class="sp-sec">Golf en Israël</div><div id="sp-golf-il"><div class="loading">Recherche…</div></div>`;
+  const T = spT('golf'), G = T.golf;
+  const L0 = spLang('golf'), stale = () => spLang('golf')!==L0 || _spGolfTab!=='il';
+  spSetBadge('sp-golf-badge', G.il, false);
+  spSetSub('sp-golf-sub', G.subIl);
+  body.innerHTML = `<div class="sp-sec">${G.secIl}</div><div id="sp-golf-il"><div class="loading">${G.searching}</div></div>`;
   const q1 = encodeURIComponent('"Laetitia Beck" OR "Israel Golf" OR "Caesarea Golf" OR "Israeli golfer" OR "golf in Israel" when:120d');
   const q2 = encodeURIComponent('גולף (קיסריה OR טורניר OR אלוף OR התאחדות) when:120d');
   const ok = await spNews('sp-golf-il', [
     {url:`https://news.google.com/rss/search?q=${q1}&hl=en-US&gl=US&ceid=US:en`, name:'Actualité', n:10},
     {url:`https://news.google.com/rss/search?q=${q2}&hl=he&gl=IL&ceid=IL:he`, name:'Actualité', n:10},
-  ], 6, it => /golf|גולף/i.test(it.title) && /israel|caesarea|beck|ישראל|קיסריה|לטישיה|מכבי/i.test(it.title) && !/restaurant|dining|vietnam|מסעדה/i.test(it.title));
-  if (!ok) {
-    document.getElementById('sp-golf-il').innerHTML = `<div class="sp-empty"><b>Rien de neuf sur le golf israélien</b> ces 4 derniers mois. Le golf reste rare en Israël — un seul parcours de 18 trous, à Caesarea — et la couverture se concentre sur <b>Laetitia Beck</b>, première Israélienne sur le circuit LPGA. Cette rubrique se remplit dès qu'une actualité sort.</div>`;
-  }
+  ], 6, it => /golf|גולף/i.test(it.title) && /israel|caesarea|beck|ישראל|קיסריה|לטישיה|מכבי/i.test(it.title) && !/restaurant|dining|vietnam|מסעדה/i.test(it.title), 'golf');
+  if (stale()) return;
+  if (!ok) document.getElementById('sp-golf-il').innerHTML = `<div class="sp-empty">${G.ilEmpty}</div>`;
 }
 function spGolfInit(){
   document.querySelectorAll('#sp-golf-tabs .sp-tab').forEach(btn => {
@@ -2908,7 +3024,16 @@ function spGolfInit(){
 function spGolfRender(){ return _spGolfTab==='il' ? spGolfIsrael() : spGolfBoard(_spGolfTab); }
 
 // ─── NFL / NBA ───
-function spGameRow(ev){
+function spLiveDetail(txt, T){
+  const g = T.games;
+  let s = txt || '';
+  if (/halftime/i.test(s)) return g.half;
+  let m = s.match(/End of (\d)(?:st|nd|rd|th)/i); if (m) return g.endQ(m[1]);
+  m = s.match(/^(.*?)\s*-\s*(\d)(?:st|nd|rd|th)/i); if (m) return m[1].trim()+' · '+g.q(m[2]);
+  m = s.match(/^(.*?)\s*-\s*OT/i); if (m) return m[1].trim()+' · '+g.ot;
+  return s ? s.replace(/(\d)(st|nd|rd|th)/,'$1') : g.inprog;
+}
+function spGameRow(ev, T){
   const comp = ev.competitions?.[0]; if (!comp) return '';
   const st = comp.status?.type || ev.status?.type || {};
   const state = st.state; // pre | in | post
@@ -2921,24 +3046,26 @@ function spGameRow(ev){
     return `<div class="sp-team ${win?'win':''}"><img src="${spEsc(t.logo||'')}" alt="" loading="lazy"><span class="n">${spEsc(t.shortDisplayName||t.displayName||t.abbreviation)}</span><span class="rec">${spEsc(rec)}</span><span class="s">${spEsc(score)}</span></div>`;
   };
   let stat;
-  if (state==='in') stat = (st.shortDetail||'En cours').replace('Halftime','Mi-temps').replace('End of','Fin').replace(/(\d)(st|nd|rd|th)/,'$1');
-  else if (state==='post') stat = ((st.shortDetail||'Final').replace(/^Final\/OT.*/,'Terminé · prol.').replace(/^Final.*/,'Terminé'));
-  else stat = spWhen(ev.date);
+  if (state==='in') stat = spLiveDetail(st.shortDetail, T);
+  else if (state==='post') stat = /^Final\/OT/i.test(st.shortDetail||'') ? T.games.finalOT : T.games.final;
+  else stat = spWhen(ev.date, T);
   return `<div class="sp-game ${state}" data-state="${state}" data-t="${new Date(ev.date).getTime()}"><div class="sp-g-stat">${spEsc(stat)}</div><div class="sp-g-teams">${team(away)}${team(home)}</div></div>`;
 }
 function spOrderGames(evs){
   const rank = e => { const s=e.competitions?.[0]?.status?.type?.state||e.status?.type?.state; return s==='in'?0:s==='pre'?1:2; };
   return evs.slice().sort((a,b) => rank(a)-rank(b) || (rank(a)===2 ? new Date(b.date)-new Date(a.date) : new Date(a.date)-new Date(b.date)));
 }
-async function spGames(sport, league, gamesId, subId, badgeId){
+async function spGames(sport, league, gamesId, subId, badgeId, card){
   const el = document.getElementById(gamesId);
+  const T = spT(card), g = T.games, L0 = spLang(card);
   try {
     const base = `${SP_ESPN}${sport}/${league}/scoreboard`;
     const d = await spJSON(base);
+    if (spLang(card)!==L0) return;
     let evs = d.events || [];
     let label = '';
     if (league==='nfl') {
-      label = d.week?.number ? 'Semaine '+d.week.number : '';
+      label = d.week?.number ? g.week(d.week.number) : '';
     } else {
       // NBA : jour courant + lendemain pour voir l'à-venir
       try {
@@ -2951,96 +3078,121 @@ async function spGames(sport, league, gamesId, subId, badgeId){
         }
       } catch {}
     }
-    if (!evs.length) { el.innerHTML = `<div class="sp-empty">Aucun match au programme pour le moment.</div>`; spSetBadge(badgeId, 'Trêve', false); return; }
+    if (spLang(card)!==L0) return;
+    if (!evs.length) { el.innerHTML = `<div class="sp-empty">${g.none}</div>`; spSetBadge(badgeId, g.brk, false); return; }
     const live = evs.some(e => (e.competitions?.[0]?.status?.type?.state||e.status?.type?.state)==='in');
-    spSetBadge(badgeId, live ? 'En direct' : (label || 'Saison'), live);
-    if (label) document.getElementById(subId).textContent = (league==='nfl'?'National Football League':'NBA')+' · '+label;
-    el.innerHTML = `<div class="sp-games">${spOrderGames(evs).map(spGameRow).join('')}</div>`;
+    spSetBadge(badgeId, live ? g.live : (label || g.season), live);
+    if (label) spSetSub(subId, (league==='nfl'?'National Football League':'NBA')+' · '+label);
+    el.innerHTML = `<div class="sp-games">${spOrderGames(evs).map(e => spGameRow(e, T)).join('')}</div>`;
   } catch(e) {
-    el.innerHTML = `<div class="sp-empty">Scores indisponibles pour le moment.</div>`;
+    el.innerHTML = `<div class="sp-empty">${g.err}</div>`;
   }
 }
 
 // ─── SURF ───
-const _spDirs = ['N','NE','E','SE','S','SO','O','NO'];
-function spCompass(deg){ return _spDirs[Math.round(((deg%360)+360)%360/45)%8]; }
+function spCompass(deg, T){ return T.surf.compass[Math.round(((deg%360)+360)%360/45)%8]; }
 function spSurfRating(h){
-  if (h < 0.3) return {c:'c0', t:'Plat'};
-  if (h < 0.6) return {c:'c1', t:'Petit'};
-  if (h < 1.2) return {c:'c2', t:'Surfable'};
-  if (h < 2.0) return {c:'c3', t:'Bon'};
-  return {c:'c4', t:'Gros'};
+  if (h < 0.3) return 'c0';
+  if (h < 0.6) return 'c1';
+  if (h < 1.2) return 'c2';
+  if (h < 2.0) return 'c3';
+  return 'c4';
 }
 function spSpark(vals){
   if (!vals?.length) return '';
   const W=120, H=30, max=Math.max(...vals, 0.5), min=0;
   const pts = vals.map((v,i) => [ (i/(vals.length-1))*W, H-2-((v-min)/(max-min))*(H-6) ]);
   const line = pts.map(p => p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
-  return `<svg class="sp-spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><defs><linearGradient id="spg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#00d4e8" stop-opacity=".45"/><stop offset="1" stop-color="#00d4e8" stop-opacity="0"/></linearGradient></defs><polygon points="0,${H} ${line} ${W},${H}" fill="url(#spg)"/><polyline points="${line}" fill="none" stroke="#00d4e8" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>`;
+  return `<svg class="sp-spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><defs><linearGradient id="spg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#00d4e8" stop-opacity=".45"/><stop offset="1" stop-color="#00d4e8" stop-opacity="0"/></linearGradient></defs><polygon points="0,${H} ${line} ${W},${H}" fill="url(#spg)"/><polyline points="${line}" fill="none" stroke="#00d4e8" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
 }
 async function spSurf(){
   const el = document.getElementById('sp-surf-spots');
+  const T = spT('surf'), S = T.surf, L0 = spLang('surf');
+  const fm = v => v.toLocaleString(T.loc==='he-IL'?'en-US':T.loc,{minimumFractionDigits:1,maximumFractionDigits:1});
   try {
     const lat = SP_SURF_SPOTS.map(s=>s.lat).join(','), lon = SP_SURF_SPOTS.map(s=>s.lon).join(',');
     const [m, w] = await Promise.all([
       spJSON(`https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&current=wave_height,wave_period,wave_direction&hourly=wave_height&forecast_hours=24&timezone=${encodeURIComponent(TZ)}`),
       spJSON(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=wind_speed_10m,wind_direction_10m&wind_speed_unit=kn&timezone=${encodeURIComponent(TZ)}`),
     ]);
+    if (spLang('surf')!==L0) return;
     const M = Array.isArray(m) ? m : [m], W_ = Array.isArray(w) ? w : [w];
     let best = null;
     const cards = SP_SURF_SPOTS.map((s,i) => {
       const c = M[i]?.current || {}, wd = W_[i]?.current || {};
       const h = c.wave_height, per = c.wave_period;
       if (h==null) return '';
-      const rt = spSurfRating(h);
+      const rc = spSurfRating(h);
       const wdir = wd.wind_direction_10m, wsp = wd.wind_speed_10m;
       let windTxt = '';
       if (wsp != null) {
         const off = wdir>=45 && wdir<=135, on = wdir>=225 && wdir<=315;
-        windTxt = `<b>${Math.round(wsp)}</b> nds ${spCompass(wdir)} · ${wsp<4 ? 'quasi nul' : off ? 'offshore' : on ? 'onshore' : 'latéral'}`;
+        windTxt = `<b>${Math.round(wsp)}</b> ${S.kn} ${spCompass(wdir, T)} · ${wsp<4 ? S.calm : off ? S.off : on ? S.on : S.side}`;
       }
-      if (!best || h > best.h) best = {n:s.n, h};
-      return `<div class="sp-spot"><div class="sp-spot-top"><div class="sp-spot-name">${s.n}</div><div class="sp-chip ${rt.c}">${rt.t}</div></div>
-        <div class="sp-spot-h">${h.toFixed(1)}<small>m</small></div>
-        <div class="sp-spot-d">Période <b>${Math.round(per||0)} s</b> · houle ${spCompass(c.wave_direction||0)}<br>${windTxt}</div>
+      if (!best || h > best.h) best = {h};
+      return `<div class="sp-spot"><div class="sp-spot-top"><div class="sp-spot-name">${S.spots[s.k]}</div><div class="sp-chip ${rc}">${S.rate[rc]}</div></div>
+        <div class="sp-spot-h">${fm(h)}<small>${S.unitM}</small></div>
+        <div class="sp-spot-d">${S.meta(Math.round(per||0), spCompass(c.wave_direction||0, T))}<br>${windTxt}</div>
         ${spSpark(M[i]?.hourly?.wave_height)}</div>`;
     }).join('');
-    el.innerHTML = cards ? `<div class="sp-spots">${cards}</div>` : `<div class="sp-empty">Données de houle indisponibles.</div>`;
-    if (best) spSetBadge('sp-surf-badge', best.h < 0.3 ? 'Plat' : 'Max '+best.h.toFixed(1)+' m', false);
+    el.innerHTML = cards ? `<div class="sp-spots">${cards}</div>` : `<div class="sp-empty">${S.none}</div>`;
+    if (best) spSetBadge('sp-surf-badge', best.h < 0.3 ? S.flat : S.max(fm(best.h)), false);
   } catch(e) {
-    el.innerHTML = `<div class="sp-empty">Données de houle indisponibles pour le moment.</div>`;
+    el.innerHTML = `<div class="sp-empty">${S.err}</div>`;
   }
+}
+
+// ─── Rendu par encart & changement de langue ───
+function spNflNews(){ return spNews('sp-nfl-news', [
+  {url:'https://www.cbssports.com/rss/headlines/nfl/', name:'CBS Sports', n:12},
+  {url:gnews('NFL when:2d'), name:'Actualité', n:12},
+], 4, null, 'nfl'); }
+function spNbaNews(){ return spNews('sp-nba-news', [
+  {url:'https://www.cbssports.com/rss/headlines/nba/', name:'CBS Sports', n:12},
+  {url:gnews('NBA when:2d'), name:'Actualité', n:12},
+], 4, null, 'nba'); }
+function spSurfNews(){ return spNews('sp-surf-news', [
+  {url:'https://www.surfer.com/feed/', name:'Surfer', n:8},
+  {url:'https://news.google.com/rss/search?q='+encodeURIComponent('"World Surf League" OR WSL surfing when:14d')+'&hl=en-US&gl=US&ceid=US:en', name:'Actualité', n:8},
+], 4, null, 'surf'); }
+function spCardRender(card){
+  spStatic(card);
+  if (card==='golf') return spGolfRender();
+  if (card==='nfl')  return Promise.all([spGames('football','nfl','sp-nfl-games','sp-nfl-sub','sp-nfl-badge','nfl'), spNflNews()]);
+  if (card==='nba')  return Promise.all([spGames('basketball','nba','sp-nba-games','sp-nba-sub','sp-nba-badge','nba'), spNbaNews()]);
+  if (card==='surf') return Promise.all([spSurf(), spSurfNews()]);
+  if (card==='mk')   return fetchMarkets();
+}
+function spInitLang(){
+  if (window._spLangInit) return; window._spLangInit = true;
+  document.addEventListener('click', e => {
+    const b = e.target.closest('.sp-lang button'); if (!b) return;
+    const card = b.parentElement.dataset.card, l = b.dataset.l;
+    SPLANG[card] = l;
+    b.parentElement.querySelectorAll('button').forEach(x => x.classList.toggle('on', x===b));
+    spCardRender(card);
+  });
+  document.querySelectorAll('.sp-lang').forEach(box => box.querySelectorAll('button').forEach(x => x.classList.toggle('on', x.dataset.l===spLang(box.dataset.card))));
 }
 
 // ─── Orchestration ───
 async function spLive(){
   await Promise.all([
     spGolfRender(),
-    spGames('football','nfl','sp-nfl-games','sp-nfl-sub','sp-nfl-badge'),
-    spGames('basketball','nba','sp-nba-games','sp-nba-sub','sp-nba-badge'),
+    spGames('football','nfl','sp-nfl-games','sp-nfl-sub','sp-nfl-badge','nfl'),
+    spGames('basketball','nba','sp-nba-games','sp-nba-sub','sp-nba-badge','nba'),
   ]);
 }
 async function fetchSport(){
-  if (!window._spInit) { window._spInit = true; spGolfInit(); }
+  if (!window._spInit) { window._spInit = true; spGolfInit(); spInitLang(); }
+  spStaticAll();
   await Promise.all([
     spLive(),
     spSurf(),
-    spNews('sp-nfl-news', [
-      {url:'https://www.cbssports.com/rss/headlines/nfl/', name:'CBS Sports', n:12},
-      {url:gnews('NFL when:2d'), name:'Actualité', n:12},
-    ], 4),
-    spNews('sp-nba-news', [
-      {url:'https://www.cbssports.com/rss/headlines/nba/', name:'CBS Sports', n:12},
-      {url:gnews('NBA when:2d'), name:'Actualité', n:12},
-    ], 4),
-    spNews('sp-surf-news', [
-      {url:'https://www.surfer.com/feed/', name:'Surfer', n:8},
-      {url:'https://news.google.com/rss/search?q='+encodeURIComponent('"World Surf League" OR WSL surfing when:14d')+'&hl=en-US&gl=US&ceid=US:en', name:'Actualité', n:8},
-    ], 4),
+    spNflNews(), spNbaNews(), spSurfNews(),
   ]);
 }
 setInterval(spLive, 3 * 60 * 1000);
-
 
 // ═══ BOURSE — RÉSUMÉ DU JOUR (Nasdaq puis grandes places mondiales) ═══
 // Textes FR / עב / EN rédigés à la main (pas de traduction automatique) : chaque langue a ses propres tournures.
@@ -3131,7 +3283,7 @@ const MK_L = {
     },
   },
 };
-function mkLang(){ const g = (typeof _gtLang==='function') ? _gtLang() : 'fr'; return g==='iw' ? 'he' : (g==='en' ? 'en' : 'fr'); }
+function mkLang(){ return spLang('mk'); }
 function mkCls(p){ return p>0.0049?'mk-up':(p<-0.0049?'mk-dn':'mk-fl'); }
 function mkUSOpen(){
   try {
@@ -3152,6 +3304,7 @@ function mkStatic(L){
   const card = document.getElementById('mk-card'); if (!card) return;
   card.setAttribute('translate','no'); card.classList.add('notranslate');   // Google ne touche pas à nos textes rédigés
   card.setAttribute('dir', L.dir); card.classList.toggle('mk-rtl', L.dir==='rtl');
+  card.querySelectorAll('.sp-lang button').forEach(b => b.classList.toggle('on', b.dataset.l===spLang('mk')));
   const t = card.querySelector('.sp-title'); if (t) t.textContent = L.title;
   const f = card.querySelector('.sp-foot'); if (f) f.textContent = L.foot;
 }
@@ -3197,11 +3350,11 @@ async function fetchMarkets(){
       <div class="mk-pane" data-p="wd">${regHTML}</div>
       <div class="mk-pane" data-p="nw"><div id="mk-news"><div class="loading">…</div></div></div>`;
     mkTab(_mkTab);
-    // Titres d'actualité : originaux (anglais), sans boutons de traduction automatique
+    // Titres d'actualité : originaux (anglais) + drapeaux de traduction
     spNews('mk-news', [
       {url:gnews('Nasdaq stocks close when:1d'), name:'Actualité', n:10},
       {url:gnews('Wall Street stocks market when:1d'), name:'Actualité', n:10},
-    ], 3, null, true);
+    ], 3, null, 'mk');
   } catch(e) {
     el.innerHTML = `<div class="sp-empty">${L.err}</div>`;
   }

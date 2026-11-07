@@ -866,7 +866,7 @@ header.hx .lang-btn{font-size:15px;padding:4px 10px}
 <div class="hx-bar">
   <nav class="hx-switch" aria-label="Changer de site">
     <a class="hx-sw on" href="https://renassia.com/news/"><i></i>Presse <small>Dionysos</small></a>
-    <a class="hx-sw re" href="https://caesarea.tv" target="_blank" rel="noopener">Immobilier <small>Caesarea</small><span class="arr">↗</span></a>
+    <a class="hx-sw re" href="https://caesarea.tv">Immobilier <small>Caesarea</small><span class="arr">↗</span></a>
   </nav>
   <div class="hx-tag"><span class="status-dot"></span><span id="status-text">Systèmes en ligne</span> · 📍 <span id="loc-name">Césarée, Israël</span></div>
 </div>
@@ -889,14 +889,14 @@ header.hx .lang-btn{font-size:15px;padding:4px 10px}
       <div id="clock-time">--:--:--</div>
       <div id="clock-date">Chargement…</div>
     </div>
-    <a class="hx-cae" href="https://caesarea.tv" target="_blank" rel="noopener" aria-label="Caesarea Real Estate — voir les biens">
+    <a class="hx-cae" href="https://caesarea.tv" aria-label="Caesarea Real Estate — voir les biens">
       <div class="blk"><div class="co">CAESAREA REAL ESTATE</div><div class="he">תיווך קיסריה</div><div class="si">Since 1985</div></div>
       <div class="rd"><div class="nm">Hillel <strong>RENASSIA</strong></div><div class="cta">Voir nos biens d'exception <em>→</em></div></div>
     </a>
   </div>
   <div class="hx-strip">
     <span>Immobilier de luxe &mdash; <b>biens d'exception</b></span>
-    <a href="https://caesarea.tv/properties" target="_blank" rel="noopener">Découvrir les biens</a>
+    <a href="https://caesarea.tv/properties">Découvrir les biens</a>
   </div>
 </header>
 
@@ -1896,7 +1896,7 @@ async function fetchNewsWorld(retryCount=0) {
       const items=d.items.map((it,i)=>{
         let dateStr=''; try{dateStr=new Date(it.date).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});}catch{}
         const sa=it.title.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
-        const ti=it.link?`<a href="${it.link}" target="_blank" rel="noopener"><span class="item-title">${it.title}</span></a>`:`<span class="item-title">${it.title}</span>`;
+        const ti=it.link?`<a href="${it.link}"><span class="item-title">${it.title}</span></a>`:`<span class="item-title">${it.title}</span>`;
         return `<div class="news-item" data-orig="${sa}"><div class="news-num">${String(i+1).padStart(2,'0')}</div><div style="flex:1;min-width:0"><div class="news-text">${ti}</div><div class="news-src">🗞️ ${it.source}${dateStr?' · '+dateStr:''}</div></div>${TF}</div>`;
       }).join('');
       el.innerHTML=`<div class="news-grid">${items}</div>`; return;
@@ -1920,7 +1920,7 @@ async function fetchNewsWorld(retryCount=0) {
     const items=flat.map((it,i)=>{
       let dateStr=''; try{dateStr=new Date(it.date).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});}catch{}
       const sa=it.title.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
-      const ti=it.link?`<a href="${it.link}" target="_blank" rel="noopener"><span class="item-title">${it.title}</span></a>`:`<span class="item-title">${it.title}</span>`;
+      const ti=it.link?`<a href="${it.link}"><span class="item-title">${it.title}</span></a>`:`<span class="item-title">${it.title}</span>`;
       return `<div class="news-item" data-orig="${sa}"><div class="news-num">${String(i+1).padStart(2,'0')}</div><div style="flex:1;min-width:0"><div class="news-text">${ti}</div><div class="news-src">🗞️ ${it.source}${dateStr?' · '+dateStr:''}</div></div>${TFw}</div>`;
     }).join('');
     el.innerHTML=`<div class="news-grid">${items}</div>`;
@@ -1938,7 +1938,7 @@ async function fetchNewsIsrael(retryCount=0) {
       const papers=d.sources.map(src=>{
         const headlines=src.items.map(it=>{
           const sa=it.title.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
-          const inner=it.link?`<a href="${it.link}" target="_blank" rel="noopener"><span class="item-title">${it.title}</span></a>`:`<span class="item-title">${it.title}</span>`;
+          const inner=it.link?`<a href="${it.link}"><span class="item-title">${it.title}</span></a>`:`<span class="item-title">${it.title}</span>`;
           return `<div class="israel-headline" data-orig="${sa}">${inner}<span class="trans-flags"><button class="trans-flag-btn" onclick="translateItem(this,'fr')">🇫🇷</button><button class="trans-flag-btn" onclick="translateItem(this,'iw')">🇮🇱</button><button class="trans-flag-btn" onclick="translateItem(this,'en')">🇬🇧</button></span></div>`;
         }).join('');
         return `<div class="israel-paper" style="border-top-color:${src.color||'var(--gold)'}"><div class="israel-paper-name">${src.name}</div><div class="israel-paper-orient">${src.orientation}</div>${headlines}</div>`;
@@ -1965,7 +1965,7 @@ async function fetchNewsIsrael(retryCount=0) {
     const papers = results.filter(s=>s.items.length).map(src=>{
       const headlines=src.items.map(it=>{
         const sa=it.title.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
-        const inner=it.link?`<a href="${it.link}" target="_blank" rel="noopener"><span class="item-title">${it.title}</span></a>`:`<span class="item-title">${it.title}</span>`;
+        const inner=it.link?`<a href="${it.link}"><span class="item-title">${it.title}</span></a>`:`<span class="item-title">${it.title}</span>`;
         return `<div class="israel-headline" data-orig="${sa}">${inner}<span class="trans-flags"><button class="trans-flag-btn" onclick="translateItem(this,'fr')">🇫🇷</button><button class="trans-flag-btn" onclick="translateItem(this,'iw')">🇮🇱</button><button class="trans-flag-btn" onclick="translateItem(this,'en')">🇬🇧</button></span></div>`;
       }).join('');
       return `<div class="israel-paper" style="border-top-color:${src.color}"><div class="israel-paper-name">${src.name}</div><div class="israel-paper-orient">${src.orientation}</div>${headlines}</div>`;
@@ -1989,7 +1989,7 @@ async function fetchNewsIntl(retryCount=0) {
         const sourcesHtml=reg.sources.map(src=>{
           const items=src.items.slice(0,4).map(it=>{
             const sa=it.title.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
-            const inner=it.link?`<a href="${it.link}" target="_blank" rel="noopener"><span class="item-title">${it.title}</span></a>`:`<span class="item-title">${it.title}</span>`;
+            const inner=it.link?`<a href="${it.link}"><span class="item-title">${it.title}</span></a>`:`<span class="item-title">${it.title}</span>`;
             return `<div class="intl-headline" data-orig="${sa}">${inner}<span class="trans-flags"><button class="trans-flag-btn" onclick="translateItem(this,'fr')">🇫🇷</button><button class="trans-flag-btn" onclick="translateItem(this,'iw')">🇮🇱</button><button class="trans-flag-btn" onclick="translateItem(this,'en')">🇬🇧</button></span></div>`;
           }).join('');
           return `<div class="intl-source"><div class="intl-source-name">${src.name}</div>${items}</div>`;
@@ -2039,7 +2039,7 @@ async function fetchNewsIntl(retryCount=0) {
       const sourcesHtml = sourcesData.filter(s=>s.items.length).map(src=>{
         const items=src.items.map(it=>{
           const sa=it.title.replace(/&/g,'&amp;').replace(/"/g,'&quot;');
-          const inner=it.link?`<a href="${it.link}" target="_blank" rel="noopener"><span class="item-title">${it.title}</span></a>`:`<span class="item-title">${it.title}</span>`;
+          const inner=it.link?`<a href="${it.link}"><span class="item-title">${it.title}</span></a>`:`<span class="item-title">${it.title}</span>`;
           return `<div class="intl-headline" data-orig="${sa}">${inner}<span class="trans-flags"><button class="trans-flag-btn" onclick="translateItem(this,'fr')">🇫🇷</button><button class="trans-flag-btn" onclick="translateItem(this,'iw')">🇮🇱</button><button class="trans-flag-btn" onclick="translateItem(this,'en')">🇬🇧</button></span></div>`;
         }).join('');
         return `<div class="intl-source"><div class="intl-source-name">${src.name}</div>${items}</div>`;
@@ -2250,7 +2250,7 @@ async function fetchShowbiz() {
     if (!all.length) { el.innerHTML = ''; return; }
     el.innerHTML = all.slice(0, 14).map(it => {
       const inner = it.href
-        ? `<a href="${it.href}" target="_blank" rel="noopener"><span class="news-text">${it.txt}</span></a>`
+        ? `<a href="${it.href}"><span class="news-text">${it.txt}</span></a>`
         : `<span class="news-text">${it.txt}</span>`;
       return `<div class="news-item">${inner}<div class="news-src">🗞️ ${it.src}</div></div>`;
     }).join('');
@@ -2300,7 +2300,7 @@ function generateRevueDePresse() {
       const titleEl = `<span class="item-title digest-headline-txt">${it.txt}</span>`;
       const srcEl = it.src ? `<div class="digest-src">${it.src}</div>` : '';
       const content = it.href
-        ? `<a href="${it.href}" target="_blank" rel="noopener">${titleEl}</a>${srcEl}`
+        ? `<a href="${it.href}">${titleEl}</a>${srcEl}`
         : `${titleEl}${srcEl}`;
       return `<div class="digest-item" data-orig="${safe}"><div style="flex:1;min-width:0">${content}</div>${flags}</div>`;
     }).join('');
@@ -2771,7 +2771,7 @@ async function spNews(elId, feeds, max, keep){
       let title = it.title, src = it.source;
       const gm = title.match(/^(.*) - ([^-]{2,40})$/);
       if (gm && it.source==='Actualité') { title = gm[1]; src = gm[2]; }
-      const link = it.link ? `<a href="${spEsc(it.link)}" target="_blank" rel="noopener"><span class="item-title">${spEsc(title)}</span></a>` : `<span class="item-title">${spEsc(title)}</span>`;
+      const link = it.link ? `<a href="${spEsc(it.link)}"><span class="item-title">${spEsc(title)}</span></a>` : `<span class="item-title">${spEsc(title)}</span>`;
       return `<div class="sp-news-item" data-orig="${spEsc(title)}"><div style="flex:1;min-width:0">${link}<div class="sp-news-meta"><span>${spEsc(src)}</span><span>·</span><span>${spAgo(it.date)}</span>${TF}</div></div></div>`;
     }).join('') + `</div>`;
     return true;

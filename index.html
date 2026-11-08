@@ -846,6 +846,7 @@ body { top:0 !important; }
 .sp-rtl .sp-empty, .sp-rtl .sp-spot-d, .sp-rtl .sp-news-item a { line-height:1.75; }
 .sp-rtl .sp-news-item a { unicode-bidi:plaintext; }
 .sp-rtl .sp-lb-score, .sp-rtl .sp-team .s, .sp-rtl .sp-team .rec { direction:ltr; }
+.hx-vc { font-family:var(--font-data); font-size:11px; letter-spacing:1.5px; color:rgba(160,185,205,.45); min-width:1ch; margin-left:6px; user-select:none; }
 @keyframes mkfade { from{opacity:0;transform:translateY(3px)} to{opacity:1;transform:none} }
 @media (min-width:901px) {
   .sec-conditions .grid { grid-auto-rows:minmax(390px,auto); }
@@ -920,6 +921,7 @@ header.hx .lang-btn{font-size:15px;padding:4px 10px}
     <a class="hx-sw re" href="https://caesarea.tv">Immobilier <small>Caesarea</small><span class="arr">↗</span></a>
   </nav>
   <div class="hx-tag"><span class="status-dot"></span><span id="status-text">Systèmes en ligne</span> · 📍 <span id="loc-name">Césarée, Israël</span></div>
+  <span id="vc" class="hx-vc" aria-hidden="true"></span>
 </div>
 <header class="hx">
   <div class="hx-row">
@@ -3482,7 +3484,6 @@ function translateTo(lang) {
 <a id="acc-btn" href="/nagishut.html" title="Accessibilité · נגישות" aria-label="Déclaration d'accessibilité">♿</a>
 
 <!-- compteur discret -->
-<div id="vc-wrap" style="text-align:center;padding:6px 0 64px;font-family:'Roboto Mono',ui-monospace,monospace;font-size:10px;letter-spacing:2px;color:rgba(160,185,205,.28);user-select:none"><span id="vc" aria-hidden="true"></span></div>
 <script>(function(){try{fetch('https://renassia.com/news/counter.php?hit=1&s=news',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){var e=document.getElementById('vc');if(e&&d&&d.total!=null)e.textContent=Number(d.total).toLocaleString('fr-FR')}).catch(function(){})}catch(e){}})();</script>
 </body>
 </html>

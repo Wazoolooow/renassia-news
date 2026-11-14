@@ -3484,6 +3484,6 @@ function translateTo(lang) {
 <a id="acc-btn" href="/nagishut.html" title="Accessibilité · נגישות" aria-label="Déclaration d'accessibilité">♿</a>
 
 <!-- compteur discret -->
-<script>(function(){try{fetch('https://renassia.com/news/counter.php?hit=1&s=news',{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){var e=document.getElementById('vc');if(e&&d&&d.total!=null)e.textContent=Number(d.total).toLocaleString('fr-FR')}).catch(function(){})}catch(e){}})();</script>
+<script>(function(){try{fetch('https://renassia.com/news/counter.php?hit=1&s=news&r='+encodeURIComponent((new URLSearchParams(location.search).get('src')||(document.referrer?new URL(document.referrer).hostname.replace(/^(www|m|l|lm)\./,''):'')).slice(0,40)),{cache:'no-store'}).then(function(r){return r.json()}).then(function(d){var e=document.getElementById('vc');if(e&&d&&d.total!=null)e.textContent=Number(d.total).toLocaleString('fr-FR')}).catch(function(){})}catch(e){}})();</script>
 </body>
 </html>

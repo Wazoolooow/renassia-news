@@ -3,6 +3,7 @@
 // GET ?hit=1&s=news|cae  → compte la visite (hors robots) et renvoie {"total":N,"today":N}
 // GET ?s=news|cae        → renvoie seulement les chiffres
 // GET ?stats=CODE        → tableau de bord privé (JSON)
+// GET ?exclude=CODE      → exclut l'adresse IP de l'appelant du comptage (visites du propriétaire)
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
@@ -34,6 +35,17 @@ if (isset($_GET['stats'])) {
     exit;
 }
 
+// ── Exclusion des visites du propriétaire : ?exclude=CODE ajoute l'adresse IP de l'appelant à la liste ──
+$exFile = "$dir/exclude.json";
+$exList = file_exists($exFile) ? (json_decode(file_get_contents($exFile), true) ?: []) : [];
+$myIp = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
+if (isset($_GET['exclude'])) {
+    if ($_GET['exclude'] !== 'hdr2012') { http_response_code(403); echo '{"error":"code"}'; exit; }
+    if ($myIp !== '' && !in_array($myIp, $exList, true)) { $exList[] = $myIp; file_put_contents($exFile, json_encode($exList)); }
+    echo json_encode(['ok' => true, 'ip' => $myIp, 'excluded_ips' => count($exList)]);
+    exit;
+}
+
 $s = $_GET['s'] ?? 'news';
 if (!in_array($s, $SITES, true)) { http_response_code(400); echo '{"error":"site"}'; exit; }
 $file = "$dir/$s.json";
@@ -46,7 +58,7 @@ flock($lock, LOCK_EX);
 $d = load($file);
 $day = date('Y-m-d');
 
-if (isset($_GET['hit']) && !$isBot) {
+if (isset($_GET['hit']) && !$isBot && !in_array($myIp, $exList, true)) {
     if (($d['seen_day'] ?? '') !== $day) { $d['seen_day'] = $day; $d['seen'] = []; }
     $ip = $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
     $id = substr(sha1($ip . '|' . $ua . '|' . $day . '|cr85'), 0, 16);
@@ -60,6 +72,11 @@ if (isset($_GET['hit']) && !$isBot) {
         $c = (array)$d['days'][$day]['c'];
         $c[$cc] = ($c[$cc] ?? 0) + 1;
         $d['days'][$day]['c'] = $c;
+        $src = strtolower(preg_replace('/[^a-z0-9.\-]/i', '', substr($_GET['r'] ?? '', 0, 40)));
+        if ($src === '') $src = 'direct';
+        $rr = (array)($d['days'][$day]['r'] ?? []);
+        $rr[$src] = ($rr[$src] ?? 0) + 1;
+        $d['days'][$day]['r'] = $rr;
     }
     file_put_contents($file, json_encode($d));
 }

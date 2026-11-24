@@ -24,7 +24,7 @@ Va sur **github.com/Wazoolooow/renassia-news → Settings → Secrets and variab
 |---|---|---|
 | `CLAUDE_CODE_OAUTH_TOKEN` | le jeton obtenu avec `claude setup-token` (voir ci-dessous) | oui (ou `ANTHROPIC_API_KEY`) |
 | `BILLET_POST_CODE` | le code d'accès du site (celui de `billet.php`) | oui |
-| `FTP_CREDENTIALS` | `identifiant:mot_de_passe` du FTP de `ftp.caesarea.tv` | non (secours) |
+| `FTP_USERNAME` et `FTP_PASSWORD` | identifiant et mot de passe du FTP de `ftp.caesarea.tv` (déjà présents dans ce dépôt) | non (secours) |
 
 ### Obtenir le jeton Claude
 Dans le Terminal du Mac:

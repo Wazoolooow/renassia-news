@@ -1,0 +1,107 @@
+name: Billet du jour
+
+# Rédige et publie le billet de renassia.com/news chaque matin, sans dépendre du Mac.
+# Deux déclenchements UTC pour couvrir l'heure d'été et d'hiver en Israël; le second ne fait rien
+# si le billet du jour est déjà en ligne.
+on:
+  schedule:
+    - cron: '35 3 * * *'   # ~05h35 (hiver) / 06h35 (été), heure d'Israël
+    - cron: '35 4 * * *'   # filet de sécurité, une heure plus tard
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Réécrire le billet même s'il est déjà en ligne"
+        type: boolean
+        default: false
+
+concurrency:
+  group: billet-du-jour
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  billet:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      TZ: Asia/Jerusalem
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      BILLET_CODE: ${{ secrets.BILLET_POST_CODE }}
+      FTP_CREDENTIALS: ${{ secrets.FTP_CREDENTIALS }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Date du jour et état en ligne
+        id: state
+        run: |
+          TODAY=$(python3 scripts/billet_tools.py today)
+          LIVE=$(python3 scripts/billet_tools.py live || echo "inconnu")
+          echo "today=$TODAY" >> "$GITHUB_OUTPUT"
+          echo "Aujourd'hui: $TODAY — en ligne: $LIVE"
+          if [ "$LIVE" = "hal_billet_v3_$TODAY" ] && [ "${{ inputs.force }}" != "true" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Le billet du jour est déjà en ligne: rien à faire."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Vérifier la clé d'accès à Claude
+        if: steps.state.outputs.skip != 'true'
+        run: |
+          if [ -z "$CLAUDE_CODE_OAUTH_TOKEN" ] && [ -z "$ANTHROPIC_API_KEY" ]; then
+            echo "::error::Aucun secret CLAUDE_CODE_OAUTH_TOKEN ni ANTHROPIC_API_KEY: voir AUTOMATISATION.md"
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.state.outputs.skip != 'true'
+        with:
+          node-version: '22'
+
+      - name: Installer Claude Code
+        if: steps.state.outputs.skip != 'true'
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Rédiger le billet (3 tentatives)
+        if: steps.state.outputs.skip != 'true'
+        run: |
+          TODAY="${{ steps.state.outputs.today }}"
+          PROMPT="Écris le billet du jour (date du jour en Israël: $TODAY). Suis rigoureusement CLAUDE.md: recherche l'actu du matin même, vérifie les dates de publication des sources, relis les derniers billets pour éviter le réchauffé, écris les trois versions (html en français, html_he en hébreu, html_en en anglais, traduites par toi, même structure et même nombre de paragraphes). Écris le résultat dans billet.json (format du fichier existant, date hal_billet_v3_$TODAY, savedAt en ISO UTC). Tu es dans un workflow GitHub: ne fais AUCUN git commit, git push ni upload, et ne modifie aucun autre fichier que billet.json: le workflow s'en charge."
+          OK=false
+          for ATTEMPT in 1 2 3; do
+            echo "=== Tentative $ATTEMPT/3 ==="
+            timeout 25m claude -p "$PROMPT" \
+              --allowedTools "WebSearch,WebFetch,Read,Edit,Write,Bash(python3:*),Bash(git log:*),Bash(git show:*),Bash(git diff:*),Bash(cat:*),Bash(ls:*),Bash(date:*)" \
+              --max-turns 120 || echo "claude a terminé avec le code $?"
+            if python3 scripts/billet_tools.py validate; then OK=true; break; fi
+            echo "Billet invalide ou absent: nouvelle tentative"
+            git checkout -- billet.json 2>/dev/null || true
+            sleep 60
+          done
+          [ "$OK" = true ] || { echo "::error::Rédaction échouée après 3 tentatives"; exit 1; }
+
+      - name: Sauvegarder sur GitHub
+        if: steps.state.outputs.skip != 'true'
+        run: |
+          git config user.name "billet-bot"
+          git config user.email "billet-bot@users.noreply.github.com"
+          git add billet.json
+          git commit -m "billet: ${{ steps.state.outputs.today }} — automatique (GitHub Actions)" || echo "rien à committer"
+          git pull --rebase origin main
+          git push origin HEAD:main
+
+      - name: Publier sur renassia.com/news
+        if: steps.state.outputs.skip != 'true'
+        run: |
+          if python3 scripts/billet_tools.py post; then
+            echo "Publié via billet.php"
+          else
+            echo "::warning::Publication HTTPS échouée, essai du secours FTP"
+            python3 scripts/billet_tools.py ftp
+          fi

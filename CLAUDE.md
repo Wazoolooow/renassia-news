@@ -274,3 +274,8 @@ git push
 ```
 
 L'upload FTP vers `ftp.caesarea.tv/news` est fait automatiquement par le script `billet_du_jour.sh` après la rédaction — pas besoin de le faire ni de le demander.
+
+### Exécution dans GitHub Actions
+
+Si la variable d'environnement `CI` vaut `true` (workflow `.github/workflows/billet.yml`), ne fais **ni `git commit`, ni `git push`, ni upload FTP, et ne touche à aucun fichier autre que `billet.json`**: le workflow valide le billet, le sauvegarde et le publie lui-même. Le reste de ce document (voix, recherche, traductions, auto-contrôle) s'applique à l'identique.
+

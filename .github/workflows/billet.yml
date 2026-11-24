@@ -73,14 +73,21 @@ jobs:
         run: |
           TODAY="${{ steps.state.outputs.today }}"
           PROMPT="Écris le billet du jour (date du jour en Israël: $TODAY). Suis rigoureusement CLAUDE.md: recherche l'actu du matin même, vérifie les dates de publication des sources, relis les derniers billets pour éviter le réchauffé, écris les trois versions (html en français, html_he en hébreu, html_en en anglais, traduites par toi, même structure et même nombre de paragraphes). Écris le résultat dans billet.json (format du fichier existant, date hal_billet_v3_$TODAY, savedAt en ISO UTC). Tu es dans un workflow GitHub: ne fais AUCUN git commit, git push ni upload, et ne modifie aucun autre fichier que billet.json: le workflow s'en charge."
+          # Le jeton collé dans GitHub peut contenir des espaces ou des retours à la ligne: on les retire.
+          export CLAUDE_CODE_OAUTH_TOKEN="$(printf '%s' "$CLAUDE_CODE_OAUTH_TOKEN" | tr -d '[:space:]')"
+          BEFORE=$(sha256sum billet.json | cut -d' ' -f1)
           OK=false
           for ATTEMPT in 1 2 3; do
             echo "=== Tentative $ATTEMPT/3 ==="
+            CODE=0
             timeout 25m claude -p "$PROMPT" \
               --allowedTools "WebSearch,WebFetch,Read,Edit,Write,Bash(python3:*),Bash(git log:*),Bash(git show:*),Bash(git diff:*),Bash(cat:*),Bash(ls:*),Bash(date:*)" \
-              --max-turns 120 || echo "claude a terminé avec le code $?"
-            if python3 scripts/billet_tools.py validate; then OK=true; break; fi
-            echo "Billet invalide ou absent: nouvelle tentative"
+              --max-turns 120 || CODE=$?
+            AFTER=$(sha256sum billet.json | cut -d' ' -f1)
+            echo "code claude: $CODE; billet modifié: $([ "$AFTER" != "$BEFORE" ] && echo oui || echo non)"
+            # Succès seulement si Claude a réussi, a réellement réécrit billet.json, et que le billet est valide.
+            if [ "$CODE" -eq 0 ] && [ "$AFTER" != "$BEFORE" ] && python3 scripts/billet_tools.py validate; then OK=true; break; fi
+            echo "Rédaction non aboutie: nouvelle tentative"
             git checkout -- billet.json 2>/dev/null || true
             sleep 60
           done

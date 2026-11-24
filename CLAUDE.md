@@ -121,31 +121,15 @@ Un sujet déjà traité ne revient **que s'il y a du nouveau** — et alors on �
 
 ---
 
-## Paragraphe d'ouverture obligatoire — sondages des élections israéliennes (à partir du 31/08/2026)
+## Sondages des élections israéliennes — règle ANNULÉE (instruction d'Hillel, 24/11/2026)
 
-Instruction permanente d'Hillel. **Chaque billet, sans exception, ouvre sur un paragraphe consacré aux sondages des élections israéliennes du 27 octobre 2026** — avant même le Moyen-Orient du jour. Ça n'enlève rien aux autres sujets obligatoires : c'est un paragraphe de plus, pas un remplacement.
-
-Objectif explicite d'Hillel : que le lecteur puisse « se faire une idée pour qui voter » en lisant ce seul paragraphe. Ça veut dire des chiffres exacts, pas des impressions.
-
-**Exigences non négociables :**
-
-- **Croiser plusieurs instituts, jamais un ou deux journaux.** Chercher au minimum : `skarim.org` (l'agrégateur « sondage des sondages », la vraie moyenne pondérée — s'en servir comme chiffre de référence), Kan 11 / Kan Hadashot, Channel 12 (Midgam), Channel 13, Maariv (Lazar), Haaretz, Times of Israel, Jerusalem Post, i24News. Chercher en hébreu ET en anglais — les résultats diffèrent souvent.
-- **Donner la moyenne officielle en tête**, puis **montrer où les instituts divergent** — c'est ça, la vraie rigueur journalistique, pas un chiffre unique présenté comme certain. Si un institut donne le Likoud devant et un autre Yashar devant le même jour, le dire clairement : ça fait partie de l'histoire.
-- **Toujours dater chaque sondage cité** (jour de publication), pas juste l'institut.
-- **Bloc contre bloc**, pas seulement parti contre parti : qui atteint les 61 sièges, qui en est loin, le rôle des partis arabes dans l'équation.
-- **Ne rien inventer.** Si une donnée n'est pas trouvée avec au moins deux sources qui se recoupent, ne pas l'affirmer — formuler avec distance ou l'omettre.
-
-> Hillel, en toutes lettres : *« je veux une vraie étude de fond tous les jours pour ce billet, une qualité journalistique digne des plus grands journaux des années de gloire de la presse écrite, et non pas la merde qu'on nous sert maintenant »* — et, après une recherche jugée trop vite faite : *« tu ne me fais pas n'importe quoi »*. Ce paragraphe ne se bâcle jamais, même un jour où l'actu presse.
-
-Exemple de paragraphe conforme (billet du 31/08/2026) : chiffres de skarim.org en ouverture, puis divergence Kan Hadashot / Haaretz / Maariv-Lazar citée avec leurs dates respectives, puis le blocage à 61 sièges des deux blocs, puis le duel de popularité personnelle Netanyahou/Eizenkot/Bennett avec pourcentages sourcés.
-
----
+Les élections israéliennes ont eu lieu le 27 octobre 2026. **Il n'y a plus de paragraphe d'ouverture sur les sondages, ni de recherche d'instituts de sondage**: cette obligation, en vigueur du 31/08 au 27/10/2026, est supprimée. Le billet s'ouvre sur l'actualité du matin la plus importante (en ce moment: les négociations de formation du gouvernement, si elles ont du nouveau), sans paragraphe imposé.
 
 ## Billet du 7 octobre 2026 — trois ans du massacre (instruction spéciale d'Hillel)
 
 Le billet du **mercredi 7 octobre 2026** tombe sur le troisième anniversaire du massacre du 7 octobre 2023. Instruction d'Hillel, en toutes lettres : *« demain pour le billet c'est le 7 octobre donc 3 ans du massacre... n'oublie pas »*. Ce billet-là ne se rédige pas comme un billet ordinaire.
 
-- **Un paragraphe consacré au 7 octobre, placé juste après le paragraphe sondages** (qui reste obligatoire en ouverture). Les faits, nus : le bilan du 7 octobre 2023 (environ 1 200 morts, 251 otages), ce qui reste ouvert trois ans après (otages, Hamas jamais désarmé, Hezbollah idem). Vérifier chaque chiffre sur au moins deux sources et dater les cérémonies, commémorations et déclarations du jour.
+- **Un paragraphe consacré au 7 octobre, placé en ouverture du billet.** Les faits, nus : le bilan du 7 octobre 2023 (environ 1 200 morts, 251 otages), ce qui reste ouvert trois ans après (otages, Hamas jamais désarmé, Hezbollah idem). Vérifier chaque chiffre sur au moins deux sources et dater les cérémonies, commémorations et déclarations du jour.
 - **Pas de trait d'esprit dans ce paragraphe**, et jamais d'annonce de la gravité — on écrit les faits, le contraste avec les autres paragraphes fait le reste (règle « la retenue se pratique »).
 - **Ligne éditoriale** : le 7 octobre a commencé cette guerre. Les victimes sont les victimes du 7 octobre et leurs familles — pas de glissement vers un paragraphe sur les pertes civiles de Gaza.
 - Le reste du billet suit les règles habituelles (pas de réchauffé, sources datées, rythme cassé). La phrase de fermeture peut nouer le fil du jour avec cet anniversaire.
@@ -154,7 +138,7 @@ Le billet du **mercredi 7 octobre 2026** tombe sur le troisième anniversaire du
 
 ## Billet du samedi 24 octobre 2026 — l'attentat de Judée et la phrase de Macron (instruction spéciale d'Hillel)
 
-Instruction d'Hillel le 23/10 : *« tu me le mettras en détail demain matin avec le fait que Macron a déclaré que le Hamas ne sévit pas en Judée-Samarie »*. Le billet du 24 octobre contient, **juste après le paragraphe sondages** (qui reste en ouverture), un paragraphe détaillé sur l'attentat, qui rapproche l'attaque de la phrase de Macron.
+Instruction d'Hillel le 23/10 : *« tu me le mettras en détail demain matin avec le fait que Macron a déclaré que le Hamas ne sévit pas en Judée-Samarie »*. Le billet du 24 octobre contient, **en ouverture**, un paragraphe détaillé sur l'attentat, qui rapproche l'attaque de la phrase de Macron.
 
 **Les faits de l'attentat (vendredi 23 octobre, vers le matin — PAS de nuit, PAS en Samarie) :**
 - Lieu : près du carrefour de Judée (Judea junction), **au sud d'Hébron, en Judée**.
@@ -192,8 +176,7 @@ Règles de traduction :
 
 ## Structure du billet
 
-**5 à 7 paragraphes** (le paragraphe sondages électoraux s'ajoute désormais aux 4-6 habituels) :
-- **Sondages élections israéliennes** (voir section dédiée ci-dessus) — toujours en premier
+**4 à 6 paragraphes** :
 - Moyen-Orient (Iran, Israël, Liban, Gaza — selon l'actu)
 - Ukraine / Russie
 - France
@@ -222,7 +205,7 @@ Relire le billet une fois et vérifier :
 6. La phrase de fermeture noue-t-elle réellement les fils du jour, ou est-elle interchangeable avec celle d'hier ?
 7. Les guillemets sont-ils bien en `«&nbsp;` / `&nbsp;»` (jamais `&laquo;` / `&raquo;`) ?
 8. Est-ce que je me suis fait plaisir en l'écrivant ? Si non, le lecteur s'ennuiera aussi.
-9. Le paragraphe sondages est-il en premier, croise-t-il au moins trois sources datées, et montre-t-il les divergences entre instituts plutôt qu'un chiffre unique présenté comme certain ? → sinon, refaire la recherche avant de publier, ne jamais bâcler ce paragraphe
+9. Les faits du jour sont-ils vérifiés sur au moins deux sources datées, et les chiffres identiques dans les trois langues ? → sinon, corriger avant de publier
 
 ---
 

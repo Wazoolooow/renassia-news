@@ -102,6 +102,7 @@ Le billet part à 6h : il doit couvrir **les infos de la nuit et du matin même*
 3. `"Ukraine Russia news [date]"` — le front
 4. `"France politique actualité [date]"` — l'intérieur
 5. Une recherche de plus sur ce qui émerge des quatre premières — l'événement inattendu du jour (catastrophe, résultat sportif, décès marquant, cocasserie américaine...) fait souvent le meilleur paragraphe
+6. **Les grandes nouvelles de la veille en fin de journée**: le billet part tôt, donc tout ce qui est tombé l'après-midi ou le soir précédent (décision de justice, procès Netanyahou, attaque, démission) doit être cherché explicitement, avec le mot-clé de l'événement et « hier ». Un événement majeur de la veille ne se rate pas: il ouvre le billet.
 
 Croiser au moins deux sources sur chaque fait chiffré. Ne rien inventer. Une info incertaine se formule avec distance — mais avec la voix Dionysos, pas avec la prudence journalistique plate.
 

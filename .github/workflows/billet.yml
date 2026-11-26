@@ -5,8 +5,10 @@ name: Billet du jour
 # si le billet du jour est déjà en ligne.
 on:
   schedule:
-    - cron: '35 3 * * *'   # ~05h35 (hiver) / 06h35 (été), heure d'Israël
-    - cron: '35 4 * * *'   # filet de sécurité, une heure plus tard
+    # Toutes les 20 minutes de 3h à 6h UTC (~5h à 9h30 heure d'Israël selon la saison).
+    # GitHub retarde ou saute parfois les exécutions planifiées: la répétition garantit qu'une passe a lieu.
+    # Chaque passe s'arrête tout de suite si le billet du jour est déjà en ligne.
+    - cron: '7,27,47 3-6 * * *'
   workflow_dispatch:
     inputs:
       force:
@@ -44,9 +46,13 @@ jobs:
           LIVE=$(python3 scripts/billet_tools.py live || echo "inconnu")
           echo "today=$TODAY" >> "$GITHUB_OUTPUT"
           echo "Aujourd'hui: $TODAY — en ligne: $LIVE"
+          HOUR=$(date +%-H)
           if [ "$LIVE" = "hal_billet_v3_$TODAY" ] && [ "${{ inputs.force }}" != "true" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
             echo "Le billet du jour est déjà en ligne: rien à faire."
+          elif [ "${{ github.event_name }}" = "schedule" ] && [ "$HOUR" -lt 5 ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Trop tôt ($HOUR h en Israël): on attend 5h pour avoir l'actualité du matin."
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi

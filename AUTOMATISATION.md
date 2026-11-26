@@ -6,7 +6,7 @@ Fichiers: `.github/workflows/billet.yml` (le workflow) et `scripts/billet_tools.
 
 ## Ce que fait le workflow, dans l'ordre
 
-1. Il se lance chaque jour à ~5h35 et ~6h35 (heure d'Israël; le 2<sup>e</sup> déclenchement est un filet de sécurité).
+1. Il se lance toutes les 20 minutes entre ~5h et ~9h30 (heure d'Israël), parce que GitHub retarde ou saute parfois les exécutions planifiées. Avant 5h il attend; dès que le billet du jour est en ligne, chaque passage s'arrête aussitôt.
 2. Il regarde le billet en ligne: s'il est déjà celui du jour, il s'arrête.
 3. Il installe Claude Code et lui demande d'écrire le billet (3 tentatives, 25 min maximum chacune), en suivant `CLAUDE.md`.
 4. Il **refuse un billet invalide**: mauvaise date, version hébraïque ou anglaise manquante, nombre de paragraphes différent entre les 3 langues, structure cassée.
